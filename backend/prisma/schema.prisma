@@ -1,0 +1,419 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String        @id @default(uuid()) @db.Char(36)
+  email               String        @unique @db.VarChar(191)
+  passwordHash        String        @map("password_hash") @db.VarChar(255)
+  resetToken          String?       @map("reset_token") @db.VarChar(191)
+  resetTokenExpiresAt DateTime?     @map("reset_token_expires_at")
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt @map("updated_at")
+  profile             Profile?
+  roles               UserRole[]
+  certificates        Certificate[]
+  professionalCertificates ProfessionalCertificate[]
+  successStories      SuccessStory[]
+  contentItems        ContentItem[] @relation("ContentAuthor")
+  contentReviews      ContentReview[] @relation("ContentReviewer")
+  auditLogs           ContentAuditLog[]
+  aiChatSessions      AiChatSession[]
+  aiSettingsUpdates   AiSettings[]   @relation("AiSettingsUpdatedBy")
+  aiMessages          AiChatMessage[]
+  aiDocumentIndexes   AiDocumentIndex[]
+
+  @@map("users")
+}
+
+model Profile {
+  id                    String   @id @default(uuid()) @db.Char(36)
+  userId                String   @unique @map("user_id") @db.Char(36)
+  fullName              String?  @map("full_name") @db.VarChar(191)
+  avatarUrl             String?  @map("avatar_url") @db.VarChar(512)
+  languagePreference    String?  @map("language_preference") @db.VarChar(12)
+  certificatesViewMode  String?  @map("certificates_view_mode") @db.VarChar(12)
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model UserRole {
+  id        String   @id @default(uuid()) @db.Char(36)
+  userId    String   @map("user_id") @db.Char(36)
+  role      String   @db.VarChar(32)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, role])
+  @@map("user_roles")
+}
+
+model Certificate {
+  id                   String    @id @default(uuid()) @db.Char(36)
+  userId               String    @map("user_id") @db.Char(36)
+  title                String    @db.VarChar(191)
+  description          String?   @db.Text
+  descriptionEn        String?   @map("description_en") @db.Text
+  descriptionEs        String?   @map("description_es") @db.Text
+  descriptionPt        String?   @map("description_pt") @db.Text
+  fileName             String    @map("file_name") @db.VarChar(255)
+  filePath             String    @map("file_path") @db.VarChar(512)
+  fileSize             Int       @map("file_size")
+  mimeType             String    @map("mime_type") @db.VarChar(191)
+  ocrFileName          String?   @map("ocr_file_name") @db.VarChar(255)
+  ocrFilePath          String?   @map("ocr_file_path") @db.VarChar(512)
+  ocrFileSize          Int?      @map("ocr_file_size")
+  ocrMimeType          String?   @map("ocr_mime_type") @db.VarChar(191)
+  issuedDate           String?   @map("issued_date") @db.VarChar(64)
+  contractStartDate    String?   @map("contract_start_date") @db.VarChar(64)
+  contractEndDate      String?   @map("contract_end_date") @db.VarChar(64)
+  issuingOrganization  String?   @map("issuing_organization") @db.VarChar(191)
+  certificateNumber    String?   @map("certificate_number") @db.VarChar(191)
+  country              String?   @db.VarChar(128)
+  tags                 Json?
+  isVerified           Boolean   @default(false) @map("is_verified")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("certificates")
+}
+
+model ProfessionalCertificate {
+  id                             String   @id @default(uuid()) @db.Char(36)
+  userId                         String   @map("user_id") @db.Char(36)
+  title                          String   @db.VarChar(191)
+  description                    String?  @db.Text
+  descriptionPt                  String?  @map("description_pt") @db.Text
+  descriptionEn                  String?  @map("description_en") @db.Text
+  descriptionEs                  String?  @map("description_es") @db.Text
+  fileName                       String   @map("file_name") @db.VarChar(255)
+  filePath                       String   @map("file_path") @db.VarChar(512)
+  fileSize                       Int      @map("file_size")
+  mimeType                       String   @map("mime_type") @db.VarChar(191)
+  professionalRegistrationNumber String?  @map("professional_registration_number") @db.VarChar(191)
+  professionalCouncil            String?  @map("professional_council") @db.VarChar(191)
+  institution                    String?  @db.VarChar(191)
+  certificationType              String?  @map("certification_type") @db.VarChar(191)
+  specializationArea             String?  @map("specialization_area") @db.VarChar(191)
+  courseHours                    Int?     @map("course_hours")
+  status                         String?  @db.VarChar(64)
+  issuedDate                     String?  @map("issued_date") @db.VarChar(64)
+  validFrom                      String?  @map("valid_from") @db.VarChar(64)
+  validUntil                     String?  @map("valid_until") @db.VarChar(64)
+  country                        String?  @db.VarChar(128)
+  stateProvince                  String?  @map("state_province") @db.VarChar(128)
+  city                           String?  @db.VarChar(128)
+  isVerified                     Boolean  @default(false) @map("is_verified")
+  verificationNotes              String?  @map("verification_notes") @db.Text
+  tags                           Json?
+  createdAt                      DateTime @default(now()) @map("created_at")
+  updatedAt                      DateTime @updatedAt @map("updated_at")
+  user                           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("professional_certificates")
+}
+
+model CertificateApproval {
+  id              String   @id @default(uuid()) @db.Char(36)
+  userId          String?  @map("user_id") @db.Char(36)
+  adminId         String   @map("admin_id") @db.Char(36)
+  certificateId   String   @map("certificate_id") @db.Char(36)
+  certificateType String   @map("certificate_type") @db.VarChar(64)
+  originalTitle   String?  @map("original_title") @db.VarChar(191)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("certificate_approvals")
+}
+
+model CertificateRejection {
+  id              String   @id @default(uuid()) @db.Char(36)
+  userId          String?  @map("user_id") @db.Char(36)
+  adminId         String   @map("admin_id") @db.Char(36)
+  certificateId   String   @map("certificate_id") @db.Char(36)
+  certificateType String   @map("certificate_type") @db.VarChar(64)
+  originalTitle   String?  @map("original_title") @db.VarChar(191)
+  rejectionReason String   @map("rejection_reason") @db.Text
+  snapshot        Json?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("certificate_rejections")
+}
+
+model SuccessStory {
+  id             String   @id @default(uuid()) @db.Char(36)
+  userId         String   @map("user_id") @db.Char(36)
+  titlePt        String?  @map("title_pt") @db.VarChar(191)
+  titleEn        String?  @map("title_en") @db.VarChar(191)
+  titleEs        String?  @map("title_es") @db.VarChar(191)
+  clientPt       String?  @map("client_pt") @db.VarChar(191)
+  clientEn       String?  @map("client_en") @db.VarChar(191)
+  clientEs       String?  @map("client_es") @db.VarChar(191)
+  countryPt      String?  @map("country_pt") @db.VarChar(128)
+  countryEn      String?  @map("country_en") @db.VarChar(128)
+  countryEs      String?  @map("country_es") @db.VarChar(128)
+  productPt      String?  @map("product_pt") @db.VarChar(191)
+  productEn      String?  @map("product_en") @db.VarChar(191)
+  productEs      String?  @map("product_es") @db.VarChar(191)
+  challengePt    String?  @map("challenge_pt") @db.Text
+  challengeEn    String?  @map("challenge_en") @db.Text
+  challengeEs    String?  @map("challenge_es") @db.Text
+  solutionPt     String?  @map("solution_pt") @db.Text
+  solutionEn     String?  @map("solution_en") @db.Text
+  solutionEs     String?  @map("solution_es") @db.Text
+  benefitsPt     String?  @map("benefits_pt") @db.Text
+  benefitsEn     String?  @map("benefits_en") @db.Text
+  benefitsEs     String?  @map("benefits_es") @db.Text
+  contractPeriod String?  @map("contract_period") @db.VarChar(191)
+  contractValue  String?  @map("contract_value") @db.VarChar(191)
+  closureYear    String?  @map("closure_year") @db.VarChar(32)
+  clientLogo     String?  @map("client_logo") @db.VarChar(512)
+  image01        String?  @map("image_01") @db.VarChar(512)
+  image02        String?  @map("image_02") @db.VarChar(512)
+  image03        String?  @map("image_03") @db.VarChar(512)
+  image04        String?  @map("image_04") @db.VarChar(512)
+  tags           Json?
+  status         String   @default("rascunho") @db.VarChar(32)
+  isVerified     Boolean  @default(false) @map("is_verified")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("success_stories")
+}
+
+model SuccessStoryApproval {
+  id         String   @id @default(uuid()) @db.Char(36)
+  userId     String?  @map("user_id") @db.Char(36)
+  adminId    String   @map("admin_id") @db.Char(36)
+  storyId    String   @map("story_id") @db.Char(36)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("success_story_approvals")
+}
+
+model SuccessStoryRejection {
+  id              String   @id @default(uuid()) @db.Char(36)
+  userId          String?  @map("user_id") @db.Char(36)
+  adminId         String   @map("admin_id") @db.Char(36)
+  storyId         String   @map("story_id") @db.Char(36)
+  rejectionReason String   @map("rejection_reason") @db.Text
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("success_story_rejections")
+}
+
+model ContentType {
+  id              String   @id @default(uuid()) @db.Char(36)
+  slug            String   @unique @db.VarChar(191)
+  namePt          String   @map("name_pt") @db.VarChar(191)
+  nameEs          String   @map("name_es") @db.VarChar(191)
+  nameEn          String   @map("name_en") @db.VarChar(191)
+  descriptionPt   String?  @map("description_pt") @db.Text
+  descriptionEs   String?  @map("description_es") @db.Text
+  descriptionEn   String?  @map("description_en") @db.Text
+  schemaCampos    Json?    @map("schema_campos")
+  regrasAprovacao Json?    @map("regras_aprovacao")
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  items           ContentItem[]
+
+  @@map("content_types")
+}
+
+model ContentItem {
+  id          String          @id @default(uuid()) @db.Char(36)
+  typeId      String          @map("type_id") @db.Char(36)
+  autorId     String          @map("autor_id") @db.Char(36)
+  status      String          @default("rascunho") @db.VarChar(32)
+  dados       Json?
+  version     Int             @default(1)
+  publishAt   DateTime?       @map("publish_at")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+  contentType ContentType     @relation(fields: [typeId], references: [id], onDelete: Cascade)
+  author      User            @relation("ContentAuthor", fields: [autorId], references: [id], onDelete: Cascade)
+  reviews     ContentReview[]
+  attachments ContentAttachment[]
+  notifications ContentNotification[]
+
+  @@map("content_items")
+}
+
+model ContentReview {
+  id         String      @id @default(uuid()) @db.Char(36)
+  itemId     String      @map("item_id") @db.Char(36)
+  reviewerId String      @map("reviewer_id") @db.Char(36)
+  decisao    String      @db.VarChar(32)
+  comentario String      @db.Text
+  createdAt  DateTime    @default(now()) @map("created_at")
+  item       ContentItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  reviewer   User        @relation("ContentReviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  @@map("content_reviews")
+}
+
+model ContentNotification {
+  id        String    @id @default(uuid()) @db.Char(36)
+  itemId     String   @map("item_id") @db.Char(36)
+  userId     String   @map("user_id") @db.Char(36)
+  tipo       String   @db.VarChar(64)
+  lida       Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+  item       ContentItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@map("content_notifications")
+}
+
+model ContentAttachment {
+  id        String      @id @default(uuid()) @db.Char(36)
+  itemId     String     @map("item_id") @db.Char(36)
+  fileName   String     @map("file_name") @db.VarChar(255)
+  filePath   String     @map("file_path") @db.VarChar(512)
+  fileSize   Int        @map("file_size")
+  mimeType   String     @map("mime_type") @db.VarChar(191)
+  hash       String?    @db.VarChar(191)
+  createdAt  DateTime   @default(now()) @map("created_at")
+  item       ContentItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@map("content_attachments")
+}
+
+model ContentAuditLog {
+  id        String    @id @default(uuid()) @db.Char(36)
+  acao      String    @db.VarChar(128)
+  actorId   String    @map("actor_id") @db.Char(36)
+  itemId    String?   @map("item_id") @db.Char(36)
+  payload   Json?
+  ipAddress String?   @map("ip_address") @db.VarChar(128)
+  userAgent String?   @map("user_agent") @db.VarChar(255)
+  createdAt DateTime  @default(now()) @map("created_at")
+  actor     User      @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@map("content_audit_logs")
+}
+
+model AvatarTemplate {
+  id        String   @id @default(uuid()) @db.Char(36)
+  name      String   @db.VarChar(191)
+  filePath  String   @map("file_path") @db.VarChar(512)
+  category  String?  @db.VarChar(128)
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("avatar_templates")
+}
+
+model Tag {
+  id         String   @id @default(uuid()) @db.Char(36)
+  name       String   @unique @db.VarChar(191)
+  slug       String?  @unique @db.VarChar(191)
+  usageCount Int      @default(0) @map("usage_count")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("tags")
+}
+
+model AiSettings {
+  id                   String   @id @default(uuid()) @db.Char(36)
+  activeProvider       String   @default("openai") @map("active_provider") @db.VarChar(64)
+  activeChatModel      String   @default("gpt-5") @map("active_chat_model") @db.VarChar(128)
+  activeEmbeddingModel String   @default("text-embedding-3-large") @map("active_embedding_model") @db.VarChar(128)
+  ragMode              String   @default("internal") @map("rag_mode") @db.VarChar(32)
+  topK                 Int      @default(5) @map("top_k")
+  maxChunks            Int      @default(8) @map("max_chunks")
+  temperature          Float    @default(0.2)
+  updatedBy            String?  @map("updated_by") @db.Char(36)
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+  updatedByUser        User?    @relation("AiSettingsUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@map("ai_settings")
+}
+
+model AiDocumentIndex {
+  id                 String   @id @default(uuid()) @db.Char(36)
+  userId             String?  @map("user_id") @db.Char(36)
+  recordType         String   @map("record_type") @db.VarChar(64)
+  recordId           String   @map("record_id") @db.Char(36)
+  title              String?  @db.VarChar(191)
+  filePath           String   @map("file_path") @db.VarChar(512)
+  fileName           String   @map("file_name") @db.VarChar(255)
+  mimeType           String?  @map("mime_type") @db.VarChar(191)
+  documentHash       String?  @map("document_hash") @db.VarChar(191)
+  provider           String?  @db.VarChar(64)
+  embeddingModel     String?  @map("embedding_model") @db.VarChar(128)
+  status             String   @default("pending") @db.VarChar(32)
+  isVerifiedSnapshot Boolean  @default(false) @map("is_verified_snapshot")
+  searchText         String?  @map("search_text") @db.Text
+  embeddingJson      Json?    @map("embedding_json")
+  metadataJson       Json?    @map("metadata_json")
+  lastError          String?  @map("last_error") @db.Text
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  user               User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  chunks             AiDocumentChunk[]
+
+  @@unique([recordType, recordId])
+  @@index([status])
+  @@index([isVerifiedSnapshot])
+  @@map("ai_document_index")
+}
+
+model AiDocumentChunk {
+  id              String          @id @default(uuid()) @db.Char(36)
+  documentIndexId String          @map("document_index_id") @db.Char(36)
+  chunkOrder      Int             @map("chunk_order")
+  chunkText       String          @map("chunk_text") @db.Text
+  embeddingJson   Json?           @map("embedding_json")
+  tokenCount      Int             @default(0) @map("token_count")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  documentIndex   AiDocumentIndex @relation(fields: [documentIndexId], references: [id], onDelete: Cascade)
+
+  @@index([documentIndexId, chunkOrder])
+  @@map("ai_document_chunks")
+}
+
+model AiChatSession {
+  id        String          @id @default(uuid()) @db.Char(36)
+  userId    String          @map("user_id") @db.Char(36)
+  title     String?         @db.VarChar(191)
+  createdAt DateTime        @default(now()) @map("created_at")
+  updatedAt DateTime        @updatedAt @map("updated_at")
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  AiChatMessage[]
+
+  @@index([userId])
+  @@map("ai_chat_sessions")
+}
+
+model AiChatMessage {
+  id          String        @id @default(uuid()) @db.Char(36)
+  sessionId   String        @map("session_id") @db.Char(36)
+  userId      String?       @map("user_id") @db.Char(36)
+  role        String        @db.VarChar(32)
+  content     String        @db.Text
+  sourcesJson Json?         @map("sources_json")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  session     AiChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user        User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([sessionId, createdAt])
+  @@map("ai_chat_messages")
+}
