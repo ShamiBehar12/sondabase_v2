@@ -17,10 +17,10 @@ ruta_documents_out_dir = os.path.join(base_dir, "06Documents")
 ruta_documents_out = os.path.join(ruta_documents_out_dir, "documents.jsonl")
 ruta_log = os.path.join(ruta_documents_out_dir, "log_documents.csv")
 
-reescribir_salida = True
+reescribir_salida = False  # 🔥 IMPORTANTE: ahora NO queremos borrar
 
-modelo_resumen = "gpt-5.4-mini"
-max_chars_para_resumen = 16000
+modelo_resumen = "gpt-4o-mini"
+max_chars_para_resumen = 22000
 
 # =========================
 # OPENAI
@@ -46,254 +46,171 @@ if reescribir_salida and os.path.exists(ruta_documents_out):
 if reescribir_salida and os.path.exists(ruta_log):
     os.remove(ruta_log)
 
-with open(ruta_log, "w", encoding="utf-8-sig", newline="") as f:
-    writer = csv.writer(f, delimiter=";")
-    writer.writerow([
-        "fecha_hora",
-        "archivo_txt",
-        "document_id",
-        "doc_class",
-        "page_count",
-        "estado",
-        "detalle"
-    ])
+if not os.path.exists(ruta_log):
+    with open(ruta_log, "w", encoding="utf-8-sig", newline="") as f:
+        writer = csv.writer(f, delimiter=";")
+        writer.writerow([
+            "fecha_hora","archivo_txt","document_id","doc_class","page_count","estado","detalle"
+        ])
 
 # =========================
-# FUNCIONES AUXILIARES
+# CACHE
 # =========================
 
-def clasificar_doc(texto: str) -> str:
-    texto_lower = texto.lower()
+def ya_existe_documento(document_id):
+    if not os.path.exists(ruta_documents_out):
+        return False
 
-    if (
-        "cláusula" in texto_lower
-        or "clausula" in texto_lower
-        or "parágrafo" in texto_lower
-        or "paragrafo" in texto_lower
-    ):
-        return "contrato"
-    elif (
-        "aclaración" in texto_lower
-        or "aclaracion" in texto_lower
-        or "ampliación" in texto_lower
-        or "ampliacion" in texto_lower
-    ):
-        return "aclaracion"
-    elif "certifica" in texto_lower or "certificado" in texto_lower:
-        return "certificado"
+    with open(ruta_documents_out, "r", encoding="utf-8") as f:
+        for line in f:
+            try:
+                obj = json.loads(line)
+                if obj.get("document_id") == document_id:
+                    return True
+            except:
+                continue
+    return False
 
-    return "otro"
+# =========================
+# HELPERS
+# =========================
 
-def contar_paginas(texto: str) -> int:
-    matches = re.findall(r"===== PAGINA (\d+) =====", texto)
-    if not matches:
-        return 1
-
-    try:
-        return max(int(x) for x in matches)
-    except Exception:
-        return len(matches)
-
-def limpiar_texto_base(texto: str) -> str:
-    texto = texto.replace("\r\n", "\n").replace("\r", "\n")
-    texto = re.sub(r"[ \t]+", " ", texto)
-    texto = re.sub(r"\n{3,}", "\n\n", texto)
+def limpiar_texto(texto):
+    texto = texto.replace("\r\n","\n").replace("\r","\n")
+    texto = re.sub(r"[ \t]+"," ",texto)
+    texto = re.sub(r"\n{3,}","\n\n",texto)
     return texto.strip()
 
-def estimar_titulo_simple(texto: str, nombre_archivo: str) -> str:
-    lineas = [x.strip() for x in texto.splitlines() if x.strip()]
+def contar_paginas(texto):
+    matches = re.findall(r"===== PAGINA (\d+) =====", texto)
+    return max(map(int,matches)) if matches else 1
 
-    for linea in lineas[:20]:
-        if "===== PAGINA" in linea:
-            continue
-        if 8 <= len(linea) <= 140:
-            return linea
+def clasificar_doc(texto):
+    t = texto.lower()
+    if "clausula" in t: return "contrato"
+    if "aclaracion" in t: return "aclaracion"
+    if "certificado" in t: return "certificado"
+    return "otro"
 
-    return os.path.splitext(nombre_archivo)[0]
+def resumen_fallback(texto, nombre):
+    return (
+        nombre,
+        texto[:500],
+        ["otro"],
+        [],
+        []
+    )
 
-def resumen_fallback(texto: str, nombre_archivo: str):
-    titulo = estimar_titulo_simple(texto, nombre_archivo)
-    doc_class = clasificar_doc(texto)
+# =========================
+# RESUMEN LLM
+# =========================
 
-    texto_plano = re.sub(r"\s+", " ", texto).strip()
-    muestra = texto_plano[:500]
+def resumir_con_llm(texto, nombre_archivo):
 
-    summary = f"Documento tipo {doc_class}. Contenido inicial: {muestra}"
-    topics = [doc_class]
+    texto_plano = re.sub(r"\s+"," ",texto).strip()
+    largo_original = len(texto_plano)
 
-    return titulo, summary, topics
-
-def resumir_con_llm(texto: str, nombre_archivo: str):
-    texto_plano = re.sub(r"\s+", " ", texto).strip()
+    max_output_chars = int(largo_original / 3)
     texto_recortado = texto_plano[:max_chars_para_resumen]
 
     prompt = f"""
-Analiza este documento y devuelve SOLO JSON válido con esta estructura exacta:
+Devuelve SOLO JSON:
 
 {{
-  "title_guess": "string",
-  "summary": "string",
-  "topics": ["tema1", "tema2", "tema3"]
+"title_guess": "",
+"summary_dense": "",
+"topics": [],
+"key_entities": [],
+"likely_queries": []
 }}
 
-Reglas:
-- El summary debe resumir de qué trata el documento en máximo 90 palabras.
-- topics debe tener entre 3 y 8 temas cortos.
-- No inventes información.
-- Si el título real no es claro, crea un título descriptivo breve.
-- Responde SOLO con JSON válido, sin markdown ni texto extra.
+REGLAS:
+- summary_dense ULTRA DENSO
+- estilo: frases cortas separadas por ";"
+- NO narrativa
+- incluir:
+  - equipos
+  - normas
+  - variables
+  - números
+- MAX {max_output_chars} caracteres
 
-Nombre de archivo:
-{nombre_archivo}
-
-Contenido del documento:
+Contenido:
 {texto_recortado}
 """
 
-    response = client.responses.create(
-        model=modelo_resumen,
-        input=prompt
-    )
-
-    out = response.output_text.strip()
-
     try:
-        obj = json.loads(out)
+        response = client.responses.create(
+            model=modelo_resumen,
+            input=prompt
+        )
 
-        title_guess = str(obj.get("title_guess", "")).strip()
-        summary = str(obj.get("summary", "")).strip()
-        topics = obj.get("topics", [])
+        obj = json.loads(response.output_text)
 
-        if not title_guess:
-            title_guess = os.path.splitext(nombre_archivo)[0]
+        return (
+            obj.get("title_guess",""),
+            obj.get("summary_dense","")[:max_output_chars],
+            obj.get("topics",[]),
+            obj.get("key_entities",[]),
+            obj.get("likely_queries",[])
+        )
 
-        if not isinstance(topics, list):
-            topics = []
-
-        topics = [str(x).strip() for x in topics if str(x).strip()]
-
-        if not summary:
-            raise ValueError("summary vacío")
-
-        if len(topics) == 0:
-            topics = [clasificar_doc(texto)]
-
-        return title_guess, summary, topics
-
-    except Exception:
+    except:
         return resumen_fallback(texto, nombre_archivo)
 
 # =========================
-# CONTADORES
+# MAIN
 # =========================
 
-total_txt = 0
-total_docs = 0
-total_error = 0
+for raiz, _, archivos in os.walk(ruta_txt_in):
 
-# =========================
-# RECORRER TXTs
-# =========================
-
-for raiz, carpetas, archivos in os.walk(ruta_txt_in):
     for nombre_archivo in archivos:
-        if not nombre_archivo.lower().endswith(".txt"):
+
+        if not nombre_archivo.endswith(".txt"):
             continue
 
-        total_txt += 1
-
         ruta_txt = os.path.join(raiz, nombre_archivo)
+
+        with open(ruta_txt, "r", encoding="utf-8") as f:
+            texto = limpiar_texto(f.read())
+
+        if not texto:
+            continue
+
         ruta_relativa = os.path.relpath(ruta_txt, ruta_txt_in)
 
-        try:
-            with open(ruta_txt, "r", encoding="utf-8") as f:
-                texto = f.read()
+        document_id = os.path.splitext(
+            ruta_relativa.replace("\\","__").replace("/","__")
+        )[0]
 
-            texto = limpiar_texto_base(texto)
+        # 🔥 CACHE
+        if ya_existe_documento(document_id):
+            print("[SKIP CACHE]", nombre_archivo)
+            continue
 
-            if not texto:
-                with open(ruta_log, "a", encoding="utf-8-sig", newline="") as f:
-                    writer = csv.writer(f, delimiter=";")
-                    writer.writerow([
-                        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                        ruta_txt,
-                        "",
-                        "",
-                        0,
-                        "omitido",
-                        "texto vacío"
-                    ])
-                continue
+        doc_class = clasificar_doc(texto)
+        page_count = contar_paginas(texto)
 
-            document_id = os.path.splitext(
-                ruta_relativa.replace("\\", "__").replace("/", "__")
-            )[0]
+        title, summary, topics, entities, queries = resumir_con_llm(
+            texto, nombre_archivo
+        )
 
-            doc_class = clasificar_doc(texto)
-            page_count = contar_paginas(texto)
-            char_count = len(texto)
+        registro = {
+            "document_id": document_id,
+            "source_file": nombre_archivo,
+            "relative_path": ruta_relativa,
+            "source_path": ruta_txt,
+            "doc_class": doc_class,
+            "page_count": page_count,
+            "title_guess": title,
+            "summary_dense": summary,
+            "topics": topics,
+            "key_entities": entities,
+            "likely_queries": queries,
+            "ingested_at": datetime.now().isoformat()
+        }
 
-            title_guess, summary, topics = resumir_con_llm(texto, nombre_archivo)
+        with open(ruta_documents_out, "a", encoding="utf-8") as f:
+            f.write(json.dumps(registro, ensure_ascii=False)+"\n")
 
-            registro = {
-                "document_id": document_id,
-                "source_file": nombre_archivo,
-                "relative_path": ruta_relativa,
-                "source_path": ruta_txt,
-                "doc_class": doc_class,
-                "page_count": page_count,
-                "char_count": char_count,
-                "title_guess": title_guess,
-                "summary": summary,
-                "topics": topics,
-                "sample_text": re.sub(r"\s+", " ", texto)[:1200],
-                "ingested_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            }
-
-            with open(ruta_documents_out, "a", encoding="utf-8") as f:
-                f.write(json.dumps(registro, ensure_ascii=False) + "\n")
-
-            with open(ruta_log, "a", encoding="utf-8-sig", newline="") as f:
-                writer = csv.writer(f, delimiter=";")
-                writer.writerow([
-                    datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    ruta_txt,
-                    document_id,
-                    doc_class,
-                    page_count,
-                    "ok",
-                    "resumido"
-                ])
-
-            total_docs += 1
-            print(f"[DOC OK] {ruta_txt}")
-
-        except Exception as e:
-            total_error += 1
-
-            with open(ruta_log, "a", encoding="utf-8-sig", newline="") as f:
-                writer = csv.writer(f, delimiter=";")
-                writer.writerow([
-                    datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    ruta_txt,
-                    "",
-                    "",
-                    0,
-                    "error",
-                    str(e).replace(";", ",")
-                ])
-
-            print(f"[ERROR] {ruta_txt} -> {e}")
-
-# =========================
-# RESUMEN
-# =========================
-
-print("\n=========================")
-print("RESUMEN DOCUMENTS")
-print("=========================")
-print("TXT procesados:", total_txt)
-print("Documents generados:", total_docs)
-print("Errores:", total_error)
-print("Salida JSONL:", ruta_documents_out)
-print("Log:", ruta_log)
+        print("[OK]", nombre_archivo)

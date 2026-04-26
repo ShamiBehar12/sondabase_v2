@@ -257,20 +257,29 @@ for raiz, carpetas, archivos in os.walk(ruta_txt_in):
                             + f"__p{page_num}_p{page_num}__c{chunk_index_global}"
                         )
 
+                        # 🔥 CALCULAR CHAR_COUNT ROBUSTO
+                        texto_base = " ".join([
+                            str(title or ""),
+                            str(summary or ""),
+                            str(texto or ""),   # 🔥 IMPORTANTE: usar el texto completo también
+                        ])
+s
+                        char_count = len(texto_base.strip())
+
                         registro = {
-                            "chunk_id": chunk_id,
                             "document_id": document_id,
-                            "source_file": source_file,
-                            "source_path": source_path,
+                            "source_file": nombre_archivo,
                             "relative_path": ruta_relativa,
+                            "source_path": ruta_txt,
                             "doc_class": doc_class,
-                            "page_start": page_num,
-                            "page_end": page_num,
-                            "chunk_index": chunk_index_global,
-                            "section_title": section_title,
-                            "char_count": len(chunk_text),
-                            "text": chunk_text,
-                            "ingested_at": fecha_ingesta
+                            "page_count": page_count,
+                            "title_guess": title,
+                            "summary_dense": summary,
+                            "topics": topics,
+                            "key_entities": entities,
+                            "likely_queries": queries,
+                            "char_count": char_count,   # 🔥 AQUÍ ESTÁ LA CLAVE
+                            "ingested_at": datetime.now().isoformat()
                         }
 
                         with open(ruta_chunks_out, "a", encoding="utf-8") as f:
