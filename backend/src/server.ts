@@ -1430,9 +1430,10 @@ app.post("/api/racer/query", async (req, reply) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(req.body),
     });
-    return reply.code(resp.status).send(await resp.json());
+    const json = await resp.json();
+    return reply.code(resp.status).send(resp.ok ? { data: json, error: null } : { data: null, error: json });
   } catch {
-    return reply.code(503).send({ error: "RACER server not reachable" });
+    return reply.code(503).send({ data: null, error: { message: "RACER server not reachable" } });
   }
 });
 
@@ -1443,9 +1444,10 @@ app.post("/api/racer/rfp", async (req, reply) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(req.body),
     });
-    return reply.code(resp.status).send(await resp.json());
+    const json = await resp.json();
+    return reply.code(resp.status).send(resp.ok ? { data: json, error: null } : { data: null, error: json });
   } catch {
-    return reply.code(503).send({ error: "RACER server not reachable" });
+    return reply.code(503).send({ data: null, error: { message: "RACER server not reachable" } });
   }
 });
 app.listen({ port: env.port, host: env.host });
