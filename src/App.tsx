@@ -26,7 +26,7 @@ import NotFound from "./pages/NotFound";
 import { CleanupCertificates } from "./pages/CleanupCertificates";
 import AIAdmin from "./pages/AIAdmin";
 import AIChat from "./pages/AIChat";
-
+import SmartCitiesChat from "./pages/SmartCitiesChat";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -66,6 +66,7 @@ const App = () => (
         <Route path="/my-certificates" element={<MyCertificates />} />
         <Route path="/my-success-stories" element={<MySuccessStories />} />
                           <Route path="/ai-chat" element={<AIChat />} />
+                          <Route path="/smart-cities" element={<SmartCitiesChat />} />
                           <Route path="/users" element={
                             <ProtectedRoute requireRole="admin">
                               <Users />

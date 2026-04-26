@@ -1411,5 +1411,41 @@ app.setErrorHandler((error: any, _request, reply) => {
     },
   });
 });
+// ── RACER Smart Cities RAG proxy ──────────────────────────────────────────
+const RACER_URL = process.env.RACER_URL ?? "http://localhost:8000";
 
+app.get("/api/racer/health", async (_req, reply) => {
+  try {
+    const resp = await fetch(`${RACER_URL}/health`);
+    return reply.code(resp.status).send(await resp.json());
+  } catch {
+    return reply.code(503).send({ status: "unavailable", detail: "RACER server not reachable" });
+  }
+});
+
+app.post("/api/racer/query", async (req, reply) => {
+  try {
+    const resp = await fetch(`${RACER_URL}/query`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(req.body),
+    });
+    return reply.code(resp.status).send(await resp.json());
+  } catch {
+    return reply.code(503).send({ error: "RACER server not reachable" });
+  }
+});
+
+app.post("/api/racer/rfp", async (req, reply) => {
+  try {
+    const resp = await fetch(`${RACER_URL}/rfp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(req.body),
+    });
+    return reply.code(resp.status).send(await resp.json());
+  } catch {
+    return reply.code(503).send({ error: "RACER server not reachable" });
+  }
+});
 app.listen({ port: env.port, host: env.host });

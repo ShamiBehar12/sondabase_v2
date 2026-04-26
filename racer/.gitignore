@@ -1,0 +1,5 @@
+08ChromaDB/
+__pycache__/
+*.pyc
+.env
+racer_history.db
