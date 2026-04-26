@@ -14,8 +14,17 @@ from pydantic import BaseModel
 from openai import OpenAI
 from dotenv import load_dotenv
 import chromadb
-from chromadb.utils.embedding_functions import OpenAIEmbeddingFunction
+from chromadb import EmbeddingFunction, Embeddings
 import os
+
+class OpenAIEmbeddingFunction(EmbeddingFunction):
+    def __init__(self, api_key: str, model_name: str):
+        self._openai = OpenAI(api_key=api_key)
+        self._model  = model_name
+
+    def __call__(self, input: list[str]) -> Embeddings:
+        resp = self._openai.embeddings.create(input=input, model=self._model)
+        return [item.embedding for item in resp.data]
 
 load_dotenv()
 
