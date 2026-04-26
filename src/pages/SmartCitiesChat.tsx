@@ -7,6 +7,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { apiFetch } from "@/lib/api-client";
 import { Building2, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type Source = {
   archivo: string;
@@ -93,7 +95,14 @@ export default function SmartCitiesChat() {
                     <div className="text-xs uppercase tracking-wide text-foreground-muted mb-2">
                       {msg.role === "user" ? "Tú" : "Asistente"}
                     </div>
-                    <div className="whitespace-pre-wrap text-sm">{msg.content}</div>
+                    <div className="text-sm prose prose-invert prose-sm max-w-none
+                      [&_table]:w-full [&_table]:border-collapse [&_table]:text-xs
+                      [&_th]:border [&_th]:border-border [&_th]:px-2 [&_th]:py-1 [&_th]:bg-muted [&_th]:text-left
+                      [&_td]:border [&_td]:border-border [&_td]:px-2 [&_td]:py-1
+                      [&_tr:nth-child(even)]:bg-muted/30
+                      [&_p]:mb-2 [&_ul]:pl-4 [&_li]:mb-1">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                    </div>
                     {msg.tipo && (
                       <Badge variant="outline" className="mt-2 text-xs">
                         búsqueda: {msg.tipo}
