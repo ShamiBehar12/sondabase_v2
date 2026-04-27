@@ -1,23 +1,16 @@
-import { 
-  FileText, 
-  Award, 
-  Download, 
-  TrendingUp, 
-  Plus, 
-  Users, 
-  Clock, 
-  AlertTriangle, 
-  Calendar,
+import {
+  FileText,
+  Award,
+  Users,
+  Clock,
+  AlertTriangle,
   BarChart3,
-  Eye,
   Edit,
   CheckCircle
 } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 import { Button } from "@/components/ui/button";
 import { StatsCard } from "@/components/dashboard/StatsCard";
-import { StoryCard } from "@/components/stories/StoryCard";
-import { CertificateCard } from "@/components/certificates/CertificateCard";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useCertificates } from "@/hooks/useCertificates";
@@ -28,65 +21,27 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { RecentDocument } from "@/hooks/useRecentDocuments";
+import { apiFetch } from "@/lib/api-client";
 
-const mockActivities = [
-  {
-    id: "1",
-    action: "publicou",
-    document: "Case Transformação Digital",
-    user: "João Silva",
-    time: "há 2 horas",
-    type: "success"
-  },
-  {
-    id: "2",
-    action: "enviou para revisão",
-    document: "Story Automação Industrial",
-    user: "Maria Santos",
-    time: "há 4 horas",
-    type: "info"
-  },
-  {
-    id: "3",
-    action: "atualizou certificado",
-    document: "ISO 27001 CyberSec",
-    user: "Carlos Rodriguez",
-    time: "há 6 horas",
-    type: "warning"
-  },
-  {
-    id: "4",
-    action: "exportou relatório",
-    document: "Stories Q4 2023",
-    user: "Ana Lima",
-    time: "há 1 dia",
-    type: "info"
-  }
-];
+type DashStats = {
+  totalStories: number;
+  totalCerts: number;
+  totalProfCerts: number;
+  pendingApprovals: number;
+  pendingCerts: number;
+  pendingStories: number;
+  totalUsers: number;
+  recentActivity: Array<{ id: string; action: string; document: string; user: string; time: string; type: string }>;
+};
 
-const getMockAlerts = (t: any) => [
-  {
-    id: "1",
-    type: "warning",
-    title: t('dashboard.alertsExpiring'),
-    message: `3 ${t('dashboard.alertsExpiringMessage')}`,
-    count: 3
-  },
-  {
-    id: "2",
-    type: "info",
-    title: t('dashboard.alertsPending'),
-    message: `5 ${t('dashboard.alertsPendingMessage')}`,
-    count: 5
-  },
-  {
-    id: "3",
-    type: "success",
-    title: t('dashboard.alertsGoal'),
-    message: `85% ${t('dashboard.alertsGoalMessage')}`,
-    count: 85
-  }
-];
+function timeAgo(iso: string): string {
+  const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+  if (mins < 1) return "agora";
+  if (mins < 60) return `há ${mins} min`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `há ${hours}h`;
+  return `há ${Math.floor(hours / 24)}d`;
+}
 
 const getDocumentIcon = (type: string) => {
   return type === "story" ? FileText : Award;
@@ -125,8 +80,15 @@ export default function Dashboard() {
   const { documents: recentDocuments, loading: documentsLoading, refetch: refetchDocuments } = useRecentDocuments();
   const navigate = useNavigate();
 
+  const [dashStats, setDashStats] = useState<DashStats | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<RecentDocument | null>(null);
   const [documentSummaryOpen, setDocumentSummaryOpen] = useState(false);
+
+  useEffect(() => {
+    apiFetch<DashStats>("/api/stats/dashboard").then(({ data }) => {
+      if (data) setDashStats(data);
+    }).catch(() => {});
+  }, []);
 
   // Função para abrir resumo do documento
   const handleDocumentClick = (documentId: string, documentType: 'certificate' | 'story') => {
@@ -244,9 +206,9 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title={t('dashboard.totalStories')}
-          value={127}
-          change={`+12% ${t('dashboard.thisMonth')}`}
-          changeType="positive"
+          value={dashStats ? dashStats.totalStories : "..."}
+          change={dashStats ? `${dashStats.pendingStories} pendentes` : t('dashboard.loading')}
+          changeType="neutral"
           icon={FileText}
         />
         <StatsCard
@@ -280,26 +242,50 @@ export default function Dashboard() {
 
       {/* Alerts Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {getMockAlerts(t).map((alert) => (
-          <div key={alert.id} className="premium-card p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <div className={`w-3 h-3 rounded-full ${
-                  alert.type === "warning" ? "bg-warning" :
-                  alert.type === "success" ? "bg-success" : "bg-info"
-                }`}></div>
-                <h3 className="font-semibold text-sm">{alert.title}</h3>
-              </div>
-              <Badge variant="outline" className="text-xs">
-                {alert.count}
-              </Badge>
+        <div className="premium-card p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-warning"></div>
+              <h3 className="font-semibold text-sm">{t('dashboard.alertsExpiring')}</h3>
             </div>
-            <p className="text-sm text-foreground-secondary">{alert.message}</p>
-            {alert.type === "success" && (
-              <Progress value={alert.count} className="mt-3 h-2" />
-            )}
+            <Badge variant="outline" className="text-xs">{certificateStats.expiringSoon}</Badge>
           </div>
-        ))}
+          <p className="text-sm text-foreground-secondary">{certificateStats.expiringSoon} {t('dashboard.alertsExpiringMessage')}</p>
+        </div>
+        <div className="premium-card p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-info"></div>
+              <h3 className="font-semibold text-sm">{t('dashboard.alertsPending')}</h3>
+            </div>
+            <Badge variant="outline" className="text-xs">{dashStats ? dashStats.pendingApprovals : "..."}</Badge>
+          </div>
+          <p className="text-sm text-foreground-secondary">{dashStats ? dashStats.pendingApprovals : "..."} {t('dashboard.alertsPendingMessage')}</p>
+        </div>
+        <div className="premium-card p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-success"></div>
+              <h3 className="font-semibold text-sm">{t('dashboard.alertsGoal')}</h3>
+            </div>
+            <Badge variant="outline" className="text-xs">
+              {dashStats && dashStats.totalCerts > 0
+                ? Math.round(((dashStats.totalCerts - dashStats.pendingCerts) / dashStats.totalCerts) * 100)
+                : 0}%
+            </Badge>
+          </div>
+          <p className="text-sm text-foreground-secondary">
+            {dashStats && dashStats.totalCerts > 0
+              ? Math.round(((dashStats.totalCerts - dashStats.pendingCerts) / dashStats.totalCerts) * 100)
+              : 0}% {t('dashboard.alertsGoalMessage')}
+          </p>
+          <Progress
+            value={dashStats && dashStats.totalCerts > 0
+              ? Math.round(((dashStats.totalCerts - dashStats.pendingCerts) / dashStats.totalCerts) * 100)
+              : 0}
+            className="mt-3 h-2"
+          />
+        </div>
       </div>
 
       {/* Main Content Grid */}
@@ -414,7 +400,21 @@ export default function Dashboard() {
           </div>
           
           <div className="premium-card p-4 space-y-4">
-            {mockActivities.map((activity, index) => {
+            {!dashStats ? (
+              <div className="space-y-3">
+                {[1,2,3].map(i => (
+                  <div key={i} className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-muted rounded-full animate-pulse"></div>
+                    <div className="flex-1 space-y-1">
+                      <div className="h-3 bg-muted rounded animate-pulse"></div>
+                      <div className="h-2 bg-muted rounded animate-pulse w-1/3"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : dashStats.recentActivity.length === 0 ? (
+              <p className="text-sm text-foreground-muted text-center py-4">Nenhuma atividade recente</p>
+            ) : dashStats.recentActivity.map((activity) => {
               const Icon = getActivityIcon(activity.type);
               return (
                 <div key={activity.id} className="flex items-start gap-3">
@@ -431,13 +431,10 @@ export default function Dashboard() {
                     <p className="text-sm text-foreground">
                       <span className="font-medium">{activity.user}</span>
                       {' '}{activity.action}{' '}
-                      <span className="font-medium">{activity.document}</span>
+                      <span className="font-medium truncate">{activity.document}</span>
                     </p>
-                    <p className="text-xs text-foreground-muted">{activity.time}</p>
+                    <p className="text-xs text-foreground-muted">{timeAgo(activity.time)}</p>
                   </div>
-                  {index < mockActivities.length - 1 && (
-                    <div className="absolute left-[1.875rem] mt-8 w-px h-4 bg-border"></div>
-                  )}
                 </div>
               );
             })}
@@ -448,32 +445,32 @@ export default function Dashboard() {
       {/* Secondary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
-          title={t('dashboard.exportsThisMonth')}
-          value={248}
-          change={`+23% ${t('dashboard.vsLastMonth')}`}
-          changeType="positive"
-          icon={Download}
+          title="Aprovações pendentes"
+          value={dashStats ? dashStats.pendingApprovals : "..."}
+          change={dashStats ? `${dashStats.pendingCerts} cert. · ${dashStats.pendingStories} hist.` : t('dashboard.loading')}
+          changeType={dashStats && dashStats.pendingApprovals > 0 ? "neutral" : "positive"}
+          icon={AlertTriangle}
         />
         <StatsCard
           title={t('dashboard.activeUsers')}
-          value={23}
-          change={`5 ${t('dashboard.newUsersThisMonth')}`}
+          value={dashStats ? dashStats.totalUsers : "..."}
+          change={dashStats ? `${dashStats.totalUsers} cadastrados` : t('dashboard.loading')}
           changeType="positive"
           icon={Users}
         />
         <StatsCard
-          title={t('dashboard.views')}
-          value="12.5K"
-          change={`+18% ${t('dashboard.thisMonth')}`}
-          changeType="positive"
-          icon={Eye}
+          title="Histórias publicadas"
+          value={dashStats ? dashStats.totalStories : "..."}
+          change={dashStats ? `${dashStats.pendingStories} aguardando revisão` : t('dashboard.loading')}
+          changeType="neutral"
+          icon={FileText}
         />
         <StatsCard
-          title={t('dashboard.averageReviewTime')}
-          value="2.3d"
-          change={`-0.5d ${t('dashboard.thisMonth')}`}
+          title="Cert. profissionais"
+          value={dashStats ? dashStats.totalProfCerts : "..."}
+          change={professionalLoading ? t('dashboard.loading') : `${professionalStats.activeProfessional} ativos`}
           changeType="positive"
-          icon={Calendar}
+          icon={Award}
         />
       </div>
 

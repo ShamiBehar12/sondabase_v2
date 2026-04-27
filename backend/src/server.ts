@@ -1556,10 +1556,157 @@ app.post("/api/racer/ingest", async (req, reply) => {
         document_id: documentId ?? undefined,
       }),
     });
-    const json = await resp.json();
+    const json = await resp.json() as any;
+    if (resp.ok && json.status !== "duplicate") {
+      try {
+        const stat = await fs.stat(absolutePath).catch(() => ({ size: 0 }));
+        const title = filename.replace(/\.pdf$/i, "").replace(/[-_]/g, " ");
+        const meta = json.metadata || {};
+        const existing = await prisma.certificate.findFirst({ where: { filePath } });
+        if (!existing) {
+          await prisma.certificate.create({
+            data: {
+              userId: user.id,
+              title,
+              fileName: filename,
+              filePath,
+              fileSize: (stat as any).size ?? 0,
+              mimeType: "application/pdf",
+              isVerified: true,
+              issuingOrganization: meta.client ?? null,
+              country: meta.country ?? null,
+              description: meta.summary_one_line ?? null,
+              tags: meta.project_domain ? meta.project_domain : undefined,
+            },
+          });
+        }
+      } catch (e: any) {
+        app.log.warn("Certificate record creation skipped: " + String(e?.message));
+      }
+    }
     return reply.send(resp.ok ? { data: json, error: null } : { data: null, error: json });
   } catch {
     return reply.code(503).send({ data: null, error: { message: "RACER server not reachable" } });
   }
+});
+
+// ── Dashboard stats ────────────────────────────────────────────────────────
+app.get("/api/stats/dashboard", async (req, reply) => {
+  requireAuth(req);
+  const [
+    totalStories,
+    totalCerts,
+    totalProfCerts,
+    pendingCerts,
+    pendingStories,
+    totalUsers,
+    recentCerts,
+    recentStories,
+  ] = await Promise.all([
+    prisma.successStory.count({ where: { isVerified: true } }),
+    prisma.certificate.count(),
+    prisma.professionalCertificate.count(),
+    prisma.certificate.count({ where: { isVerified: false } }),
+    prisma.successStory.count({ where: { isVerified: false } }),
+    prisma.user.count(),
+    prisma.certificate.findMany({
+      take: 5,
+      orderBy: { createdAt: "desc" },
+      include: { user: { include: { profile: true } } },
+    }),
+    prisma.successStory.findMany({
+      take: 5,
+      orderBy: { createdAt: "desc" },
+      include: { user: { include: { profile: true } } },
+    }),
+  ]);
+
+  type ActivityItem = { id: string; action: string; document: string; user: string; time: string; type: string };
+  const activities: ActivityItem[] = [];
+
+  for (const cert of recentCerts) {
+    const userName = (cert as any).user?.profile?.fullName || (cert as any).user?.email || "Usuário";
+    activities.push({
+      id: cert.id,
+      action: cert.isVerified ? "adicionou certificado" : "enviou certificado para revisão",
+      document: cert.title,
+      user: userName,
+      time: cert.createdAt.toISOString(),
+      type: cert.isVerified ? "success" : "info",
+    });
+  }
+  for (const story of recentStories) {
+    const userName = (story as any).user?.profile?.fullName || (story as any).user?.email || "Usuário";
+    activities.push({
+      id: story.id,
+      action: story.isVerified ? "publicou história" : "enviou história para revisão",
+      document: (story as any).titlePt || (story as any).titleEs || (story as any).titleEn || "Sem título",
+      user: userName,
+      time: story.createdAt.toISOString(),
+      type: story.isVerified ? "success" : "info",
+    });
+  }
+
+  activities.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
+
+  return reply.send({
+    data: {
+      totalStories,
+      totalCerts,
+      totalProfCerts,
+      pendingApprovals: pendingCerts + pendingStories,
+      pendingCerts,
+      pendingStories,
+      totalUsers,
+      recentActivity: activities.slice(0, 6),
+    },
+    error: null,
+  });
+});
+
+// ── Seed RACER documents as certificates ──────────────────────────────────
+app.post("/api/admin/seed-racer", async (req, reply) => {
+  const user = requireAdmin(req);
+  const metadataPath = path.join(process.cwd(), "../racer/data/metadata.jsonl");
+  let raw: string;
+  try {
+    raw = await fs.readFile(metadataPath, "utf-8");
+  } catch {
+    throw app.httpErrors.notFound("metadata.jsonl not found at " + metadataPath);
+  }
+
+  const lines = raw.split("\n").filter(l => l.trim());
+  let created = 0;
+  let skipped = 0;
+
+  for (const line of lines) {
+    let obj: any;
+    try { obj = JSON.parse(line); } catch { skipped++; continue; }
+    const sourceFile: string = String(obj.source_file || "").trim();
+    if (!sourceFile) { skipped++; continue; }
+    try {
+      const existing = await prisma.certificate.findFirst({ where: { fileName: sourceFile } });
+      if (existing) { skipped++; continue; }
+      const title = sourceFile.replace(/\.pdf$/i, "").replace(/[-_]/g, " ");
+      await prisma.certificate.create({
+        data: {
+          userId: user.id,
+          title,
+          fileName: sourceFile,
+          filePath: String(obj.relative_path || `racer-seeded/${sourceFile}`),
+          fileSize: 0,
+          mimeType: "application/pdf",
+          isVerified: true,
+          issuingOrganization: obj.client ? String(obj.client) : null,
+          country: obj.country ? String(obj.country) : null,
+          description: obj.summary_one_line ? String(obj.summary_one_line) : null,
+          tags: Array.isArray(obj.project_domain) ? obj.project_domain : undefined,
+        },
+      });
+      created++;
+    } catch { skipped++; }
+  }
+
+  return reply.send({ data: { created, skipped, total: lines.length }, error: null });
 });
 app.listen({ port: env.port, host: env.host });
