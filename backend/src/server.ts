@@ -1489,6 +1489,21 @@ app.post("/api/racer/query", async (req, reply) => {
   }
 });
 
+app.post("/api/racer/reingest-metadata", async (req, reply) => {
+  requireAuth(req);
+  try {
+    const resp = await fetch(`${RACER_URL}/reingest/metadata`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(req.body),
+    });
+    const json = await resp.json();
+    return reply.code(resp.status).send(resp.ok ? { data: json, error: null } : { data: null, error: json });
+  } catch {
+    return reply.code(503).send({ data: null, error: { message: "RACER server not reachable" } });
+  }
+});
+
 app.post("/api/racer/rfp", async (req, reply) => {
   try {
     const resp = await fetch(`${RACER_URL}/rfp`, {

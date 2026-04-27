@@ -198,6 +198,9 @@ class IngestResponse(BaseModel):
     metadata:     dict
     status:       str
 
+class ReMetadataRequest(BaseModel):
+    document_id: str
+
 app = FastAPI(title="RACER Smart Cities API", version="2.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"],
                    allow_methods=["*"], allow_headers=["*"])
@@ -312,3 +315,135 @@ def ingest_stats():
         "chunks": col_chunks.count(),
         "docs":   col_docs.count(),
     }
+
+@app.post("/reingest/metadata")
+def reingest_metadata(req: ReMetadataRequest):
+    """Re-extract metadata for a document that failed during initial ingestion.
+    Reconstructs the original text from existing ChromaDB chunks and re-runs the LLM."""
+    from ingest import extract_metadata, _safe_meta
+
+    # 1 — Leer chunks existentes de ChromaDB
+    results = col_chunks.get(
+        where={"document_id": req.document_id},
+        include=["documents", "metadatas"],
+    )
+    if not results["ids"]:
+        raise HTTPException(404, f"No se encontraron chunks para '{req.document_id}'")
+
+    # 2 — Reconstruir texto ordenando por chunk_index
+    pairs = sorted(
+        zip(results["documents"], results["metadatas"]),
+        key=lambda x: x[1].get("chunk_index", 0),
+    )
+    full_text   = "\n".join(doc for doc, _ in pairs)
+    source_file = results["metadatas"][0].get("source_file", req.document_id)
+
+    # 3 — Re-extraer metadata con el LLM
+    meta = extract_metadata(full_text, source_file, llm, MODELO)
+    summary = meta.get("summary_one_line", "")
+    if summary.startswith("No se pudo procesar") or summary.startswith("Error al procesar"):
+        raise HTTPException(500, f"La extracción de metadata falló de nuevo: {summary}")
+
+    # 4 — Actualizar colección docs en ChromaDB (upsert)
+    texto_doc = "\n".join(filter(None, [
+        f"ARCHIVO: {source_file}",
+        f"TIPO: {meta.get('doc_type','')}",
+        f"CLIENTE: {meta.get('client','')}",
+        f"PAIS: {meta.get('country','')}",
+        f"APOSTILLADO: {'Sí' if meta.get('is_apostilled') else 'No'}",
+        f"AÑO: {meta.get('year','')}",
+        f"DOMINIOS: {', '.join(meta.get('project_domain') or [])}",
+        f"RESUMEN: {meta.get('summary_one_line','')}",
+    ]))
+    new_doc_meta = {
+        "document_id":     req.document_id,
+        "source_file":     _safe_meta(source_file),
+        "doc_type":        _safe_meta(meta.get("doc_type")),
+        "client":          _safe_meta(meta.get("client")),
+        "country":         _safe_meta(meta.get("country")),
+        "is_apostilled":   1 if meta.get("is_apostilled") is True else (-1 if meta.get("is_apostilled") is None else 0),
+        "year":            meta.get("year") or 0,
+        "project_domain":  _safe_meta(meta.get("project_domain")),
+        "validity_alert":  1 if meta.get("validity_alert") else 0,
+        "summary_one_line": _safe_meta(meta.get("summary_one_line")),
+        "language":        _safe_meta(meta.get("language")),
+    }
+    if col_docs.get(ids=[req.document_id])["ids"]:
+        col_docs.update(ids=[req.document_id], documents=[texto_doc], metadatas=[new_doc_meta])
+    else:
+        col_docs.add(ids=[req.document_id], documents=[texto_doc], metadatas=[new_doc_meta])
+
+    # 5 — Actualizar metadata de chunks en ChromaDB
+    chunk_update_metas = []
+    for m in results["metadatas"]:
+        um = dict(m)
+        um.update({
+            "doc_type":        _safe_meta(meta.get("doc_type")),
+            "client":          _safe_meta(meta.get("client")),
+            "country":         _safe_meta(meta.get("country")),
+            "is_apostilled":   1 if meta.get("is_apostilled") is True else (-1 if meta.get("is_apostilled") is None else 0),
+            "year":            meta.get("year") or 0,
+            "project_domain":  _safe_meta(meta.get("project_domain")),
+            "validity_alert":  1 if meta.get("validity_alert") else 0,
+            "summary_one_line": _safe_meta(meta.get("summary_one_line")),
+        })
+        chunk_update_metas.append(um)
+    col_chunks.update(ids=results["ids"], metadatas=chunk_update_metas)
+
+    # 6 — Actualizar SQLite
+    def _b(v): return 1 if v is True else (0 if v is False else None)
+    def _i(v):
+        try: return int(v)
+        except: return None
+    def _f(v):
+        try: return float(v)
+        except: return None
+
+    with get_db() as conn:
+        conn.execute("""
+            UPDATE documents SET
+                doc_type=?, client=?, country=?, is_apostilled=?, year=?,
+                contract_value_usd=?, contract_duration_years=?, units_deployed=?,
+                summary_one_line=?, language=?, validity_alert=?,
+                project_domain_json=?, technologies_json=?
+            WHERE document_id=?
+        """, (
+            str(meta.get("doc_type", "") or ""),
+            str(meta.get("client", "") or "") or None,
+            str(meta.get("country", "") or "") or None,
+            _b(meta.get("is_apostilled")),
+            _i(meta.get("year")),
+            _f(meta.get("contract_value_usd")),
+            _f(meta.get("contract_duration_years")),
+            _i(meta.get("units_deployed")),
+            str(meta.get("summary_one_line", "") or ""),
+            str(meta.get("language", "") or ""),
+            _b(meta.get("validity_alert", False)),
+            json.dumps(meta.get("project_domain") or [], ensure_ascii=False),
+            json.dumps(meta.get("technologies") or [], ensure_ascii=False),
+            req.document_id,
+        ))
+
+    # 7 — Reemplazar línea en metadata.jsonl
+    ruta_meta = Path("data/metadata.jsonl")
+    if ruta_meta.exists():
+        nuevo_reg = {"document_id": req.document_id, "source_file": source_file, **meta}
+        lines = ruta_meta.read_text(encoding="utf-8").splitlines()
+        new_lines, updated = [], False
+        for line in lines:
+            if not line.strip():
+                continue
+            try:
+                obj = json.loads(line)
+                if obj.get("document_id") == req.document_id:
+                    new_lines.append(json.dumps(nuevo_reg, ensure_ascii=False))
+                    updated = True
+                else:
+                    new_lines.append(line)
+            except Exception:
+                new_lines.append(line)
+        if not updated:
+            new_lines.append(json.dumps(nuevo_reg, ensure_ascii=False))
+        ruta_meta.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+
+    return {"status": "ok", "document_id": req.document_id, "metadata": meta}

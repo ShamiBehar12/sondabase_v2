@@ -20,6 +20,7 @@ import {
   Search,
   Sprout,
   FileText,
+  RotateCcw,
 } from "lucide-react";
 
 type RacerHealth = { status: string; chunks: number; docs: number };
@@ -108,6 +109,8 @@ export default function AIAdmin() {
 
   const [seeding, setSeeding] = useState(false);
   const [seedResult, setSeedResult] = useState<SeedResult | null>(null);
+  const [reingesting, setReingesting] = useState<Set<string>>(new Set());
+  const [reingestResults, setReingestResults] = useState<Record<string, "ok" | "error">>({});
 
   const fetchHealth = async () => {
     setHealthLoading(true);
@@ -145,6 +148,35 @@ export default function AIAdmin() {
     });
     fetchDocs();
     fetchHealth();
+  };
+
+  const failedDocs = useMemo(
+    () => racerDocs.filter(d => (d.summary_one_line || "").startsWith("No se pudo procesar")),
+    [racerDocs],
+  );
+
+  const handleReingest = async (documentId: string) => {
+    setReingesting(prev => new Set(prev).add(documentId));
+    const { data, error } = await apiFetch<{ status: string; metadata: any }>(
+      "/api/racer/reingest-metadata",
+      { method: "POST", body: { document_id: documentId } },
+    );
+    setReingesting(prev => { const s = new Set(prev); s.delete(documentId); return s; });
+    if (error || !data) {
+      setReingestResults(prev => ({ ...prev, [documentId]: "error" }));
+      toast({ variant: "destructive", title: "Error al re-extraer", description: error?.message });
+      return;
+    }
+    setReingestResults(prev => ({ ...prev, [documentId]: "ok" }));
+    toast({ title: "Metadata actualizada", description: `${documentId}: ${data.metadata?.summary_one_line || "OK"}` });
+    fetchDocs();
+  };
+
+  const handleReingestAll = async () => {
+    for (const doc of failedDocs) {
+      await handleReingest(doc.document_id);
+    }
+    toast({ title: "Re-extracción masiva completada" });
   };
 
   const filteredDocs = useMemo(() => {
@@ -420,6 +452,38 @@ export default function AIAdmin() {
           </Card>
         </div>
 
+        {/* Failed docs banner */}
+        {failedDocs.length > 0 && (
+          <Card className="premium-card border-orange-400/40 bg-orange-500/5">
+            <CardContent className="py-4">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div className="flex items-center gap-3">
+                  <AlertCircle className="w-5 h-5 text-orange-400 flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold text-sm text-orange-400">
+                      {failedDocs.length} documento{failedDocs.length > 1 ? "s" : ""} sin metadata
+                    </p>
+                    <p className="text-xs text-foreground-muted">
+                      La extracción con GPT falló durante la ingesta inicial. Puedes re-intentarlo ahora.
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-orange-400/40 text-orange-400 hover:bg-orange-400/10"
+                  onClick={handleReingestAll}
+                  disabled={reingesting.size > 0}
+                >
+                  {reingesting.size > 0
+                    ? <><Loader2 className="w-3 h-3 mr-2 animate-spin" />Re-extrayendo {reingesting.size}...</>
+                    : <><RotateCcw className="w-3 h-3 mr-2" />Re-extraer los {failedDocs.length}</>}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Documents table */}
         <Card className="premium-card">
           <CardHeader>
@@ -428,6 +492,9 @@ export default function AIAdmin() {
                 <CardTitle>Documentos en el índice RACER</CardTitle>
                 <CardDescription>
                   {filteredDocs.length} de {racerDocs.length} documentos
+                  {failedDocs.length > 0 && (
+                    <span className="ml-2 text-orange-400">· {failedDocs.length} sin metadata</span>
+                  )}
                 </CardDescription>
               </div>
               <div className="relative w-64">
@@ -462,32 +529,72 @@ export default function AIAdmin() {
                       <th className="pb-2 pr-4 font-medium text-foreground-muted">Cliente</th>
                       <th className="pb-2 pr-4 font-medium text-foreground-muted">País</th>
                       <th className="pb-2 pr-4 font-medium text-foreground-muted">Año</th>
-                      <th className="pb-2 font-medium text-foreground-muted">Apostilla</th>
+                      <th className="pb-2 pr-4 font-medium text-foreground-muted">Apostilla</th>
+                      <th className="pb-2 font-medium text-foreground-muted">Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredDocs.map((doc) => (
-                      <tr key={doc.document_id} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
-                        <td className="py-2 pr-4 max-w-[200px] truncate font-mono text-xs text-foreground" title={doc.source_file}>
-                          {doc.source_file}
-                        </td>
-                        <td className="py-2 pr-4">
-                          <Badge variant="outline" className="text-xs whitespace-nowrap">{doc.doc_type || "—"}</Badge>
-                        </td>
-                        <td className="py-2 pr-4 text-foreground-secondary max-w-[160px] truncate" title={doc.client}>
-                          {doc.client || "—"}
-                        </td>
-                        <td className="py-2 pr-4 text-foreground-secondary">{doc.country || "—"}</td>
-                        <td className="py-2 pr-4 text-foreground-secondary">{doc.year || "—"}</td>
-                        <td className="py-2">
-                          {doc.is_apostilled === true || doc.is_apostilled === 1 ? (
-                            <CheckCircle className="w-4 h-4 text-green-500" />
-                          ) : (
-                            <span className="text-foreground-muted">—</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                    {filteredDocs.map((doc) => {
+                      const isFailed = (doc.summary_one_line || "").startsWith("No se pudo procesar");
+                      const isLoading = reingesting.has(doc.document_id);
+                      const result = reingestResults[doc.document_id];
+                      return (
+                        <tr
+                          key={doc.document_id}
+                          className={`border-b border-border/50 transition-colors ${
+                            isFailed ? "bg-orange-500/5 hover:bg-orange-500/10" : "hover:bg-muted/20"
+                          }`}
+                        >
+                          <td className="py-2 pr-4 max-w-[200px]">
+                            <div className="flex items-center gap-1.5">
+                              {isFailed && <AlertCircle className="w-3 h-3 text-orange-400 flex-shrink-0" />}
+                              {result === "ok" && <CheckCircle className="w-3 h-3 text-green-500 flex-shrink-0" />}
+                              <span className="truncate font-mono text-xs text-foreground" title={doc.source_file}>
+                                {doc.source_file}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-2 pr-4">
+                            <Badge
+                              variant="outline"
+                              className={`text-xs whitespace-nowrap ${isFailed ? "border-orange-400/40 text-orange-400" : ""}`}
+                            >
+                              {doc.doc_type || "—"}
+                            </Badge>
+                          </td>
+                          <td className="py-2 pr-4 text-foreground-secondary max-w-[160px] truncate" title={doc.client}>
+                            {doc.client || <span className="text-foreground-muted italic text-xs">sin datos</span>}
+                          </td>
+                          <td className="py-2 pr-4 text-foreground-secondary">{doc.country || "—"}</td>
+                          <td className="py-2 pr-4 text-foreground-secondary">{doc.year || "—"}</td>
+                          <td className="py-2 pr-4">
+                            {doc.is_apostilled === true || doc.is_apostilled === 1 ? (
+                              <CheckCircle className="w-4 h-4 text-green-500" />
+                            ) : (
+                              <span className="text-foreground-muted">—</span>
+                            )}
+                          </td>
+                          <td className="py-2">
+                            {isFailed && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 px-2 text-xs text-orange-400 hover:text-orange-300 hover:bg-orange-400/10"
+                                onClick={() => handleReingest(doc.document_id)}
+                                disabled={isLoading}
+                              >
+                                {isLoading
+                                  ? <Loader2 className="w-3 h-3 animate-spin" />
+                                  : <><RotateCcw className="w-3 h-3 mr-1" />Re-extraer</>}
+                              </Button>
+                            )}
+                            {result === "ok" && !isFailed && (
+                              <CheckCircle className="w-4 h-4 text-green-500" />
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
