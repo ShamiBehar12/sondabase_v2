@@ -51,7 +51,8 @@ conn.executescript("""
         is_apostilled INTEGER, year INTEGER, contract_value_usd REAL,
         contract_duration_years REAL, units_deployed INTEGER,
         summary_one_line TEXT, language TEXT, validity_alert INTEGER,
-        project_domain_json TEXT, technologies_json TEXT, ingested_at TEXT
+        project_domain_json TEXT, technologies_json TEXT, ingested_at TEXT,
+        content_hash TEXT
     );
     CREATE INDEX idx_country    ON documents(country);
     CREATE INDEX idx_doc_type   ON documents(doc_type);

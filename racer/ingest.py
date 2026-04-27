@@ -20,6 +20,32 @@ def _id_from_filename(filename: str) -> str:
     return clean or hashlib.md5(filename.encode()).hexdigest()[:16]
 
 
+def _content_hash(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:32]
+
+
+def _ensure_hash_column(conn: sqlite3.Connection):
+    try:
+        conn.execute("ALTER TABLE documents ADD COLUMN content_hash TEXT")
+        conn.commit()
+    except Exception:
+        pass  # column already exists
+
+
+def check_duplicate(text: str, db_path: str) -> str | None:
+    """Devuelve el document_id existente si el contenido ya fue ingestado, o None."""
+    h = _content_hash(text)
+    conn = sqlite3.connect(db_path)
+    try:
+        _ensure_hash_column(conn)
+        row = conn.execute(
+            "SELECT document_id FROM documents WHERE content_hash = ?", (h,)
+        ).fetchone()
+        return row[0] if row else None
+    finally:
+        conn.close()
+
+
 def _safe_meta(val, default=""):
     if val is None:              return default
     if isinstance(val, list):    return ", ".join(str(x) for x in val)
@@ -138,6 +164,18 @@ def ingest_document(
     Retorna {document_id, chunks_added, metadata}.
     """
     doc_id = document_id or _id_from_filename(filename)
+    text_hash = _content_hash(text)
+
+    # 0 — Deduplicación por contenido
+    existing_id = check_duplicate(text, db_path)
+    if existing_id and existing_id != doc_id:
+        return {
+            "document_id":  doc_id,
+            "chunks_added": 0,
+            "metadata":     {},
+            "status":       "duplicate",
+            "duplicate_of": existing_id,
+        }
 
     # 1 — Metadata
     metadata = extract_metadata(text, filename, llm, modelo)
@@ -219,8 +257,9 @@ def ingest_document(
 
     conn = sqlite3.connect(db_path)
     try:
+        _ensure_hash_column(conn)
         conn.execute(
-            "INSERT OR REPLACE INTO documents VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "INSERT OR REPLACE INTO documents VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (
                 doc_id, filename, filename, "",
                 str(metadata.get("doc_type", "") or ""),
@@ -237,6 +276,7 @@ def ingest_document(
                 json.dumps(metadata.get("project_domain") or [], ensure_ascii=False),
                 json.dumps(metadata.get("technologies") or [], ensure_ascii=False),
                 datetime.now().isoformat(),
+                text_hash,
             ),
         )
         conn.commit()
@@ -265,4 +305,5 @@ def ingest_document(
         "document_id":  doc_id,
         "chunks_added": len(nuevos),
         "metadata":     metadata,
+        "status":       "ok",
     }

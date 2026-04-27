@@ -11,7 +11,8 @@ import {
   CheckCircle,
   ClipboardList,
   Bot,
-  MapPin
+  MapPin,
+  Upload
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
@@ -46,6 +47,7 @@ export function AppSidebar() {
     { title: "Minhas Histórias", url: "/my-success-stories", icon: FileText },
     { title: "Assistente IA", url: "/ai-chat", icon: Bot },
     { title: "Smart Cities RAG", url: "/smart-cities", icon: MapPin },
+    { title: "Carga Masiva RAG", url: "/smart-cities/ingest", icon: Upload },
   ];
 
   const adminItems = [

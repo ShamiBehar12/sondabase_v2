@@ -1094,6 +1094,13 @@ app.patch("/api/db/:table", async (request) => {
 
     if (table === "certificates") {
       await syncAiIndexForRecord(table, updatedRow);
+      const patchData = body.data as Record<string, unknown>;
+      if (patchData.is_verified === true && (updatedRow as any).filePath) {
+        const r = updatedRow as any;
+        triggerRacerIngest(r.filePath, r.fileName, r.id).catch((err: any) =>
+          app.log.warn(`RACER auto-ingest failed for ${r.fileName}: ${err?.message}`)
+        );
+      }
     }
   }
 
@@ -1414,6 +1421,22 @@ app.setErrorHandler((error: any, _request, reply) => {
 // ── RACER Smart Cities RAG proxy ──────────────────────────────────────────
 const RACER_URL = process.env.RACER_URL ?? "http://localhost:8000";
 
+async function triggerRacerIngest(filePath: string, fileName: string, documentId: string) {
+  const absolutePath = bucketFilePath("certificates", filePath);
+  let extraction: { text: string };
+  try {
+    extraction = await extractPdfTextWithOcrFallback(absolutePath);
+  } catch {
+    extraction = await extractPdfTextDirect(absolutePath);
+  }
+  if (!extraction.text.trim()) return;
+  await fetch(`${RACER_URL}/ingest`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text: extraction.text, filename: fileName, document_id: documentId }),
+  });
+}
+
 app.get("/api/racer/health", async (_req, reply) => {
   try {
     const resp = await fetch(`${RACER_URL}/health`);
@@ -1449,6 +1472,55 @@ app.post("/api/racer/rfp", async (req, reply) => {
   } catch {
     return reply.code(503).send({ data: null, error: { message: "RACER server not reachable" } });
   }
+});
+
+app.post("/api/racer/ingest-batch", async (req, reply) => {
+  requireAuth(req);
+  const { files } = req.body as {
+    files: Array<{ bucket: string; filePath: string; documentId?: string }>;
+  };
+  if (!Array.isArray(files) || files.length === 0) {
+    throw app.httpErrors.badRequest("files array is required");
+  }
+
+  const results: Array<{ filePath: string; status: string; chunks_added?: number; duplicate_of?: string; error?: string }> = [];
+
+  for (const file of files) {
+    const absolutePath = bucketFilePath(file.bucket, file.filePath);
+    const filename     = path.basename(file.filePath);
+    try {
+      let extraction: { text: string };
+      try {
+        extraction = await extractPdfTextWithOcrFallback(absolutePath);
+      } catch {
+        extraction = await extractPdfTextDirect(absolutePath);
+      }
+      if (!extraction.text.trim()) {
+        results.push({ filePath: file.filePath, status: "empty" });
+        continue;
+      }
+      const resp = await fetch(`${RACER_URL}/ingest`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text:        extraction.text,
+          filename,
+          document_id: file.documentId ?? undefined,
+        }),
+      });
+      const json = await resp.json() as any;
+      results.push({
+        filePath:     file.filePath,
+        status:       json.status ?? "ok",
+        chunks_added: json.chunks_added,
+        duplicate_of: json.duplicate_of,
+      });
+    } catch (err: any) {
+      results.push({ filePath: file.filePath, status: "error", error: err?.message });
+    }
+  }
+
+  return reply.send({ data: { results, total: results.length }, error: null });
 });
 
 app.post("/api/racer/ingest", async (req, reply) => {
