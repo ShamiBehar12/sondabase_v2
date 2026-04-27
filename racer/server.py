@@ -41,8 +41,8 @@ EMBED_MODEL = "text-embedding-3-small"
 llm    = OpenAI(api_key=OPENAI_API_KEY)
 ef     = OpenAIEmbeddingFunction(api_key=OPENAI_API_KEY, model_name=EMBED_MODEL)
 chroma = chromadb.PersistentClient(path=RUTA_CHROMA)
-col_chunks = chroma.get_collection("chunks", embedding_function=ef)
-col_docs   = chroma.get_collection("docs",   embedding_function=ef)
+col_chunks = chroma.get_or_create_collection("chunks", embedding_function=ef, metadata={"hnsw:space": "cosine"})
+col_docs   = chroma.get_or_create_collection("docs",   embedding_function=ef, metadata={"hnsw:space": "cosine"})
 
 @contextmanager
 def get_db():
