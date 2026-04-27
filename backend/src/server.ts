@@ -1440,10 +1440,39 @@ async function triggerRacerIngest(filePath: string, fileName: string, documentId
 app.get("/api/racer/health", async (_req, reply) => {
   try {
     const resp = await fetch(`${RACER_URL}/health`);
-    return reply.code(resp.status).send(await resp.json());
+    const json = await resp.json() as any;
+    return reply.code(resp.status).send({ data: json, error: null });
   } catch {
-    return reply.code(503).send({ status: "unavailable", detail: "RACER server not reachable" });
+    return reply.code(503).send({ data: null, error: { message: "RACER server not reachable" } });
   }
+});
+
+app.get("/api/racer/docs", async (req, reply) => {
+  requireAuth(req);
+  const metadataPath = path.join(process.cwd(), "../racer/data/metadata.jsonl");
+  let raw: string;
+  try {
+    raw = await fs.readFile(metadataPath, "utf-8");
+  } catch {
+    return reply.send({ data: [], error: null });
+  }
+  const docs = raw
+    .split("\n")
+    .filter(l => l.trim())
+    .map(l => { try { return JSON.parse(l); } catch { return null; } })
+    .filter(Boolean)
+    .map((obj: any) => ({
+      document_id:     obj.document_id,
+      source_file:     obj.source_file,
+      doc_type:        obj.doc_type,
+      client:          obj.client,
+      country:         obj.country,
+      year:            obj.year,
+      is_apostilled:   obj.is_apostilled,
+      summary_one_line: obj.summary_one_line,
+      ingested_at:     obj.ingested_at,
+    }));
+  return reply.send({ data: docs, error: null });
 });
 
 app.post("/api/racer/query", async (req, reply) => {
