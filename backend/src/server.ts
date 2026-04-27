@@ -18,7 +18,7 @@ import {
   rankDocumentMatch,
   type MatchStats,
 } from "./lib/ai.js";
-import { extractPdfTextDirect } from "./lib/pdf.js";
+import { extractPdfTextDirect, extractPdfTextWithOcrFallback } from "./lib/pdf.js";
 import { generateOpenAIAnswer, generateOpenAIEmbedding, testOpenAIConnection } from "./lib/openai.js";
 import { prisma } from "./lib/prisma.js";
 import {
@@ -1446,6 +1446,46 @@ app.post("/api/racer/rfp", async (req, reply) => {
     });
     const json = await resp.json();
     return reply.code(resp.status).send(resp.ok ? { data: json, error: null } : { data: null, error: json });
+  } catch {
+    return reply.code(503).send({ data: null, error: { message: "RACER server not reachable" } });
+  }
+});
+
+app.post("/api/racer/ingest", async (req, reply) => {
+  const user = requireAuth(req);
+  const body = req.body as { bucket: string; filePath: string; documentId?: string };
+  const { bucket, filePath, documentId } = body;
+
+  if (!bucket || !filePath) {
+    throw app.httpErrors.badRequest("bucket y filePath son requeridos");
+  }
+
+  const absolutePath = bucketFilePath(bucket, filePath);
+  const filename     = path.basename(filePath);
+
+  let extraction: { text: string };
+  try {
+    extraction = await extractPdfTextWithOcrFallback(absolutePath);
+  } catch {
+    extraction = await extractPdfTextDirect(absolutePath);
+  }
+
+  if (!extraction.text.trim()) {
+    return reply.send({ data: null, error: { message: "No se pudo extraer texto del archivo" } });
+  }
+
+  try {
+    const resp = await fetch(`${RACER_URL}/ingest`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        text:        extraction.text,
+        filename,
+        document_id: documentId ?? undefined,
+      }),
+    });
+    const json = await resp.json();
+    return reply.send(resp.ok ? { data: json, error: null } : { data: null, error: json });
   } catch {
     return reply.code(503).send({ data: null, error: { message: "RACER server not reachable" } });
   }

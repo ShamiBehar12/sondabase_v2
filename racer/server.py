@@ -8,7 +8,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from openai import OpenAI
@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 import chromadb
 from chromadb import EmbeddingFunction, Embeddings
 import os
+from ingest import ingest_document
 
 class OpenAIEmbeddingFunction(EmbeddingFunction):
     def __init__(self, api_key: str, model_name: str):
@@ -186,6 +187,17 @@ class RFPResponse(BaseModel):
     total:      int
     requisitos: list[RFPRow]
 
+class IngestRequest(BaseModel):
+    text:        str
+    filename:    str
+    document_id: Optional[str] = None
+
+class IngestResponse(BaseModel):
+    document_id:  str
+    chunks_added: int
+    metadata:     dict
+    status:       str
+
 app = FastAPI(title="RACER Smart Cities API", version="2.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"],
                    allow_methods=["*"], allow_headers=["*"])
@@ -272,3 +284,31 @@ Contexto documental:
         time.sleep(0.2)
 
     return RFPResponse(total=len(resultados), requisitos=resultados)
+
+@app.post("/ingest", response_model=IngestResponse)
+def ingest(req: IngestRequest):
+    if not req.text.strip():
+        raise HTTPException(400, "Texto vacío")
+    try:
+        result = ingest_document(
+            text=req.text,
+            filename=req.filename,
+            col_chunks=col_chunks,
+            col_docs=col_docs,
+            db_path=RUTA_DB,
+            llm=llm,
+            modelo=MODELO,
+            ruta_chunks_jsonl=Path("data/chunks.jsonl"),
+            ruta_metadata_jsonl=Path("data/metadata.jsonl"),
+            document_id=req.document_id,
+        )
+        return IngestResponse(status="ok", **result)
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.get("/ingest/stats")
+def ingest_stats():
+    return {
+        "chunks": col_chunks.count(),
+        "docs":   col_docs.count(),
+    }
