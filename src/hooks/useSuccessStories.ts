@@ -36,7 +36,7 @@ export interface SuccessStory {
   image_03?: string;
   image_04?: string;
   tags?: string[];
-  status: 'rascunho' | 'em_revisao' | 'aprovado' | 'rejeitado';
+  status: 'rascunho' | 'em_revisao' | 'aprovado' | 'rechazado';
   is_verified: boolean;
   created_at: string;
   updated_at: string;
@@ -127,15 +127,15 @@ export const useSuccessStories = () => {
       // Map database status to interface status
       const mappedStories = (data || []).map(story => ({
         ...story,
-        status: story.status as 'rascunho' | 'em_revisao' | 'aprovado' | 'rejeitado'
+        status: story.status as 'rascunho' | 'em_revisao' | 'aprovado' | 'rechazado'
       }));
       
       setStories(mappedStories);
     } catch (error: any) {
       if (user && error?.message !== 'Load failed') {
         toast({
-          title: "Erro ao carregar histórias de sucesso",
-          description: error instanceof Error ? error.message : "Erro desconhecido",
+          title: "Error ao carregar historias de éxito",
+          description: error instanceof Error ? error.message : "Error desconhecido",
           variant: "destructive",
         });
       }
@@ -237,16 +237,16 @@ export const useSuccessStories = () => {
       if (error) throw error;
 
       toast({
-        title: "História de sucesso enviada",
-        description: "Sua história foi enviada e está aguardando aprovação.",
+        title: "Historia de éxito enviada",
+        description: "Sua historia foi enviada y está esperando aprobación.",
       });
 
       await fetchSuccessStories(); 
       return data;
     } catch (error) {
       toast({
-        title: "Erro ao enviar história",
-        description: error instanceof Error ? error.message : "Erro desconhecido",
+        title: "Error ao enviar historia",
+        description: error instanceof Error ? error.message : "Error desconhecido",
         variant: "destructive",
       });
       return null;
@@ -297,16 +297,16 @@ export const useSuccessStories = () => {
       if (error) throw error;
 
       toast({
-        title: "História atualizada",
-        description: "Sua história foi atualizada e enviada novamente para aprovação.",
+        title: "Historia atualizada",
+        description: "Sua historia foi atualizada y enviada novamente para aprobación.",
       });
 
       await fetchSuccessStories();
       return data;
     } catch (error) {
       toast({
-        title: "Erro ao atualizar história",
-        description: error instanceof Error ? error.message : "Erro desconhecido",
+        title: "Error ao atualizar historia",
+        description: error instanceof Error ? error.message : "Error desconhecido",
         variant: "destructive",
       });
       return null;
@@ -341,16 +341,16 @@ export const useSuccessStories = () => {
       if (error) throw error;
 
       toast({
-        title: "História removida",
-        description: "A história de sucesso foi removida com sucesso.",
+        title: "Historia removida",
+        description: "A historia de éxito foi removida com éxito.",
       });
 
       await fetchSuccessStories();
       return true;
     } catch (error) {
       toast({
-        title: "Erro ao remover história",
-        description: error instanceof Error ? error.message : "Erro desconhecido",
+        title: "Error ao remover historia",
+        description: error instanceof Error ? error.message : "Error desconhecido",
         variant: "destructive",
       });
       return false;

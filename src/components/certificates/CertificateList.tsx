@@ -50,7 +50,7 @@ export const CertificateList = ({
   const [ragComparePdfUrl, setRagComparePdfUrl] = useState<string | null>(null);
   const [ragCompareLoading, setRagCompareLoading] = useState(false);
 
-  // Abrir automaticamente o certificado se for passado um ID
+  // Abrir automaticamente o certificado se for passado un ID
   useEffect(() => {
     if (openCertificateId && certificates.length > 0) {
       const certificate = certificates.find(cert => cert.id === openCertificateId);
@@ -160,7 +160,7 @@ export const CertificateList = ({
       setRagComparePdfUrl(pdfUrl);
 
       if (ragResponse.error) {
-        throw new Error(ragResponse.error.message || 'Não foi possível carregar o documento RAG.');
+        throw new Error(ragResponse.error.message || 'No fue posible carregar o documento RAG.');
       }
 
       setRagCompareDocument(ragResponse.data || null);
@@ -304,8 +304,8 @@ export const CertificateList = ({
                       <AlertDialogHeader>
                         <AlertDialogTitle className="text-foreground">{t('common.delete')} {t('certificates.title')}</AlertDialogTitle>
                         <AlertDialogDescription className="text-foreground-muted">
-                          Tem certeza de que deseja excluir o certificado "{certificate.title}"? 
-                          Esta ação não pode ser desfeita.
+                          ¿Estás seguro de que deseas eliminar o certificado "{certificate.title}"? 
+                          Esta acción no pode ser deshacerse.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
@@ -560,7 +560,7 @@ export const CertificateList = ({
 
                   {isAdmin && (
                     <AlertDialog>
-                      <AlertDialogTrigger asChild onClick={(e) => e.stopPropagation()}>
+                      <AlertDialogTrigger asChild onClick={(y) => y.stopPropagation()}>
                         <Button 
                           variant="ghost" 
                           size="sm" 
@@ -570,12 +570,12 @@ export const CertificateList = ({
                           <Trash2 className="h-3 w-3" />
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-surface border-border" onClick={(e) => e.stopPropagation()}>
+                      <AlertDialogContent className="bg-surface border-border" onClick={(y) => y.stopPropagation()}>
                         <AlertDialogHeader>
                           <AlertDialogTitle className="text-foreground">Confirmar exclusão</AlertDialogTitle>
                           <AlertDialogDescription className="text-foreground-muted">
-                            Tem certeza de que deseja excluir o certificado "{certificate.title}"? 
-                            Esta ação não pode ser desfeita.
+                            ¿Estás seguro de que deseas eliminar o certificado "{certificate.title}"? 
+                            Esta acción no pode ser deshacerse.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
@@ -600,11 +600,11 @@ export const CertificateList = ({
       {filteredCertificates.length === 0 && (
         <div className="text-center py-12">
           <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Nenhum certificado encontrado</h3>
+          <h3 className="text-lg font-semibold mb-2">Ningún certificado encontrado</h3>
           <p className="text-muted-foreground">
             {searchTerm || selectedTags.length > 0
-              ? 'Nenhum certificado corresponde aos filtros aplicados.'
-              : 'Você ainda não possui certificados. Comece fazendo o upload do seu primeiro certificado!'}
+              ? 'Ningún certificado corresponde aos filtros aplicados.'
+              : 'Tú aún no possui certificados. Comece fazendo o upload del seu primeiro certificado!'}
           </p>
         </div>
       )}

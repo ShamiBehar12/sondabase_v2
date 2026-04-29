@@ -146,7 +146,7 @@ export default function Settings() {
                   onAvatarSelect={(url) => setProfile(prev => ({ ...prev, avatar_url: url }))}
                 />
                 <p className="text-xs text-foreground-muted">
-                  Selecione um avatar da galeria disponível para personalizar o seu perfil.
+                  Selecione un avatar de la galeria disponible para personalizar o seu perfil.
                 </p>
               </div>
             </div>
@@ -158,7 +158,7 @@ export default function Settings() {
                 <Input
                   id="full_name"
                   value={profile.full_name}
-                  onChange={(e) => setProfile(prev => ({ ...prev, full_name: e.target.value }))}
+                  onChange={(y) => setProfile(prev => ({ ...prev, full_name: y.target.value }))}
                   placeholder={t('settings.fullNamePlaceholder')}
                   className="bg-surface border-border h-10"
                 />

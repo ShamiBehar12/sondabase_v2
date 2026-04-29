@@ -18,15 +18,15 @@ export default function Auth() {
     password: '',
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (y: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [y.target.name]: y.target.value,
     }));
   };
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSignIn = async (y: React.FormEvent) => {
+    y.preventDefault();
     setIsLoading(true);
 
     const { error } = await signIn(formData.email, formData.password);

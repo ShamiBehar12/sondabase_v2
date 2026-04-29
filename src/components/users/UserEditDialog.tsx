@@ -79,8 +79,8 @@ export function UserEditDialog({ user, isOpen, onClose, onUserUpdated }: UserEdi
       }
 
       toast({
-        title: "Usuário atualizado",
-        description: "As informações do usuário foram atualizadas com sucesso.",
+        title: "Usuario atualizado",
+        description: "As informações del usuario foram atualizadas com éxito.",
       });
 
       // Call the parent callback to refresh and wait for it
@@ -90,8 +90,8 @@ export function UserEditDialog({ user, isOpen, onClose, onUserUpdated }: UserEdi
       console.error('Error updating user:', error);
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível atualizar o usuário.",
+        title: "Error",
+        description: "No fue posible atualizar o usuario.",
       });
     } finally {
       setLoading(false);
@@ -110,19 +110,19 @@ export function UserEditDialog({ user, isOpen, onClose, onUserUpdated }: UserEdi
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="bg-surface border-border">
         <DialogHeader>
-          <DialogTitle>Editar Usuário</DialogTitle>
+          <DialogTitle>Editar Usuario</DialogTitle>
           <DialogDescription>
-            Edite as informações do usuário {user.full_name || user.email}
+            Edite as informações del usuario {user.full_name || user.email}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="fullName">Nome Completo</Label>
+            <Label htmlFor="fullName">Nombre Completo</Label>
             <Input
               id="fullName"
               placeholder="Digite o nome completo"
               value={formData.fullName}
-              onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
+              onChange={(y) => setFormData(prev => ({ ...prev, fullName: y.target.value }))}
               className="bg-background border-border"
               disabled={loading}
             />
@@ -136,9 +136,9 @@ export function UserEditDialog({ user, isOpen, onClose, onUserUpdated }: UserEdi
               value={formData.email}
               className="bg-background border-border"
               disabled
-              title="O email não pode ser alterado"
+              title="O email no pode ser alterado"
             />
-            <p className="text-xs text-foreground-muted">O email não pode ser alterado</p>
+            <p className="text-xs text-foreground-muted">O email no pode ser alterado</p>
           </div>
 
           <Tabs defaultValue="avatar-selector" className="space-y-4">
@@ -148,7 +148,7 @@ export function UserEditDialog({ user, isOpen, onClose, onUserUpdated }: UserEdi
             </TabsList>
             
             <TabsContent value="avatar-selector" className="space-y-2">
-              <Label>Escolha um Avatar</Label>
+              <Label>Escolha un Avatar</Label>
               <AvatarSelector
                 selectedAvatarUrl={formData.avatarUrl}
                 onAvatarSelect={(url) => setFormData(prev => ({ ...prev, avatarUrl: url }))}
@@ -156,12 +156,12 @@ export function UserEditDialog({ user, isOpen, onClose, onUserUpdated }: UserEdi
             </TabsContent>
             
             <TabsContent value="custom-url" className="space-y-2">
-              <Label htmlFor="avatarUrl">URL do Avatar Personalizada</Label>
+              <Label htmlFor="avatarUrl">URL del Avatar Personalizada</Label>
               <Input
                 id="avatarUrl"
                 placeholder="https://exemplo.com/avatar.jpg"
                 value={formData.avatarUrl}
-                onChange={(e) => setFormData(prev => ({ ...prev, avatarUrl: e.target.value }))}
+                onChange={(y) => setFormData(prev => ({ ...prev, avatarUrl: y.target.value }))}
                 className="bg-background border-border"
                 disabled={loading}
               />
@@ -175,7 +175,7 @@ export function UserEditDialog({ user, isOpen, onClose, onUserUpdated }: UserEdi
                 <SelectValue placeholder="Selecione uma função" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="user">Usuário</SelectItem>
+                <SelectItem value="user">Usuario</SelectItem>
                 <SelectItem value="moderator">Moderador</SelectItem>
                 <SelectItem value="admin">Administrador</SelectItem>
               </SelectContent>

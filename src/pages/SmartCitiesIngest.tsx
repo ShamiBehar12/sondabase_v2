@@ -63,10 +63,10 @@ export default function SmartCitiesIngest() {
     setFiles(prev => [...prev, ...entries]);
   };
 
-  const onDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
+  const onDrop = useCallback((y: React.DragEvent) => {
+    y.preventDefault();
     setDragOver(false);
-    addFiles(e.dataTransfer.files);
+    addFiles(y.dataTransfer.files);
   }, []);
 
   const updateFile = (id: string, patch: Partial<FileEntry>) =>
@@ -141,7 +141,7 @@ export default function SmartCitiesIngest() {
       <Card
         className={`premium-card border-2 border-dashed transition-colors cursor-pointer
           ${dragOver ? "border-primary bg-primary/5" : "border-border"}`}
-        onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+        onDragOver={y => { y.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={onDrop}
         onClick={() => inputRef.current?.click()}
@@ -152,10 +152,10 @@ export default function SmartCitiesIngest() {
             Arrastra PDFs aquí o haz clic para seleccionar
           </p>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={e => { e.stopPropagation(); inputRef.current?.click(); }}>
+            <Button variant="outline" size="sm" onClick={y => { y.stopPropagation(); inputRef.current?.click(); }}>
               Seleccionar archivos
             </Button>
-            <Button variant="outline" size="sm" onClick={e => { e.stopPropagation(); folderRef.current?.click(); }}>
+            <Button variant="outline" size="sm" onClick={y => { y.stopPropagation(); folderRef.current?.click(); }}>
               Seleccionar carpeta
             </Button>
           </div>
@@ -163,10 +163,10 @@ export default function SmartCitiesIngest() {
       </Card>
 
       <input ref={inputRef}    type="file" multiple accept=".pdf" className="hidden"
-        onChange={e => addFiles(e.target.files)} />
+        onChange={y => addFiles(y.target.files)} />
       <input ref={folderRef}   type="file" className="hidden"
         {...{ webkitdirectory: "", multiple: true } as any}
-        onChange={e => addFiles(e.target.files)} />
+        onChange={y => addFiles(y.target.files)} />
 
       {/* Controls */}
       {files.length > 0 && (

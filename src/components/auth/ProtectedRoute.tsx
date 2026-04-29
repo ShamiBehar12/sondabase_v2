@@ -23,7 +23,7 @@ export function ProtectedRoute({ children, requireRole }: ProtectedRouteProps) {
     return <Navigate to="/auth" replace />;
   }
 
-  // Permitir acesso se não há role obrigatório ou se o userRole é válido
+  // Permitir acesso se no há role obrigatório o se o userRole é válido
   // Fallback para 'user' se userRole for null
   const effectiveRole = userRole || 'user';
   
@@ -32,7 +32,7 @@ export function ProtectedRoute({ children, requireRole }: ProtectedRouteProps) {
       <div className="min-h-screen flex items-center justify-center bg-gradient-secondary">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-foreground mb-2">Acesso Negado</h1>
-          <p className="text-foreground-muted">Você não tem permissão para acessar esta página.</p>
+          <p className="text-foreground-muted">No tienes permiso para acessar esta página.</p>
         </div>
       </div>
     );

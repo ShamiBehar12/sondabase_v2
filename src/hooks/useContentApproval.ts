@@ -22,7 +22,7 @@ export interface ContentItem {
   id: string;
   type_id: string;
   autor_id: string;
-  status: 'rascunho' | 'em_revisao' | 'aprovado' | 'rejeitado';
+  status: 'rascunho' | 'em_revisao' | 'aprovado' | 'rechazado';
   dados: any;
   version: number;
   publish_at?: string;
@@ -36,7 +36,7 @@ export interface ContentReview {
   id: string;
   item_id: string;
   reviewer_id: string;
-  decisao: 'aprovar' | 'rejeitar' | 'ajustes';
+  decisao: 'aprobar' | 'rejeitar' | 'ajustes';
   comentario: string;
   created_at: string;
   reviewer_name?: string;
@@ -70,7 +70,7 @@ export function useContentApproval() {
       setContentTypes(data || []);
     } catch (error: any) {
       console.error('Error fetching content types:', error);
-      toast.error('Erro ao carregar tipos de conteúdo');
+      toast.error('Error ao carregar tipos de conteúdo');
     }
   };
 
@@ -97,7 +97,7 @@ export function useContentApproval() {
       setItems(data || []);
     } catch (error: any) {
       console.error('Error fetching items:', error);
-      toast.error('Erro ao carregar itens');
+      toast.error('Error ao carregar itens');
     } finally {
       setLoading(false);
     }
@@ -137,7 +137,7 @@ export function useContentApproval() {
       setItems(itemsWithAuthor);
     } catch (error: any) {
       console.error('Error fetching review queue:', error);
-      toast.error('Erro ao carregar fila de revisão');
+      toast.error('Error ao carregar fila de revisão');
     } finally {
       setLoading(false);
     }
@@ -162,12 +162,12 @@ export function useContentApproval() {
       // Log audit
       await logAudit('criar_item', newItem.id, { type_id: typeId });
       
-      toast.success('Item criado com sucesso');
+      toast.success('Item criado com éxito');
       await fetchMyItems();
       return newItem;
     } catch (error: any) {
       console.error('Error creating item:', error);
-      toast.error('Erro ao criar item');
+      toast.error('Error ao crear item');
       throw error;
     }
   };
@@ -188,11 +188,11 @@ export function useContentApproval() {
       // Log audit
       await logAudit('editar_item', itemId, data);
       
-      toast.success('Item atualizado com sucesso');
+      toast.success('Item atualizado com éxito');
       await fetchMyItems();
     } catch (error: any) {
       console.error('Error updating item:', error);
-      toast.error('Erro ao atualizar item');
+      toast.error('Error ao atualizar item');
       throw error;
     }
   };
@@ -220,7 +220,7 @@ export function useContentApproval() {
       await fetchMyItems();
     } catch (error: any) {
       console.error('Error submitting for review:', error);
-      toast.error('Erro ao enviar para revisão');
+      toast.error('Error ao enviar para revisão');
       throw error;
     }
   };
@@ -245,7 +245,7 @@ export function useContentApproval() {
         .insert({
           item_id: itemId,
           reviewer_id: (await apiClient.auth.getUser()).data.user?.id,
-          decisao: 'aprovar',
+          decisao: 'aprobar',
           comentario: comment || 'Aprovado'
         });
 
@@ -257,11 +257,11 @@ export function useContentApproval() {
       // Create notification for author
       await createNotification(itemId, 'aprovado');
       
-      toast.success('Item aprovado com sucesso');
+      toast.success('Item aprovado com éxito');
       await fetchReviewQueue();
     } catch (error: any) {
       console.error('Error approving item:', error);
-      toast.error('Erro ao aprovar item');
+      toast.error('Error ao aprobar item');
       throw error;
     }
   };
@@ -269,7 +269,7 @@ export function useContentApproval() {
   // Reject item
   const rejectItem = async (itemId: string, comment: string) => {
     if (!comment.trim()) {
-      toast.error('Comentário é obrigatório para rejeição');
+      toast.error('Comentário é obrigatório para rechazo');
       return;
     }
 
@@ -278,7 +278,7 @@ export function useContentApproval() {
       const { error: updateError } = await apiClient
         .from('content_items')
         .update({ 
-          status: 'rejeitado',
+          status: 'rechazado',
           updated_at: new Date().toISOString()
         })
         .eq('id', itemId);
@@ -301,13 +301,13 @@ export function useContentApproval() {
       await logAudit('rejeitar_item', itemId, { comentario: comment });
       
       // Create notification for author
-      await createNotification(itemId, 'rejeitado');
+      await createNotification(itemId, 'rechazado');
       
-      toast.success('Item rejeitado');
+      toast.success('Item rechazado');
       await fetchReviewQueue();
     } catch (error: any) {
       console.error('Error rejecting item:', error);
-      toast.error('Erro ao rejeitar item');
+      toast.error('Error ao rejeitar item');
       throw error;
     }
   };
@@ -353,7 +353,7 @@ export function useContentApproval() {
       await fetchReviewQueue();
     } catch (error: any) {
       console.error('Error requesting changes:', error);
-      toast.error('Erro ao solicitar ajustes');
+      toast.error('Error ao solicitar ajustes');
       throw error;
     }
   };
@@ -411,7 +411,7 @@ export function useContentApproval() {
   };
 
   // Helper function to create notifications
-  const createNotification = async (itemId: string, type: 'envio_revisao' | 'aprovado' | 'rejeitado' | 'pedido_ajustes') => {
+  const createNotification = async (itemId: string, type: 'envio_revisao' | 'aprovado' | 'rechazado' | 'pedido_ajustes') => {
     try {
       // Get item details
       const { data: item } = await apiClient
@@ -427,11 +427,11 @@ export function useContentApproval() {
       let targetUserId = '';
 
       const itemData = item.dados as any;
-      const titulo = itemData?.titulo || 'Sem título';
+      const titulo = itemData?.titulo || 'Sin título';
 
       switch (type) {
         case 'envio_revisao':
-          title = 'Novo item para revisão';
+          title = 'Nuevo item para revisão';
           message = `Item "${titulo}" foi enviado para revisão`;
           // TODO: Send to all reviewers - for now we'll skip this
           return;
@@ -442,9 +442,9 @@ export function useContentApproval() {
           targetUserId = item.autor_id;
           break;
           
-        case 'rejeitado':
-          title = 'Item rejeitado';
-          message = `Seu item "${titulo}" foi rejeitado`;
+        case 'rechazado':
+          title = 'Item rechazado';
+          message = `Seu item "${titulo}" foi rechazado`;
           targetUserId = item.autor_id;
           break;
           

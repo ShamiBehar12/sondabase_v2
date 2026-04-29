@@ -46,7 +46,7 @@ declare module "fastify" {
 
 const app = Fastify({
   logger: true,
-  bodyLimit: 10 * 1024 * 1024,
+  bodyLimit: 50 * 1024 * 1024,
 });
 
 await app.register(cors, {
@@ -55,7 +55,7 @@ await app.register(cors, {
 });
 await app.register(multipart, {
   limits: {
-    fileSize: 10 * 1024 * 1024,
+    fileSize: 50 * 1024 * 1024,
   },
 });
 await app.register(sensible);
@@ -1421,20 +1421,19 @@ app.setErrorHandler((error: any, _request, reply) => {
 // ── RACER Smart Cities RAG proxy ──────────────────────────────────────────
 const RACER_URL = process.env.RACER_URL ?? "http://localhost:8000";
 
+async function sendPdfToRacer(absolutePath: string, fileName: string, documentId?: string) {
+  const fileBuffer = await fs.readFile(absolutePath);
+  const blob = new Blob([fileBuffer], { type: "application/pdf" });
+  const form = new FormData();
+  form.append("file", blob, fileName);
+  if (documentId) form.append("document_id", documentId);
+  const resp = await fetch(`${RACER_URL}/ingest/pdf`, { method: "POST", body: form });
+  return await resp.json() as any;
+}
+
 async function triggerRacerIngest(filePath: string, fileName: string, documentId: string) {
   const absolutePath = bucketFilePath("certificates", filePath);
-  let extraction: { text: string };
-  try {
-    extraction = await extractPdfTextWithOcrFallback(absolutePath);
-  } catch {
-    extraction = await extractPdfTextDirect(absolutePath);
-  }
-  if (!extraction.text.trim()) return;
-  await fetch(`${RACER_URL}/ingest`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text: extraction.text, filename: fileName, document_id: documentId }),
-  });
+  await sendPdfToRacer(absolutePath, fileName, documentId);
 }
 
 app.get("/api/racer/health", async (_req, reply) => {
@@ -1533,26 +1532,7 @@ app.post("/api/racer/ingest-batch", async (req, reply) => {
     const absolutePath = bucketFilePath(file.bucket, file.filePath);
     const filename     = path.basename(file.filePath);
     try {
-      let extraction: { text: string };
-      try {
-        extraction = await extractPdfTextWithOcrFallback(absolutePath);
-      } catch {
-        extraction = await extractPdfTextDirect(absolutePath);
-      }
-      if (!extraction.text.trim()) {
-        results.push({ filePath: file.filePath, status: "empty" });
-        continue;
-      }
-      const resp = await fetch(`${RACER_URL}/ingest`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text:        extraction.text,
-          filename,
-          document_id: file.documentId ?? undefined,
-        }),
-      });
-      const json = await resp.json() as any;
+      const json = await sendPdfToRacer(absolutePath, filename, file.documentId);
       results.push({
         filePath:     file.filePath,
         status:       json.status ?? "ok",
@@ -1579,29 +1559,14 @@ app.post("/api/racer/ingest", async (req, reply) => {
   const absolutePath = bucketFilePath(bucket, filePath);
   const filename     = path.basename(filePath);
 
-  let extraction: { text: string };
   try {
-    extraction = await extractPdfTextWithOcrFallback(absolutePath);
-  } catch {
-    extraction = await extractPdfTextDirect(absolutePath);
-  }
+    const json = await sendPdfToRacer(absolutePath, filename, documentId);
 
-  if (!extraction.text.trim()) {
-    return reply.send({ data: null, error: { message: "No se pudo extraer texto del archivo" } });
-  }
+    if (json.status === "empty") {
+      return reply.send({ data: null, error: { message: "No se pudo extraer texto del archivo" } });
+    }
 
-  try {
-    const resp = await fetch(`${RACER_URL}/ingest`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        text:        extraction.text,
-        filename,
-        document_id: documentId ?? undefined,
-      }),
-    });
-    const json = await resp.json() as any;
-    if (resp.ok && json.status !== "duplicate") {
+    if (json.status !== "duplicate") {
       try {
         const stat = await fs.stat(absolutePath).catch(() => ({ size: 0 }));
         const title = filename.replace(/\.pdf$/i, "").replace(/[-_]/g, " ");
@@ -1628,7 +1593,7 @@ app.post("/api/racer/ingest", async (req, reply) => {
         app.log.warn("Certificate record creation skipped: " + String(e?.message));
       }
     }
-    return reply.send(resp.ok ? { data: json, error: null } : { data: null, error: json });
+    return reply.send({ data: json, error: null });
   } catch {
     return reply.code(503).send({ data: null, error: { message: "RACER server not reachable" } });
   }
@@ -1669,10 +1634,10 @@ app.get("/api/stats/dashboard", async (req, reply) => {
   const activities: ActivityItem[] = [];
 
   for (const cert of recentCerts) {
-    const userName = (cert as any).user?.profile?.fullName || (cert as any).user?.email || "Usuário";
+    const userName = (cert as any).user?.profile?.fullName || (cert as any).user?.email || "Usuario";
     activities.push({
       id: cert.id,
-      action: cert.isVerified ? "adicionou certificado" : "enviou certificado para revisão",
+      action: cert.isVerified ? "añadió un certificado" : "envió certificado para revisión",
       document: cert.title,
       user: userName,
       time: cert.createdAt.toISOString(),
@@ -1680,11 +1645,11 @@ app.get("/api/stats/dashboard", async (req, reply) => {
     });
   }
   for (const story of recentStories) {
-    const userName = (story as any).user?.profile?.fullName || (story as any).user?.email || "Usuário";
+    const userName = (story as any).user?.profile?.fullName || (story as any).user?.email || "Usuario";
     activities.push({
       id: story.id,
-      action: story.isVerified ? "publicou história" : "enviou história para revisão",
-      document: (story as any).titlePt || (story as any).titleEs || (story as any).titleEn || "Sem título",
+      action: story.isVerified ? "publicó historia" : "envió historia para revisión",
+      document: (story as any).titlePt || (story as any).titleEs || (story as any).titleEn || "Sin título",
       user: userName,
       time: story.createdAt.toISOString(),
       type: story.isVerified ? "success" : "info",

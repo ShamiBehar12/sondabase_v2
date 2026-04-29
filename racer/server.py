@@ -8,7 +8,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, File, HTTPException, BackgroundTasks, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from openai import OpenAI
@@ -17,6 +17,7 @@ import chromadb
 from chromadb import EmbeddingFunction, Embeddings
 import os
 from ingest import ingest_document
+from pdf_reader import extract_text_from_pdf
 
 class OpenAIEmbeddingFunction(EmbeddingFunction):
     def __init__(self, api_key: str, model_name: str):
@@ -41,12 +42,42 @@ EMBED_MODEL = "text-embedding-3-small"
 llm    = OpenAI(api_key=OPENAI_API_KEY)
 ef     = OpenAIEmbeddingFunction(api_key=OPENAI_API_KEY, model_name=EMBED_MODEL)
 chroma = chromadb.PersistentClient(path=RUTA_CHROMA)
-col_chunks = chroma.get_collection("chunks", embedding_function=ef)
-col_docs   = chroma.get_collection("docs",   embedding_function=ef)
+col_chunks = chroma.get_or_create_collection("chunks", embedding_function=ef)
+col_docs   = chroma.get_or_create_collection("docs",   embedding_function=ef)
+
+# Ensure data directory and SQLite schema exist
+Path("data").mkdir(exist_ok=True)
+_init_conn = sqlite3.connect(RUTA_DB)
+_init_conn.execute("""
+    CREATE TABLE IF NOT EXISTS documents (
+        document_id TEXT PRIMARY KEY,
+        source_file TEXT,
+        original_filename TEXT,
+        relative_path TEXT,
+        doc_type TEXT,
+        client TEXT,
+        country TEXT,
+        is_apostilled INTEGER,
+        year INTEGER,
+        contract_value_usd REAL,
+        contract_duration_years REAL,
+        units_deployed INTEGER,
+        summary_one_line TEXT,
+        language TEXT,
+        validity_alert INTEGER,
+        project_domain_json TEXT,
+        technologies_json TEXT,
+        ingested_at TEXT,
+        content_hash TEXT
+    )
+""")
+_init_conn.commit()
+_init_conn.close()
 
 @contextmanager
 def get_db():
     conn = sqlite3.connect(RUTA_DB)
+
     conn.row_factory = sqlite3.Row
     try:
         yield conn
@@ -306,6 +337,37 @@ def ingest(req: IngestRequest):
             document_id=req.document_id,
         )
         return IngestResponse(status="ok", **result)
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.post("/ingest/pdf")
+async def ingest_pdf(file: UploadFile = File(...), document_id: str | None = None):
+    """Acepta un PDF via multipart, extrae texto con PyMuPDF + OCR, e ingesta."""
+    if not file.filename or not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(400, "Se requiere un archivo PDF")
+    file_bytes = await file.read()
+    if not file_bytes:
+        raise HTTPException(400, "Archivo vacío")
+
+    text = extract_text_from_pdf(file_bytes, file.filename)
+    if not text.strip():
+        return {"status": "empty", "document_id": document_id or "",
+                "chunks_added": 0, "metadata": {},
+                "message": "No se pudo extraer texto del PDF"}
+    try:
+        result = ingest_document(
+            text=text,
+            filename=file.filename,
+            col_chunks=col_chunks,
+            col_docs=col_docs,
+            db_path=RUTA_DB,
+            llm=llm,
+            modelo=MODELO,
+            ruta_chunks_jsonl=Path("data/chunks.jsonl"),
+            ruta_metadata_jsonl=Path("data/metadata.jsonl"),
+            document_id=document_id,
+        )
+        return {"status": result.get("status", "ok"), **result}
     except Exception as e:
         raise HTTPException(500, str(e))
 

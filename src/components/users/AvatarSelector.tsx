@@ -39,9 +39,9 @@ export function AvatarSelector({ selectedAvatarUrl, onAvatarSelect }: AvatarSele
                 src={selectedAvatarUrl} 
                 alt="Avatar selecionado"
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                onError={(y) => {
+                  y.currentTarget.style.display = 'none';
+                  const fallback = y.currentTarget.nextElementSibling as HTMLElement;
                   if (fallback) fallback.style.display = 'flex';
                 }}
               />
@@ -57,7 +57,7 @@ export function AvatarSelector({ selectedAvatarUrl, onAvatarSelect }: AvatarSele
         <DialogHeader>
           <DialogTitle>Selecionar Avatar</DialogTitle>
           <DialogDescription>
-            Escolha um avatar da galeria disponível
+            Escolha un avatar de la galeria disponible
           </DialogDescription>
         </DialogHeader>
 
@@ -68,7 +68,7 @@ export function AvatarSelector({ selectedAvatarUrl, onAvatarSelect }: AvatarSele
             </div>
           ) : templates.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-foreground-muted">Nenhum avatar disponível.</p>
+              <p className="text-foreground-muted">Ningún avatar disponible.</p>
             </div>
           ) : (
             <div className="space-y-6 max-h-96 overflow-y-auto">

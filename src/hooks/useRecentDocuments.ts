@@ -16,7 +16,7 @@ export interface RecentDocument {
   wasEdited?: boolean;
   isNew?: boolean;
   mostRecentDate?: string;
-  // Dados específicos do certificado
+  // Dados específicos del certificado
   description?: string;
   certificate_number?: string;
   issued_date?: string;
@@ -81,11 +81,11 @@ export const useRecentDocuments = () => {
         const updatedAt = new Date(cert.updated_at);
         const endDate = cert.contract_end_date ? new Date(cert.contract_end_date) : null;
         
-        // Verificar se foi editado (diferença entre created_at e updated_at > 1 minuto)
+        // Verificar se foi editado (diferença entre created_at y updated_at > 1 minuto)
         const timeDiff = updatedAt.getTime() - createdAt.getTime();
         const wasEdited = timeDiff > 60000; // 1 minuto
         
-        // Verificar se é novo (criado nos últimos 7 dias)
+        // Verificar se é nuevo (criado nos últimos 7 dias)
         const isNew = createdAt >= sevenDaysAgo;
         
         // Verificar se está expirando
@@ -97,15 +97,15 @@ export const useRecentDocuments = () => {
           type: 'certificate' as const,
           client: cert.issuing_organization || undefined,
           lastEdited: cert.updated_at,
-          editedBy: cert.user_id === user.id ? 'Você' : 'Administrador',
+          editedBy: cert.user_id === user.id ? 'Tú' : 'Administrador',
           status: 'published' as const,
           created_at: cert.created_at,
           updated_at: cert.updated_at,
           wasEdited,
           isNew,
-          // Data mais recente entre criação e atualização
+          // Data mais recente entre criação y atualização
           mostRecentDate: updatedAt > createdAt ? cert.updated_at : cert.created_at,
-          // Dados específicos do certificado
+          // Dados específicos del certificado
           description: cert.description,
           certificate_number: cert.certificate_number,
           issued_date: cert.issued_date,
@@ -119,7 +119,7 @@ export const useRecentDocuments = () => {
       // TODO: Quando houver tabela de success stories, adicionar aqui
       // Por enquanto, vamos usar apenas certificados
       
-      // Ordenar pela data mais recente (criação ou atualização)
+      // Ordenar pela data mais recente (criação o atualização)
       const allDocuments = [...certificateDocuments]
         .sort((a, b) => new Date(b.mostRecentDate).getTime() - new Date(a.mostRecentDate).getTime())
         .slice(0, 5); // Limitar a 5 documentos mais recentes
@@ -129,8 +129,8 @@ export const useRecentDocuments = () => {
       // Only show error if user is still authenticated
       if (user && error?.message !== 'Load failed') {
         toast({
-          title: "Erro ao carregar documentos recentes",
-          description: error instanceof Error ? error.message : "Erro desconhecido",
+          title: "Error ao carregar documentos recentes",
+          description: error instanceof Error ? error.message : "Error desconhecido",
           variant: "destructive",
         });
       }

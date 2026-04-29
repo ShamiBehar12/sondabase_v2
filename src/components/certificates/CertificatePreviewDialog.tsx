@@ -100,7 +100,7 @@ export function CertificatePreviewDialog({
           ) : (
             <div className="flex items-center justify-center h-[70vh] bg-muted rounded-lg">
               <div className="text-center">
-                <p className="text-muted-foreground">Não foi possível carregar o PDF</p>
+                <p className="text-muted-foreground">No fue posible carregar o PDF</p>
                 <Button
                   variant="outline"
                   onClick={onClose}

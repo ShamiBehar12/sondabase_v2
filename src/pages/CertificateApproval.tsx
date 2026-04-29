@@ -262,20 +262,20 @@ export default function CertificateApproval() {
     console.log('User:', { userId: user?.id, userRole });
     
     if (userRole !== 'admin' && userRole !== 'reviewer') {
-      console.log('❌ Usuário sem permissão:', { userRole });
+      console.log('❌ Usuario sem permiso:', { userRole });
       toast({
         variant: "destructive",
-        title: "Sem permissão",
-        description: "Você não tem permissão para aprovar certificados.",
+        title: "Sem permiso",
+        description: "No tienes permiso para aprobar certificados.",
       });
       return;
     }
 
     try {
-      console.log('✅ Iniciando aprovação:', { type, id, userRole, userId: user?.id });
+      console.log('✅ Iniciando aprobación:', { type, id, userRole, userId: user?.id });
       setLoadingApprove(prev => ({ ...prev, [id]: true }));
       
-      // Verificar se o certificado existe e obter dados antes de aprovar
+      // Verificar se o certificado existe y obter dados antes de aprobar
       const { data: existingCert, error: checkError } = await apiClient
         .from(type)
         .select('id, is_verified, user_id, title')
@@ -283,13 +283,13 @@ export default function CertificateApproval() {
         .single();
       
       if (checkError) {
-        console.error('❌ Erro ao verificar certificado:', checkError);
+        console.error('❌ Error ao verificar certificado:', checkError);
         throw checkError;
       }
       
       console.log('📋 Certificado encontrado:', existingCert);
 
-      // Primeiro, registrar a aprovação na tabela de aprovações
+      // Primeiro, registrar a aprobación na tabela de aprovações
       const { data: approvalData, error: approvalError } = await apiClient
         .from('certificate_approvals')
         .insert({
@@ -302,11 +302,11 @@ export default function CertificateApproval() {
         .select();
 
       if (approvalError) {
-        console.error('Erro ao registrar aprovação:', approvalError);
+        console.error('Error ao registrar aprobación:', approvalError);
         throw approvalError;
       }
 
-      console.log('Aprovação registrada:', approvalData);
+      console.log('Aprobación registrada:', approvalData);
       
       // Depois, atualizar o certificado como verificado
       const { data, error } = await apiClient
@@ -316,15 +316,15 @@ export default function CertificateApproval() {
         .select();
 
       if (error) {
-        console.error('Erro ao aprovar - detalhes:', error);
+        console.error('Error ao aprobar - detalhes:', error);
         throw error;
       }
 
-      console.log('Certificado aprovado com sucesso - dados:', data);
+      console.log('Certificado aprovado com éxito - dados:', data);
 
       toast({
         title: "Certificado aprovado",
-        description: "O certificado foi aprovado com sucesso.",
+        description: "O certificado foi aprovado com éxito.",
       });
 
       // Close the detail dialog
@@ -340,7 +340,7 @@ export default function CertificateApproval() {
       }
       console.log('Lista recarregada');
     } catch (error: any) {
-      console.error('Erro completo ao aprovar:', {
+      console.error('Error completo ao aprobar:', {
         error,
         message: error?.message,
         details: error?.details,
@@ -349,8 +349,8 @@ export default function CertificateApproval() {
       });
       toast({
         variant: "destructive",
-        title: "Erro ao aprovar certificado",
-        description: error?.message || "Não foi possível aprovar o certificado.",
+        title: "Error ao aprobar certificado",
+        description: error?.message || "No fue posible aprobar o certificado.",
       });
     } finally {
       setLoadingApprove(prev => ({ ...prev, [id]: false }));
@@ -366,7 +366,7 @@ export default function CertificateApproval() {
       setLoadingReject(prev => ({ ...prev, [id]: true }));
       
       // First get the certificate to get the user_id and title
-      console.log('Buscando certificado para obter user_id e título...');
+      console.log('Buscando certificado para obter user_id y título...');
       const tableName = type === 'certificates' ? 'certificates' : 'professional_certificates';
       const { data: certData, error: certError } = await apiClient
         .from(tableName)
@@ -375,12 +375,12 @@ export default function CertificateApproval() {
         .single();
 
       if (certError) {
-        console.error('Erro ao buscar certificado:', certError);
+        console.error('Error ao buscar certificado:', certError);
         throw certError;
       }
 
       // Save the rejection reason with user_id and original title
-      console.log('Tentando inserir motivo da rejeição...');
+      console.log('Tentando inserir motivo del rechazo...');
       const { data: rejectionData, error: rejectionError } = await apiClient
         .from('certificate_rejections')
         .insert({
@@ -394,15 +394,15 @@ export default function CertificateApproval() {
         })
         .select();
 
-      console.log('Resultado da inserção de rejeição:', { rejectionData, rejectionError });
+      console.log('Resultado de la inserção de rechazo:', { rejectionData, rejectionError });
 
       if (rejectionError) {
-        console.error('Erro ao salvar motivo da rejeição:', rejectionError);
+        console.error('Error ao salvar motivo del rechazo:', rejectionError);
         throw rejectionError;
       }
 
       // Then delete the certificate
-      console.log('Tentando deletar certificado da tabela:', type);
+      console.log('Tentando deletar certificado de la tabela:', type);
       console.log('User atual:', user);
       console.log('UserRole atual:', userRole);
       
@@ -413,18 +413,18 @@ export default function CertificateApproval() {
         .eq('id', id)
         .select();
 
-      console.log('Resultado da deleção:', { deleteData, deleteError });
+      console.log('Resultado de la deleção:', { deleteData, deleteError });
 
       if (deleteError) {
-        console.error('Erro ao deletar certificado:', deleteError);
+        console.error('Error ao deletar certificado:', deleteError);
         throw deleteError;
       }
 
-      console.log('Certificado rejeitado com sucesso');
+      console.log('Certificado rechazado com éxito');
 
       toast({
-        title: "Certificado rejeitado",
-        description: "O certificado foi rejeitado e o usuário foi notificado do motivo.",
+        title: "Certificado rechazado",
+        description: "O certificado foi rechazado y o usuario foi notificado del motivo.",
       });
 
       // Close the detail dialog
@@ -436,14 +436,14 @@ export default function CertificateApproval() {
       setSelectedCertificate(null);
 
       // Force a complete refresh of the list
-      console.log('Iniciando refresh da lista...');
+      console.log('Iniciando refresh de la lista...');
       if (type === 'certificates') {
-        console.log('Estado atual de certificates antes do refresh:', certificates.length, 'certificados');
+        console.log('Estado atual de certificates antes del refresh:', certificates.length, 'certificados');
         setCertificates([]);
         await fetchCertificatesWithUsers();
         console.log('fetchCertificatesWithUsers executado');
       } else {
-        console.log('Estado atual de professionalCertificates antes do refresh:', professionalCertificates.length, 'certificados');
+        console.log('Estado atual de professionalCertificates antes del refresh:', professionalCertificates.length, 'certificados');
         setProfessionalCertificates([]);
         await fetchProfessionalCertificatesWithUsers();
         console.log('fetchProfessionalCertificatesWithUsers executado');
@@ -452,7 +452,7 @@ export default function CertificateApproval() {
       
     } catch (error: any) {
       console.error('=== ERRO NA REJEIÇÃO ===');
-      console.error('Erro completo ao rejeitar:', {
+      console.error('Error completo ao rejeitar:', {
         error,
         message: error?.message,
         details: error?.details,
@@ -461,8 +461,8 @@ export default function CertificateApproval() {
       });
       toast({
         variant: "destructive",
-        title: "Erro ao rejeitar certificado",
-        description: error?.message || "Não foi possível rejeitar o certificado.",
+        title: "Error ao rejeitar certificado",
+        description: error?.message || "No fue posible rejeitar o certificado.",
       });
     } finally {
       setLoadingReject(prev => ({ ...prev, [id]: false }));
@@ -502,7 +502,7 @@ export default function CertificateApproval() {
             <Card>
               <CardContent className="p-6 text-center">
                 <p className="text-muted-foreground">
-                  Nenhum certificado aguardando aprovação.
+                  Ningún certificado esperando aprobación.
                 </p>
               </CardContent>
             </Card>
@@ -512,7 +512,7 @@ export default function CertificateApproval() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Título</TableHead>
-                    <TableHead>Usuário</TableHead>
+                    <TableHead>Usuario</TableHead>
                     <TableHead>Organização</TableHead>
                     <TableHead>País</TableHead>
                     <TableHead>Criado em</TableHead>
@@ -529,16 +529,16 @@ export default function CertificateApproval() {
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <User className="w-4 w-4 text-muted-foreground" />
-                            <span>{certificate.full_name || 'Nome não disponível'}</span>
+                            <span>{certificate.full_name || 'Nombre no disponible'}</span>
                           </div>
                         </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Building className="w-4 h-4 text-muted-foreground" />
-                          <span>{certificate.issuing_organization || 'Não informado'}</span>
+                          <span>{certificate.issuing_organization || 'No informado'}</span>
                         </div>
                       </TableCell>
-                      <TableCell>{certificate.country || 'Não informado'}</TableCell>
+                      <TableCell>{certificate.country || 'No informado'}</TableCell>
                       <TableCell>
                         {new Date(certificate.created_at).toLocaleDateString('pt-BR')}
                       </TableCell>
@@ -550,8 +550,8 @@ export default function CertificateApproval() {
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
+                            onClick={(y) => {
+                              y.stopPropagation();
                               setSelectedCertificate(certificate);
                               setSelectedType('certificate');
                               setDetailDialogOpen(true);
@@ -603,7 +603,7 @@ export default function CertificateApproval() {
             <Card>
               <CardContent className="p-6 text-center">
                 <p className="text-muted-foreground">
-                  Nenhum certificado profissional aguardando aprovação.
+                  Ningún certificado profissional esperando aprobación.
                 </p>
               </CardContent>
             </Card>
@@ -613,7 +613,7 @@ export default function CertificateApproval() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Título</TableHead>
-                    <TableHead>Usuário</TableHead>
+                    <TableHead>Usuario</TableHead>
                     <TableHead>Instituição</TableHead>
                     <TableHead>Tipo</TableHead>
                     <TableHead>Conselho</TableHead>
@@ -631,17 +631,17 @@ export default function CertificateApproval() {
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <User className="w-4 w-4 text-muted-foreground" />
-                            <span>{certificate.full_name || 'Nome não disponível'}</span>
+                            <span>{certificate.full_name || 'Nombre no disponible'}</span>
                           </div>
                         </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Building className="w-4 h-4 text-muted-foreground" />
-                          <span>{certificate.institution || 'Não informado'}</span>
+                          <span>{certificate.institution || 'No informado'}</span>
                         </div>
                       </TableCell>
-                      <TableCell>{certificate.certification_type || 'Não informado'}</TableCell>
-                      <TableCell>{certificate.professional_council || 'Não informado'}</TableCell>
+                      <TableCell>{certificate.certification_type || 'No informado'}</TableCell>
+                      <TableCell>{certificate.professional_council || 'No informado'}</TableCell>
                       <TableCell>
                         {new Date(certificate.created_at).toLocaleDateString('pt-BR')}
                       </TableCell>
@@ -653,8 +653,8 @@ export default function CertificateApproval() {
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
+                            onClick={(y) => {
+                              y.stopPropagation();
                               setSelectedCertificate(certificate);
                               setSelectedType('professional_certificate');
                               setDetailDialogOpen(true);
@@ -711,13 +711,13 @@ export default function CertificateApproval() {
           <div className="space-y-4">
             <div>
               <Label htmlFor="rejection-reason">
-                Motivo da rejeição <span className="text-destructive">*</span>
+                Motivo de la rechazo <span className="text-destructive">*</span>
               </Label>
               <Textarea
                 id="rejection-reason"
-                placeholder="Explique o motivo da rejeição para que o usuário possa corrigir..."
+                placeholder="Explique o motivo del rechazo para que el usuario pueda corregir..."
                 value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
+                onChange={(y) => setRejectionReason(y.target.value)}
                 className="mt-2"
                 rows={4}
               />
@@ -739,8 +739,8 @@ export default function CertificateApproval() {
                   if (!certificateToReject || !rejectionReason.trim()) {
                     toast({
                       variant: "destructive",
-                      title: "Erro",
-                      description: "Por favor, forneça um motivo para a rejeição.",
+                      title: "Error",
+                      description: "Por favor, forneça un motivo para a rechazo.",
                     });
                     return;
                   }
@@ -752,7 +752,7 @@ export default function CertificateApproval() {
                 }}
                 disabled={loading || !rejectionReason.trim()}
               >
-                Confirmar Rejeição
+                Confirmar Rechazo
               </Button>
             </div>
           </div>

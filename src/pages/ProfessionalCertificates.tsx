@@ -84,20 +84,20 @@ export default function ProfessionalCertificates() {
 
       toast({
         title: "Download iniciado",
-        description: "O arquivo está sendo baixado.",
+        description: "O archivo está sendo baixado.",
       });
     } catch (error) {
       console.error('Error downloading file:', error);
       toast({
         variant: "destructive",
-        title: "Erro no download",
-        description: "Não foi possível baixar o arquivo.",
+        title: "Error no download",
+        description: "No fue posible descargar o archivo.",
       });
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Tem certeza que deseja excluir este certificado?')) {
+    if (window.confirm('¿Estás seguro que deseas eliminar este certificado?')) {
       await deleteCertificate(id);
     }
   };
@@ -150,7 +150,7 @@ export default function ProfessionalCertificates() {
           <div>
             <h1 className="text-3xl font-bold text-gradient">Certificados Profissionais</h1>
             <p className="text-foreground-muted mt-2">
-              Gerencie seus certificados profissionais, registros e qualificações
+              Gerencie seus certificados profissionais, registros y qualificações
             </p>
           </div>
         </div>
@@ -220,7 +220,7 @@ export default function ProfessionalCertificates() {
             <Input
               placeholder="Buscar certificados..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(y) => setSearchTerm(y.target.value)}
               className="pl-10 bg-surface border-border"
             />
           </div>
@@ -285,8 +285,8 @@ export default function ProfessionalCertificates() {
           <GraduationCap className="mx-auto h-12 w-12 text-foreground-muted mb-4" />
           <h3 className="text-lg font-medium text-foreground mb-2">
             {searchTerm || typeFilter || statusFilter 
-              ? 'Nenhum certificado encontrado' 
-              : 'Nenhum certificado profissional ainda'
+              ? 'Ningún certificado encontrado' 
+              : 'Ningún certificado profissional aún'
             }
           </h3>
           <p className="text-foreground-muted mb-6">

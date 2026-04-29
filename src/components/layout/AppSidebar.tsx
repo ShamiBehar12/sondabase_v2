@@ -44,15 +44,15 @@ export function AppSidebar() {
     { title: t('navigation.certificates'), url: "/certificates", icon: Award },
     { title: t('navigation.professionalCertificates'), url: "/professional-certificates", icon: GraduationCap },
     { title: t('myCertificates.title'), url: "/my-certificates", icon: ClipboardList },
-    { title: "Minhas Histórias", url: "/my-success-stories", icon: FileText },
+    { title: "Minhas Historias", url: "/my-success-stories", icon: FileText },
     { title: "Assistente IA", url: "/ai-chat", icon: Bot },
     { title: "Smart Cities RAG", url: "/smart-cities", icon: MapPin },
     { title: "Carga Masiva RAG", url: "/smart-cities/ingest", icon: Upload },
   ];
 
   const adminItems = [
-    { title: "Aprovação de Certificados", url: "/certificate-approval", icon: CheckCircle },
-    { title: "Aprovação de Histórias", url: "/success-story-approval", icon: FileText },
+    { title: "Aprobación de Certificados", url: "/certificate-approval", icon: CheckCircle },
+    { title: "Aprobación de Historias", url: "/success-story-approval", icon: FileText },
     { title: t('navigation.users'), url: "/users", icon: Users },
     { title: "Administração IA", url: "/ai-admin", icon: Bot },
   ];

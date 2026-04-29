@@ -60,7 +60,7 @@ export function CertificateCard({
             </div>
           </div>
 
-          {/* Ícones de ação */}
+          {/* Ícones de acción */}
           <div className="flex items-center gap-1">
             <Button
               variant="outline"

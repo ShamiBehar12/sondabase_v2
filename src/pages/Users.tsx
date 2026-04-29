@@ -49,25 +49,25 @@ export default function Users() {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
+    if (!confirm('¿Estás seguro que deseas eliminar este usuario?')) return;
 
     try {
       await deleteUser(userId);
       toast({
-        title: "Usuário excluído",
-        description: "Usuário removido com sucesso.",
+        title: "Usuario eliminado",
+        description: "Usuario eliminado com éxito.",
       });
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível excluir o usuário.",
+        title: "Error",
+        description: "No fue posible excluir o usuario.",
       });
     }
   };
 
   const handlePasswordReset = async (email: string) => {
-    if (!confirm(`Enviar email de redefinição de senha para ${email}?`)) return;
+    if (!confirm(`Enviar email de restablecimiento de senha para ${email}?`)) return;
 
     try {
       const { error } = await apiClient.functions.invoke('send-password-reset', {
@@ -78,14 +78,14 @@ export default function Users() {
 
       toast({
         title: "Email enviado",
-        description: `Link de redefinição de senha enviado para ${email}.`,
+        description: `Link de restablecimiento de senha enviado para ${email}.`,
       });
     } catch (error) {
       console.error('Error sending password reset:', error);
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível enviar o email de redefinição.",
+        title: "Error",
+        description: "No fue posible enviar o email de restablecimiento.",
       });
     }
   };
@@ -94,7 +94,7 @@ export default function Users() {
     if (!newUser.email || !newUser.password || !newUser.fullName) {
       toast({
         variant: "destructive",
-        title: "Erro",
+        title: "Error",
         description: "Todos os campos são obrigatórios.",
       });
       return;
@@ -103,16 +103,16 @@ export default function Users() {
     try {
       await createUser(newUser.email, newUser.password, newUser.fullName, newUser.role);
       toast({
-        title: "Usuário criado",
-        description: `Usuário ${newUser.fullName} criado com sucesso.`,
+        title: "Usuario criado",
+        description: `Usuario ${newUser.fullName} criado com éxito.`,
       });
       setShowCreateDialog(false);
       setNewUser({ email: '', password: '', fullName: '', role: 'user' });
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível criar o usuário.",
+        title: "Error",
+        description: "No fue posible crear o usuario.",
       });
     }
   };
@@ -167,7 +167,7 @@ export default function Users() {
             <Input
               placeholder={t('users.searchUsers')}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(y) => setSearchTerm(y.target.value)}
               className="pl-10 bg-surface border-border"
             />
           </div>
@@ -180,7 +180,7 @@ export default function Users() {
             <SelectItem value="all">Todas as funções</SelectItem>
             <SelectItem value="admin">Administrador</SelectItem>
             <SelectItem value="moderator">Moderador</SelectItem>
-            <SelectItem value="user">Usuário</SelectItem>
+            <SelectItem value="user">Usuario</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -189,13 +189,13 @@ export default function Users() {
         {loading ? (
           <Card className="premium-card">
             <CardContent className="p-6">
-              <div className="text-center text-foreground-muted">Carregando usuários...</div>
+              <div className="text-center text-foreground-muted">Carregando usuarios...</div>
             </CardContent>
           </Card>
         ) : filteredUsers.length === 0 ? (
           <Card className="premium-card">
             <CardContent className="p-6">
-              <div className="text-center text-foreground-muted">Nenhum usuário encontrado</div>
+              <div className="text-center text-foreground-muted">Ningún usuario encontrado</div>
             </CardContent>
           </Card>
         ) : (
@@ -211,13 +211,13 @@ export default function Users() {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="font-semibold text-foreground">{user.full_name || 'Nome não informado'}</h3>
+                      <h3 className="font-semibold text-foreground">{user.full_name || 'Nombre no informado'}</h3>
                       <p className="text-sm text-foreground-muted">{user.email}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge variant={getRoleBadgeVariant(user.role)} className="flex items-center gap-1">
                           {getRoleIcon(user.role)}
                           {user.role === 'admin' ? 'Administrador' : 
-                           user.role === 'moderator' ? 'Moderador' : 'Usuário'}
+                           user.role === 'moderator' ? 'Moderador' : 'Usuario'}
                         </Badge>
                         <span className="text-xs text-foreground-muted">
                           Membro desde {new Date(user.created_at).toLocaleDateString('pt-BR')}
@@ -261,19 +261,19 @@ export default function Users() {
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent className="bg-surface border-border">
           <DialogHeader>
-            <DialogTitle>Criar Novo Usuário</DialogTitle>
+            <DialogTitle>Crear Nuevo Usuario</DialogTitle>
             <DialogDescription>
-              Adicione um novo usuário ao sistema
+              Añade un nuevo usuario al sistema
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="fullName">Nome Completo</Label>
+              <Label htmlFor="fullName">Nombre Completo</Label>
               <Input
                 id="fullName"
                 placeholder="Digite o nome completo"
                 value={newUser.fullName}
-                onChange={(e) => setNewUser(prev => ({ ...prev, fullName: e.target.value }))}
+                onChange={(y) => setNewUser(prev => ({ ...prev, fullName: y.target.value }))}
                 className="bg-background border-border"
               />
             </div>
@@ -284,7 +284,7 @@ export default function Users() {
                 type="email"
                 placeholder="Digite o email"
                 value={newUser.email}
-                onChange={(e) => setNewUser(prev => ({ ...prev, email: e.target.value }))}
+                onChange={(y) => setNewUser(prev => ({ ...prev, email: y.target.value }))}
                 className="bg-background border-border"
               />
             </div>
@@ -295,7 +295,7 @@ export default function Users() {
                 type="password"
                 placeholder="Digite a senha"
                 value={newUser.password}
-                onChange={(e) => setNewUser(prev => ({ ...prev, password: e.target.value }))}
+                onChange={(y) => setNewUser(prev => ({ ...prev, password: y.target.value }))}
                 className="bg-background border-border"
               />
             </div>
@@ -306,7 +306,7 @@ export default function Users() {
                   <SelectValue placeholder="Selecione uma função" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="user">Usuário</SelectItem>
+                  <SelectItem value="user">Usuario</SelectItem>
                   <SelectItem value="moderator">Moderador</SelectItem>
                   <SelectItem value="admin">Administrador</SelectItem>
                 </SelectContent>
@@ -317,7 +317,7 @@ export default function Users() {
                 Cancelar
               </Button>
               <Button onClick={handleCreateUser} className="bg-gradient-primary">
-                Criar Usuário
+                Crear Usuario
               </Button>
             </div>
           </div>

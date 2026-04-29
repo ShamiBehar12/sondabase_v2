@@ -36,7 +36,7 @@ export default function AIChat() {
 
     return reason
       .replace(/^Correspondencia encontrada para:\s*/i, "Referência encontrada para: ")
-      .replace(/^Correspondencia baseada em metadados gerais do certificado\.?$/i, "Referência localizada nos metadados do certificado.");
+      .replace(/^Correspondencia baseada em metadados gerais del certificado\.?$/i, "Referência localizada nos metadados del certificado.");
   };
 
   const formatMatch = (reason?: string) => {
@@ -65,11 +65,11 @@ export default function AIChat() {
   };
 
   const handleNewSession = async () => {
-    const { error } = await createSession("Nova conversa");
+    const { error } = await createSession("Nova conversación");
     if (error) {
       toast({
         variant: "destructive",
-        title: "Erro ao criar conversa",
+        title: "Error ao crear conversación",
         description: error.message,
       });
     }
@@ -84,7 +84,7 @@ export default function AIChat() {
     if (error) {
       toast({
         variant: "destructive",
-        title: "Erro no chat",
+        title: "Error no chat",
         description: error.message,
       });
     }
@@ -95,7 +95,7 @@ export default function AIChat() {
     if (error) {
       toast({
         variant: "destructive",
-        title: "Erro ao excluir conversa",
+        title: "Error ao excluir conversación",
         description: error.message,
       });
       return;
@@ -103,7 +103,7 @@ export default function AIChat() {
 
     toast({
       title: "Conversa excluída",
-      description: "A sessão foi removida com sucesso.",
+      description: "A sessão foi removida com éxito.",
     });
   };
 
@@ -115,7 +115,7 @@ export default function AIChat() {
           Assistente de Certificados
         </h1>
         <p className="text-foreground-muted mt-2">
-          Pergunta em linguagem natural e recebe os certificados aprovados mais aderentes, com ranking e fontes.
+          Pergunta em linguagem natural y recebe os certificados aprovados mais aderentes, com ranking y fontes.
         </p>
       </div>
 
@@ -125,7 +125,7 @@ export default function AIChat() {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <CardTitle>Conversas</CardTitle>
-                <CardDescription>Sessões recentes do assistente.</CardDescription>
+                <CardDescription>Sessões recentes del assistente.</CardDescription>
               </div>
               <Button size="icon" variant="outline" onClick={handleNewSession}>
                 <MessageSquarePlus className="w-4 h-4" />
@@ -147,7 +147,7 @@ export default function AIChat() {
                       onClick={() => setActiveSessionId(session.id)}
                     >
                       <div className="break-words text-sm font-medium leading-snug">
-                        {session.title || "Sem título"}
+                        {session.title || "Sin título"}
                       </div>
                       <div className="text-xs text-foreground-muted mt-1">
                         {new Date(session.updatedAt).toLocaleString("pt-BR")}
@@ -168,9 +168,9 @@ export default function AIChat() {
                       </AlertDialogTrigger>
                       <AlertDialogContent className="bg-surface border-border">
                         <AlertDialogHeader>
-                          <AlertDialogTitle className="text-foreground">Excluir conversa</AlertDialogTitle>
+                          <AlertDialogTitle className="text-foreground">Excluir conversación</AlertDialogTitle>
                           <AlertDialogDescription className="text-foreground-muted">
-                            Tem certeza de que deseja excluir a conversa "{session.title || "Sem título"}"? Esta ação não pode ser desfeita.
+                            ¿Estás seguro de que deseas eliminar a conversación "{session.title || "Sin título"}"? Esta acción no pode ser deshacerse.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
@@ -194,7 +194,7 @@ export default function AIChat() {
         <Card className="premium-card">
           <CardHeader>
             <CardTitle>Chat</CardTitle>
-            <CardDescription>Consulta orientada aos certificados aprovados e indexados.</CardDescription>
+            <CardDescription>Consulta orientada aos certificados aprovados y indexados.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <ScrollArea className="h-[460px] rounded-lg border border-border p-4">
@@ -202,7 +202,7 @@ export default function AIChat() {
                 {loading && <div className="text-sm text-foreground-muted">Carregando conversas...</div>}
                 {!loading && messages.length === 0 && (
                   <div className="text-sm text-foreground-muted">
-                    Ainda não há mensagens. Exemplo: "Que certificados atendem a uma experiência em gestão de contratos no Chile?"
+                    Aún no há mensajes. Ejemplo: "Qué certificados cumplen con una experiencia en gestión de contratos en Chile?"
                   </div>
                 )}
                 {messages.map((message) => (
@@ -220,7 +220,7 @@ export default function AIChat() {
               <Input
                 value={question}
                 onChange={(event) => setQuestion(event.target.value)}
-                placeholder="Descreve o perfil, tecnologia ou requisito que queres atender..."
+                placeholder="Descreve o perfil, tecnologia o requisito que queres atender..."
                 onKeyDown={(event) => {
                   if (event.key === "Enter") {
                     handleSubmit();
@@ -242,7 +242,7 @@ export default function AIChat() {
           </CardHeader>
           <CardContent className="space-y-4">
             {latestAssistantSources.length === 0 ? (
-              <div className="text-sm text-foreground-muted">O ranking aparecerá aqui depois da primeira resposta.</div>
+              <div className="text-sm text-foreground-muted">O ranking aparecerá aqui depois de la primeira resposta.</div>
             ) : (
               latestAssistantSources.map((match) => (
                 <div key={`${match.recordType}-${match.recordId}`} className="rounded-lg border border-border p-4 space-y-3">

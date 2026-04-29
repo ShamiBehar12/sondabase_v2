@@ -113,7 +113,7 @@ export const SuccessStoryDetailDialog = ({
         return <Badge variant="default" className="bg-green-100 text-green-800">Aprovada</Badge>;
       case 'em_revisao':
         return <Badge variant="secondary">Pendente</Badge>;
-      case 'rejeitado':
+      case 'rechazado':
         return <Badge variant="destructive">Rejeitada</Badge>;
       default:
         return <Badge variant="outline">Rascunho</Badge>;
@@ -145,7 +145,7 @@ export const SuccessStoryDetailDialog = ({
             <div className="flex flex-col gap-1">
               {getStatusBadge()}
               {!story.is_verified && (
-                <Badge variant="outline" className="text-xs">Não Verificada</Badge>
+                <Badge variant="outline" className="text-xs">No Verificada</Badge>
               )}
             </div>
           </div>
@@ -267,7 +267,7 @@ export const SuccessStoryDetailDialog = ({
                 <div className="pt-4 border-t">
                   <h4 className="font-semibold text-base mb-3 flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-primary" />
-                    Informações do Contrato
+                    Informações del Contrato
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {story.contract_period && (
@@ -351,11 +351,11 @@ export const SuccessStoryDetailDialog = ({
                   {/* Client Logo */}
                   {imageUrls.client_logo && (
                     <div className="space-y-2">
-                      <label className="text-xs text-foreground-muted uppercase tracking-wide font-medium">Logo do Cliente</label>
+                      <label className="text-xs text-foreground-muted uppercase tracking-wide font-medium">Logo del Cliente</label>
                       <div className="relative w-full h-32 rounded-lg overflow-hidden bg-surface border border-border">
                         <img
                           src={imageUrls.client_logo}
-                          alt="Logo do cliente"
+                          alt="Logo del cliente"
                           className="w-full h-full object-contain bg-white"
                         />
                       </div>
@@ -365,7 +365,7 @@ export const SuccessStoryDetailDialog = ({
                   {/* Story Images Grid */}
                   {['image_01', 'image_02', 'image_03', 'image_04'].some(key => imageUrls[key]) && (
                     <div className="space-y-2">
-                      <label className="text-xs text-foreground-muted uppercase tracking-wide font-medium">Imagens da História</label>
+                      <label className="text-xs text-foreground-muted uppercase tracking-wide font-medium">Imagens de la Historia</label>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {['image_01', 'image_02', 'image_03', 'image_04'].map((imageKey, index) => (
                           imageUrls[imageKey] && (
@@ -376,7 +376,7 @@ export const SuccessStoryDetailDialog = ({
                               <div className="relative w-full h-48 rounded-lg overflow-hidden bg-surface border border-border">
                                 <img
                                   src={imageUrls[imageKey]}
-                                  alt={`Imagem da história ${index + 1}`}
+                                  alt={`Imagem de la historia ${index + 1}`}
                                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-200 cursor-pointer"
                                   onClick={() => window.open(imageUrls[imageKey], '_blank')}
                                 />
@@ -392,7 +392,7 @@ export const SuccessStoryDetailDialog = ({
                   {!imageUrls.client_logo && !['image_01', 'image_02', 'image_03', 'image_04'].some(key => imageUrls[key]) && (
                     <div className="text-center py-8 text-foreground-muted">
                       <ImageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                      <p>Nenhuma imagem associada a esta história</p>
+                      <p>Ninguna imagem associada a esta historia</p>
                     </div>
                   )}
                 </div>
@@ -411,7 +411,7 @@ export const SuccessStoryDetailDialog = ({
                       ))}
                     </div>
                   ) : (
-                    <p className="text-foreground-muted">Nenhuma tag associada</p>
+                    <p className="text-foreground-muted">Ninguna tag associada</p>
                   )}
                 </div>
               </TabsContent>
@@ -427,7 +427,7 @@ export const SuccessStoryDetailDialog = ({
                     </div>
                     <div>
                       <label className="text-xs text-foreground-muted uppercase tracking-wide">Verificada</label>
-                      <p className="mt-1 text-sm">{story.is_verified ? 'Sim' : 'Não'}</p>
+                      <p className="mt-1 text-sm">{story.is_verified ? 'Sim' : 'No'}</p>
                     </div>
                     <div>
                       <label className="text-xs text-foreground-muted uppercase tracking-wide">Data de Criação</label>

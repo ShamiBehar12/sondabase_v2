@@ -73,14 +73,14 @@ export function ProfessionalCertificateUploadForm({
     city: ''
   });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
+  const handleFileChange = (y: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = y.target.files?.[0];
     if (selectedFile) {
       if (selectedFile.size > 10 * 1024 * 1024) {
         toast({
           variant: "destructive",
           title: "Arquivo muito grande",
-          description: "O arquivo deve ter menos de 10MB.",
+          description: "O archivo deve ter menos de 10MB.",
         });
         return;
       }
@@ -99,14 +99,14 @@ export function ProfessionalCertificateUploadForm({
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (y: React.FormEvent) => {
+    y.preventDefault();
     
     if (!file) {
       toast({
         variant: "destructive",
         title: "Arquivo obrigatório",
-        description: "Por favor, selecione um arquivo para fazer upload.",
+        description: "Por favor, selecione un archivo para fazer upload.",
       });
       return;
     }
@@ -115,7 +115,7 @@ export function ProfessionalCertificateUploadForm({
       toast({
         variant: "destructive",
         title: "Título obrigatório",
-        description: "Por favor, informe o título do certificado.",
+        description: "Por favor, informe o título del certificado.",
       });
       return;
     }
@@ -162,8 +162,8 @@ export function ProfessionalCertificateUploadForm({
       if (insertError) throw insertError;
 
       toast({
-        title: "Upload realizado com sucesso",
-        description: "Seu certificado profissional foi enviado com sucesso.",
+        title: "Upload realizado com éxito",
+        description: "Seu certificado profissional foi enviado com éxito.",
       });
 
       onUploadComplete();
@@ -171,8 +171,8 @@ export function ProfessionalCertificateUploadForm({
       console.error('Error uploading professional certificate:', error);
       toast({
         variant: "destructive",
-        title: "Erro no upload",
-        description: "Não foi possível fazer o upload do certificado. Tente novamente.",
+        title: "Error no upload",
+        description: "No fue posible fazer o upload del certificado. Tente novamente.",
       });
     } finally {
       setLoading(false);
@@ -191,7 +191,7 @@ export function ProfessionalCertificateUploadForm({
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* File Upload */}
           <div>
-            <Label htmlFor="file">Arquivo do Certificado *</Label>
+            <Label htmlFor="file">Arquivo del Certificado *</Label>
             <div className="mt-2 flex justify-center rounded-lg border border-dashed border-border px-6 py-10">
               <div className="text-center">
                 <FileText className="mx-auto h-12 w-12 text-foreground-muted" />
@@ -200,7 +200,7 @@ export function ProfessionalCertificateUploadForm({
                     htmlFor="file"
                     className="relative cursor-pointer rounded-md bg-surface font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-primary/80"
                   >
-                    <span>Enviar um arquivo</span>
+                    <span>Enviar un archivo</span>
                     <input
                       id="file"
                       name="file"
@@ -210,7 +210,7 @@ export function ProfessionalCertificateUploadForm({
                       onChange={handleFileChange}
                     />
                   </label>
-                  <p className="pl-1">ou arraste e solte</p>
+                  <p className="pl-1">o arraste y solte</p>
                 </div>
                 <p className="text-xs leading-5 text-foreground-muted">
                   PDF, PNG, JPG até 10MB
@@ -234,7 +234,7 @@ export function ProfessionalCertificateUploadForm({
                 <Input
                   id="title"
                   value={formData.title}
-                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  onChange={(y) => setFormData(prev => ({ ...prev, title: y.target.value }))}
                   placeholder="Ex: Bacharel em Engenharia Civil"
                   className="bg-surface border-border"
                 />
@@ -245,8 +245,8 @@ export function ProfessionalCertificateUploadForm({
                 <Textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Descrição do certificado..."
+                  onChange={(y) => setFormData(prev => ({ ...prev, description: y.target.value }))}
+                  placeholder="Descrição del certificado..."
                   className="bg-surface border-border min-h-20"
                 />
               </div>
@@ -299,8 +299,8 @@ export function ProfessionalCertificateUploadForm({
                 <Input
                   id="institution"
                   value={formData.institution}
-                  onChange={(e) => setFormData(prev => ({ ...prev, institution: e.target.value }))}
-                  placeholder="Ex: Universidade Federal do Rio de Janeiro"
+                  onChange={(y) => setFormData(prev => ({ ...prev, institution: y.target.value }))}
+                  placeholder="Ex: Universidade Federal del Rio de Janeiro"
                   className="bg-surface border-border"
                 />
               </div>
@@ -310,7 +310,7 @@ export function ProfessionalCertificateUploadForm({
                 <Input
                   id="professional_council"
                   value={formData.professional_council}
-                  onChange={(e) => setFormData(prev => ({ ...prev, professional_council: e.target.value }))}
+                  onChange={(y) => setFormData(prev => ({ ...prev, professional_council: y.target.value }))}
                   placeholder="Ex: CREA-RJ, CRM, OAB"
                   className="bg-surface border-border"
                 />
@@ -321,7 +321,7 @@ export function ProfessionalCertificateUploadForm({
                 <Input
                   id="registration_number"
                   value={formData.professional_registration_number}
-                  onChange={(e) => setFormData(prev => ({ ...prev, professional_registration_number: e.target.value }))}
+                  onChange={(y) => setFormData(prev => ({ ...prev, professional_registration_number: y.target.value }))}
                   placeholder="Ex: 123456789"
                   className="bg-surface border-border"
                 />
@@ -332,7 +332,7 @@ export function ProfessionalCertificateUploadForm({
                 <Input
                   id="specialization_area"
                   value={formData.specialization_area}
-                  onChange={(e) => setFormData(prev => ({ ...prev, specialization_area: e.target.value }))}
+                  onChange={(y) => setFormData(prev => ({ ...prev, specialization_area: y.target.value }))}
                   placeholder="Ex: Estruturas, Geotecnia"
                   className="bg-surface border-border"
                 />
@@ -344,7 +344,7 @@ export function ProfessionalCertificateUploadForm({
                   id="course_hours"
                   type="number"
                   value={formData.course_hours}
-                  onChange={(e) => setFormData(prev => ({ ...prev, course_hours: e.target.value }))}
+                  onChange={(y) => setFormData(prev => ({ ...prev, course_hours: y.target.value }))}
                   placeholder="Ex: 360"
                   className="bg-surface border-border"
                 />
@@ -448,7 +448,7 @@ export function ProfessionalCertificateUploadForm({
                 <Input
                   id="country"
                   value={formData.country}
-                  onChange={(e) => setFormData(prev => ({ ...prev, country: e.target.value }))}
+                  onChange={(y) => setFormData(prev => ({ ...prev, country: y.target.value }))}
                   placeholder="Ex: Brasil"
                   className="bg-surface border-border"
                 />
@@ -458,7 +458,7 @@ export function ProfessionalCertificateUploadForm({
                 <Input
                   id="state"
                   value={formData.state_province}
-                  onChange={(e) => setFormData(prev => ({ ...prev, state_province: e.target.value }))}
+                  onChange={(y) => setFormData(prev => ({ ...prev, state_province: y.target.value }))}
                   placeholder="Ex: Rio de Janeiro"
                   className="bg-surface border-border"
                 />
@@ -468,7 +468,7 @@ export function ProfessionalCertificateUploadForm({
                 <Input
                   id="city"
                   value={formData.city}
-                  onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                  onChange={(y) => setFormData(prev => ({ ...prev, city: y.target.value }))}
                   placeholder="Ex: Rio de Janeiro"
                   className="bg-surface border-border"
                 />
@@ -482,10 +482,10 @@ export function ProfessionalCertificateUploadForm({
             <div className="flex gap-2">
               <Input
                 value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
+                onChange={(y) => setTagInput(y.target.value)}
                 placeholder="Digite uma tag..."
                 className="bg-surface border-border"
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                onKeyPress={(y) => y.key === 'Enter' && (y.preventDefault(), addTag())}
               />
               <Button type="button" onClick={addTag} variant="outline">
                 <Plus className="h-4 w-4" />

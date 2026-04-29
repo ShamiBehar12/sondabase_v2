@@ -90,7 +90,7 @@ export default function Dashboard() {
     }).catch(() => {});
   }, []);
 
-  // Função para abrir resumo do documento
+  // Função para abrir resumo del documento
   const handleDocumentClick = (documentId: string, documentType: 'certificate' | 'story') => {
     const document = recentDocuments.find(doc => doc.id === documentId);
     if (document) {
@@ -105,7 +105,7 @@ export default function Dashboard() {
       refetch();
       refetchDocuments();
     }
-  }, [user]); // Remove refetch da dependência para evitar loop
+  }, [user]); // Remove refetch de la dependência para evitar loop
 
   // Calculate certificate statistics
   const certificateStats = useMemo(() => {
@@ -121,7 +121,7 @@ export default function Dashboard() {
     const now = new Date();
     const thirtyDaysFromNow = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000));
     
-    // Calcular início da semana (segunda-feira)
+    // Calcular início de la semana (segunda-feira)
     const startOfWeek = new Date(now);
     const day = startOfWeek.getDay();
     const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
@@ -140,9 +140,9 @@ export default function Dashboard() {
 
     // Certificados ativos: sem data de fim OU com data de fim no futuro
     const activeCertificates = certificates.filter(cert => {
-      // Se não tem data de fim, considera ativo
+      // Si no tiene fecha de fin, se considera activo
       if (!cert.contract_end_date) return true;
-      // Se tem data de fim, verifica se ainda não expirou
+      // Si tiene fecha de fin, verifica si aún no expiró
       return new Date(cert.contract_end_date) > now;
     }).length;
 
@@ -150,7 +150,7 @@ export default function Dashboard() {
     const editedThisWeek = certificates.filter(cert => {
       const createdAt = new Date(cert.created_at);
       const updatedAt = new Date(cert.updated_at);
-      // Verificar se foi editado (diferença entre created_at e updated_at > 1 minuto)
+      // Verificar se foi editado (diferença entre created_at y updated_at > 1 minuto)
       const timeDiff = updatedAt.getTime() - createdAt.getTime();
       const wasEdited = timeDiff > 60000; // 1 minuto
       // Verificar se a edição foi esta semana
@@ -346,7 +346,7 @@ export default function Dashboard() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        {/* Substituir status ativo por badge de editado ou novo */}
+                        {/* Substituir status ativo por badge de editado o nuevo */}
                         {isEdited ? (
                           <Badge variant="outline" className="text-xs bg-warning/10 text-warning border-warning/20">
                             {t('dashboard.edited')}
@@ -413,7 +413,7 @@ export default function Dashboard() {
                 ))}
               </div>
             ) : dashStats.recentActivity.length === 0 ? (
-              <p className="text-sm text-foreground-muted text-center py-4">Nenhuma atividade recente</p>
+              <p className="text-sm text-foreground-muted text-center py-4">Ninguna atividade recente</p>
             ) : dashStats.recentActivity.map((activity) => {
               const Icon = getActivityIcon(activity.type);
               return (
@@ -459,9 +459,9 @@ export default function Dashboard() {
           icon={Users}
         />
         <StatsCard
-          title="Histórias publicadas"
+          title="Historias publicadas"
           value={dashStats ? dashStats.totalStories : "..."}
-          change={dashStats ? `${dashStats.pendingStories} aguardando revisão` : t('dashboard.loading')}
+          change={dashStats ? `${dashStats.pendingStories} esperando revisão` : t('dashboard.loading')}
           changeType="neutral"
           icon={FileText}
         />
@@ -512,7 +512,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Modal de Resumo do Documento */}
+      {/* Modal de Resumo del Documento */}
       <Dialog open={documentSummaryOpen} onOpenChange={setDocumentSummaryOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -523,7 +523,7 @@ export default function Dashboard() {
           
           {selectedDocument && (
             <div className="space-y-6">
-              {/* Cabeçalho do documento */}
+              {/* Cabeçalho del documento */}
               <div className="border-b pb-4">
                 <div className="flex items-start justify-between">
                   <div>
@@ -564,7 +564,7 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {/* Informações do documento */}
+              {/* Informações del documento */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">{t('dashboard.type')}</label>

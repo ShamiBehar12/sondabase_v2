@@ -121,9 +121,9 @@ export default function SmartCitiesChat() {
             <div className="flex gap-3">
               <Input
                 value={question}
-                onChange={(e) => setQuestion(e.target.value)}
+                onChange={(y) => setQuestion(y.target.value)}
                 placeholder="Escribe tu pregunta..."
-                onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
+                onKeyDown={(y) => { if (y.key === "Enter") handleSubmit(); }}
                 disabled={loading}
               />
               <Button onClick={handleSubmit} disabled={loading} className="bg-gradient-primary hover:opacity-90">

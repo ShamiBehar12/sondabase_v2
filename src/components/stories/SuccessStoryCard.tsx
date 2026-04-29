@@ -47,7 +47,7 @@ export const SuccessStoryCard = ({
 
   const title = getLocalizedContent('title');
   const client = getLocalizedContent('client');
-  const country = story.country_pt || ''; // Usar country_pt do banco
+  const country = story.country_pt || ''; // Usar country_pt del banco
   const product = getLocalizedContent('product');
 
   const handleDelete = async () => {
@@ -58,7 +58,7 @@ export const SuccessStoryCard = ({
     }
   };
 
-  // Não mostrar badges de status conforme solicitado pelo usuário
+  // No mostrar badges de status conforme solicitado pelo usuario
 
   if (viewMode === 'list') {
     return (
@@ -120,7 +120,7 @@ export const SuccessStoryCard = ({
               </div>
             </div>
 
-            {/* Botões de ação à direita */}
+            {/* Botões de acción à direita */}
             <div className="flex items-center gap-2 flex-shrink-0">
               <Button
                 variant="outline"
@@ -174,7 +174,7 @@ export const SuccessStoryCard = ({
             </CardDescription>
           </div>
           
-          {/* Ícones de ação compactos */}
+          {/* Ícones de acción compactos */}
           <div className="flex items-center gap-1 ml-2 flex-shrink-0">
             <Button
               variant="outline"

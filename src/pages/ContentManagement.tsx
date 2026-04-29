@@ -105,7 +105,7 @@ export default function ContentManagement() {
         <div>
           <h1 className="text-3xl font-bold">Meus Certificados</h1>
           <p className="text-muted-foreground">
-            Gerencie seus certificados e documentos pessoais
+            Gerencie seus certificados y documentos pessoais
           </p>
         </div>
       </div>
@@ -150,7 +150,7 @@ export default function ContentManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Rejeitados</p>
-                <p className="text-3xl font-bold">{statusCounts.rejeitado || 0}</p>
+                <p className="text-3xl font-bold">{statusCounts.rechazado || 0}</p>
               </div>
               <Badge variant="destructive" className="text-xs">REJECTED</Badge>
             </div>
@@ -163,7 +163,7 @@ export default function ContentManagement() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Plus className="w-5 h-5" />
-            Criar Novo Conteúdo
+            Crear Nuevo Conteúdo
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -193,9 +193,9 @@ export default function ContentManagement() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
-              placeholder="Buscar por título ou descrição..."
+              placeholder="Buscar por título o descrição..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(y) => setSearchTerm(y.target.value)}
               className="pl-10"
             />
           </div>
@@ -209,7 +209,7 @@ export default function ContentManagement() {
               <SelectItem value="rascunho">Rascunho</SelectItem>
               <SelectItem value="em_revisao">Em Revisão</SelectItem>
               <SelectItem value="aprovado">Aprovado</SelectItem>
-              <SelectItem value="rejeitado">Rejeitado</SelectItem>
+              <SelectItem value="rechazado">Rejeitado</SelectItem>
             </SelectContent>
           </Select>
 
@@ -256,8 +256,8 @@ export default function ContentManagement() {
           <CardContent className="text-center py-8">
             <p className="text-muted-foreground">
               {items.length === 0 
-                ? 'Nenhum item encontrado. Comece criando seu primeiro conteúdo!' 
-                : 'Nenhum item corresponde aos filtros selecionados.'}
+                ? 'Ningún item encontrado. Comece criando seu primeiro conteúdo!' 
+                : 'Ningún item corresponde aos filtros selecionados.'}
             </p>
           </CardContent>
         </Card>
@@ -283,7 +283,7 @@ export default function ContentManagement() {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              Criar {selectedType?.name_pt}
+              Crear {selectedType?.name_pt}
             </DialogTitle>
           </DialogHeader>
           {selectedType && (

@@ -55,7 +55,7 @@ export function CertificateRagCompareDialog({
                 Comparar PDF x Documento RAG
               </DialogTitle>
               <p className="text-sm text-muted-foreground mt-1">
-                {certificateName || "Certificado"}: comparação entre o arquivo original e o conteúdo indexado para IA.
+                {certificateName || "Certificado"}: comparação entre o archivo original y o conteúdo indexado para IA.
               </p>
             </div>
 
@@ -94,7 +94,7 @@ export function CertificateRagCompareDialog({
                 />
               ) : (
                 <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
-                  Não foi possível carregar o PDF.
+                  No fue posible carregar o PDF.
                 </div>
               )}
             </div>
@@ -116,7 +116,7 @@ export function CertificateRagCompareDialog({
               </div>
             ) : !ragDocument ? (
               <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground">
-                Este certificado ainda não possui documento RAG disponível.
+                Este certificado aún no possui documento RAG disponible.
               </div>
             ) : (
               <div className="grid grid-rows-[auto_1fr_1fr] gap-4 min-h-0 flex-1">
@@ -131,12 +131,12 @@ export function CertificateRagCompareDialog({
                   </div>
                   <div className="rounded-lg border border-border p-3">
                     <div className="text-xs text-muted-foreground">Verificado</div>
-                    <div className="text-sm font-medium">{ragDocument.isVerifiedSnapshot ? "Sim" : "Não"}</div>
+                    <div className="text-sm font-medium">{ragDocument.isVerifiedSnapshot ? "Sim" : "No"}</div>
                   </div>
                 </div>
 
                 <div className="min-h-0">
-                  <div className="text-sm font-medium mb-2">Texto consolidado do índice</div>
+                  <div className="text-sm font-medium mb-2">Texto consolidado del índice</div>
                   <ScrollArea className="h-full rounded-lg border border-border bg-muted/10 p-4">
                     <pre className="text-xs whitespace-pre-wrap break-words text-foreground font-mono">
                       {ragDocument.searchText || "Sem texto consolidado."}

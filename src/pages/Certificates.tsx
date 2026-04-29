@@ -29,7 +29,7 @@ export default function Certificates() {
     }
   }, [preferences.certificates_view_mode, preferencesLoading]);
 
-  // Verificar se foi passado um ID de certificado para abrir
+  // Verificar se foi passado un ID de certificado para abrir
   useEffect(() => {
     if (location.state?.openCertificateId) {
       setOpenCertificateId(location.state.openCertificateId);
@@ -117,7 +117,7 @@ export default function Certificates() {
                 <Input
                   placeholder={t('certificates.searchPlaceholder')}
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(y) => setSearchTerm(y.target.value)}
                   className="pl-10"
                 />
               </div>

@@ -74,10 +74,10 @@ export default function AIAdmin() {
   const handleSave = async () => {
     const { error } = await saveSettings(form);
     if (error) {
-      toast({ variant: "destructive", title: "Erro ao guardar configuração", description: error.message });
+      toast({ variant: "destructive", title: "Error ao guardar configuração", description: error.message });
       return;
     }
-    toast({ title: "Configuração guardada", description: "A configuração de IA foi atualizada com sucesso." });
+    toast({ title: "Configuração guardada", description: "A configuração de IA foi atualizada com éxito." });
   };
 
   const handleTest = async () => {
@@ -92,7 +92,7 @@ export default function AIAdmin() {
   const handleReindex = async () => {
     const { data, error } = await reindexAll();
     if (error) {
-      toast({ variant: "destructive", title: "Erro na reindexação", description: error.message });
+      toast({ variant: "destructive", title: "Error na reindexação", description: error.message });
       return;
     }
     toast({ title: "Reindexação concluída", description: `${data?.indexed || 0} documento(s) sincronizados.` });
@@ -138,7 +138,7 @@ export default function AIAdmin() {
     const { data, error } = await apiFetch<SeedResult>("/api/admin/seed-racer", { method: "POST" });
     setSeeding(false);
     if (error) {
-      toast({ variant: "destructive", title: "Erro ao sembrar", description: error.message });
+      toast({ variant: "destructive", title: "Error ao sembrar", description: error.message });
       return;
     }
     setSeedResult(data!);
@@ -203,7 +203,7 @@ export default function AIAdmin() {
           Administração de IA
         </h1>
         <p className="text-foreground-muted mt-2">
-          Configura provider, modelo ativo, estado do índice e gestão do RACER Smart Cities.
+          Configura provider, modelo ativo, estado del índice y gestão del RACER Smart Cities.
         </p>
       </div>
 
@@ -212,7 +212,7 @@ export default function AIAdmin() {
         <Card className="premium-card">
           <CardHeader>
             <CardTitle>Configuração ativa</CardTitle>
-            <CardDescription>Seleciona provider, modelo e comportamento do RAG.</CardDescription>
+            <CardDescription>Seleciona provider, modelo y comportamento del RAG.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
@@ -276,20 +276,20 @@ export default function AIAdmin() {
               <div className="space-y-2">
                 <label className="text-sm font-medium">Top K</label>
                 <Input type="number" value={form.topK}
-                  onChange={(e) => setForm((cur) => ({ ...cur, topK: Number(e.target.value) }))} />
+                  onChange={(y) => setForm((cur) => ({ ...cur, topK: Number(y.target.value) }))} />
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Max Chunks</label>
                 <Input type="number" value={form.maxChunks}
-                  onChange={(e) => setForm((cur) => ({ ...cur, maxChunks: Number(e.target.value) }))} />
+                  onChange={(y) => setForm((cur) => ({ ...cur, maxChunks: Number(y.target.value) }))} />
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Temperature</label>
               <Input type="number" step="0.1" value={form.temperature}
-                onChange={(e) => setForm((cur) => ({ ...cur, temperature: Number(e.target.value) }))} />
+                onChange={(y) => setForm((cur) => ({ ...cur, temperature: Number(y.target.value) }))} />
             </div>
 
             <div className="flex flex-wrap gap-3">
@@ -308,7 +308,7 @@ export default function AIAdmin() {
 
         <Card className="premium-card">
           <CardHeader>
-            <CardTitle>Estado do índice</CardTitle>
+            <CardTitle>Estado del índice</CardTitle>
             <CardDescription>Resumo dos certificados de experiência preparados para o chat.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -320,7 +320,7 @@ export default function AIAdmin() {
             <div className="space-y-3">
               {indexStatus?.recent.map((item) => (
                 <div key={item.id} className="rounded-lg border border-border p-3">
-                  <div className="font-medium text-foreground">{item.title || "Sem título"}</div>
+                  <div className="font-medium text-foreground">{item.title || "Sin título"}</div>
                   <div className="text-sm text-foreground-muted">{item.recordType}</div>
                   <div className="text-xs text-foreground-muted mt-1">
                     {item.status} em {new Date(item.updatedAt).toLocaleString("pt-BR")}
@@ -503,7 +503,7 @@ export default function AIAdmin() {
                   placeholder="Buscar por nombre, país, cliente..."
                   className="pl-8"
                   value={docsSearch}
-                  onChange={(e) => setDocsSearch(e.target.value)}
+                  onChange={(y) => setDocsSearch(y.target.value)}
                 />
               </div>
             </div>
