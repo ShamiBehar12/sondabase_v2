@@ -79,8 +79,8 @@ export const useProfessionalCertificates = () => {
       console.error('Error fetching professional certificates:', error);
       toast({
         variant: "destructive",
-        title: "Erro ao carregar certificados",
-        description: "Não foi possível carregar seus certificados profissionais.",
+        title: "Error ao carregar certificados",
+        description: "No fue posible carregar seus certificados profissionais.",
       });
     } finally {
       setLoading(false);
@@ -105,7 +105,7 @@ export const useProfessionalCertificates = () => {
       setCertificates(prev => [data, ...prev]);
       toast({
         title: "Certificado criado",
-        description: "Certificado profissional criado com sucesso.",
+        description: "Certificado profissional criado com éxito.",
       });
 
       return data;
@@ -113,8 +113,8 @@ export const useProfessionalCertificates = () => {
       console.error('Error creating professional certificate:', error);
       toast({
         variant: "destructive",
-        title: "Erro ao criar certificado",
-        description: "Não foi possível criar o certificado profissional.",
+        title: "Error ao crear certificado",
+        description: "No fue posible crear o certificado profissional.",
       });
       return null;
     }
@@ -138,7 +138,7 @@ export const useProfessionalCertificates = () => {
 
       toast({
         title: "Certificado atualizado",
-        description: "Certificado profissional atualizado com sucesso.",
+        description: "Certificado profissional atualizado com éxito.",
       });
 
       return data;
@@ -146,8 +146,8 @@ export const useProfessionalCertificates = () => {
       console.error('Error updating professional certificate:', error);
       toast({
         variant: "destructive",
-        title: "Erro ao atualizar certificado",
-        description: "Não foi possível atualizar o certificado profissional.",
+        title: "Error ao atualizar certificado",
+        description: "No fue posible atualizar o certificado profissional.",
       });
       return null;
     }
@@ -166,8 +166,8 @@ export const useProfessionalCertificates = () => {
       setCertificates(prev => prev.filter(cert => cert.id !== id));
       
       toast({
-        title: "Certificado excluído",
-        description: "Certificado profissional excluído com sucesso.",
+        title: "Certificado eliminado",
+        description: "Certificado profissional eliminado com éxito.",
       });
 
       return true;
@@ -175,8 +175,8 @@ export const useProfessionalCertificates = () => {
       console.error('Error deleting professional certificate:', error);
       toast({
         variant: "destructive",
-        title: "Erro ao excluir certificado",
-        description: "Não foi possível excluir o certificado profissional.",
+        title: "Error ao excluir certificado",
+        description: "No fue posible excluir o certificado profissional.",
       });
       return false;
     }

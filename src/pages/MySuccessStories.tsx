@@ -47,8 +47,8 @@ interface MySuccessStory {
   image_03?: string;
   image_04?: string;
   tags?: string[];
-  status: 'rascunho' | 'em_revisao' | 'aprovado' | 'rejeitado';
-  is_verified: boolean | null; // null = rejeitado, false = pendente, true = aprovado
+  status: 'rascunho' | 'em_revisao' | 'aprovado' | 'rechazado';
+  is_verified: boolean | null; // null = rechazado, false = pendente, true = aprovado
   created_at: string;
   updated_at: string;
   user_id: string;
@@ -88,7 +88,7 @@ export default function MySuccessStories() {
     try {
       setLoading(true);
       
-      // Buscar histórias ativas do usuário
+      // Buscar historias activas del usuario
       const { data: userStories, error: storiesError } = await apiClient
         .from('success_stories')
         .select('*')
@@ -97,11 +97,11 @@ export default function MySuccessStories() {
       
       if (storiesError) {
         console.error('Error fetching success stories:', storiesError);
-        toast.error('Erro ao carregar histórias de sucesso');
+        toast.error('Error ao carregar historias de éxito');
         return;
       }
 
-      // Buscar histórias rejeitadas
+      // Buscar historias rejeitadas
       const { data: rejectedStories, error: rejectionsError } = await apiClient
         .from('success_story_rejections')
         .select(`
@@ -117,10 +117,10 @@ export default function MySuccessStories() {
 
       if (rejectionsError) {
         console.error('Error fetching rejected stories:', rejectionsError);
-        toast.error('Erro ao carregar histórias rejeitadas: ' + rejectionsError.message);
+        toast.error('Error ao carregar historias rejeitadas: ' + rejectionsError.message);
       }
 
-      // Buscar histórias aprovadas
+      // Buscar historias aprovadas
       const { data: approvedStories, error: approvalsError } = await apiClient
         .from('success_story_approvals')
         .select(`
@@ -135,7 +135,7 @@ export default function MySuccessStories() {
 
       if (approvalsError) {
         console.error('Error fetching approved stories:', approvalsError);
-        toast.error('Erro ao carregar histórias aprovadas: ' + approvalsError.message);
+        toast.error('Error ao carregar historias aprovadas: ' + approvalsError.message);
       }
 
       // Buscar perfis dos administradores
@@ -157,9 +157,9 @@ export default function MySuccessStories() {
         }
       }
 
-      // Combinar todas as histórias
+      // Combinar todas as historias
       const allStories: MySuccessStory[] = [
-        // Histórias ativas (aprovadas ou pendentes)
+        // Historias activas (aprovadas o pendentes)
         ...(userStories || []).map(story => {
           const approvalRecord = (approvedStories || []).find(a => a.success_story_id === story.id);
           let approverName: string | undefined = undefined;
@@ -179,7 +179,7 @@ export default function MySuccessStories() {
             approver_name: approverName
           };
         }),
-        // Histórias rejeitadas
+        // Historias rejeitadas
         ...(rejectedStories || []).map(rejection => {
           const adminProfile = adminProfiles.find(p => p.user_id === rejection.admin_id);
           const approverName = adminProfile?.full_name || t('myCertificates.unknownAdmin');
@@ -216,8 +216,8 @@ export default function MySuccessStories() {
             image_03: undefined,
             image_04: undefined,
             tags: undefined,
-            status: 'rejeitado' as const,
-            is_verified: null, // null indica rejeitado
+            status: 'rechazado' as const,
+            is_verified: null, // null indica rechazado
             created_at: rejection.created_at,
             updated_at: rejection.created_at,
             user_id: user.id,
@@ -230,7 +230,7 @@ export default function MySuccessStories() {
       setStories(allStories);
     } catch (error) {
       console.error('Unexpected error:', error);
-      toast.error('Erro inesperado ao carregar histórias');
+      toast.error('Error inesperado ao carregar historias');
     } finally {
       setLoading(false);
     }
@@ -304,7 +304,7 @@ export default function MySuccessStories() {
     return true;
   });
 
-  // Separar histórias por status
+  // Separar historias por status
   const verifiedStories = filteredStories.filter(story => story.is_verified === true);
   const pendingStories = filteredStories.filter(story => story.is_verified === false);
   const rejectedStories = filteredStories.filter(story => story.is_verified === null);
@@ -390,7 +390,7 @@ export default function MySuccessStories() {
         <Input
           placeholder={t('mySuccessStories.searchPlaceholder')}
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(y) => setSearchTerm(y.target.value)}
           className="pl-10"
         />
       </div>

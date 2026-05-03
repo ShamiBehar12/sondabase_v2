@@ -18,7 +18,7 @@ import {
   rankDocumentMatch,
   type MatchStats,
 } from "./lib/ai.js";
-import { extractPdfTextDirect } from "./lib/pdf.js";
+import { extractPdfTextDirect, extractPdfTextWithOcrFallback } from "./lib/pdf.js";
 import { generateOpenAIAnswer, generateOpenAIEmbedding, testOpenAIConnection } from "./lib/openai.js";
 import { prisma } from "./lib/prisma.js";
 import {
@@ -46,7 +46,7 @@ declare module "fastify" {
 
 const app = Fastify({
   logger: true,
-  bodyLimit: 10 * 1024 * 1024,
+  bodyLimit: 50 * 1024 * 1024,
 });
 
 await app.register(cors, {
@@ -55,7 +55,7 @@ await app.register(cors, {
 });
 await app.register(multipart, {
   limits: {
-    fileSize: 10 * 1024 * 1024,
+    fileSize: 50 * 1024 * 1024,
   },
 });
 await app.register(sensible);
@@ -714,6 +714,34 @@ app.get("/api/ai/chat/sessions/:id/messages", async (request) => {
   return { data: messages, error: null };
 });
 
+app.post("/api/ai/chat/sessions/:id/messages", async (request) => {
+  const user = requireAuth(request);
+  const sessionId = pathParam(request, "id");
+  const body = request.body as { role: string; content: string; sourcesJson?: unknown };
+
+  const session = await prisma.aiChatSession.findUnique({ where: { id: sessionId } });
+  if (!session) throw app.httpErrors.notFound("Session not found");
+  if (user.role !== "admin" && session.userId !== user.id)
+    throw app.httpErrors.forbidden("Operation not allowed");
+
+  const msg = await prisma.aiChatMessage.create({
+    data: {
+      sessionId,
+      userId: user.id,
+      role: body.role,
+      content: body.content,
+      sourcesJson: (body.sourcesJson as any) ?? undefined,
+    },
+  });
+
+  await prisma.aiChatSession.update({
+    where: { id: sessionId },
+    data: { updatedAt: new Date() },
+  });
+
+  return { data: msg, error: null };
+});
+
 app.delete("/api/ai/chat/sessions/:id", async (request) => {
   const user = requireAuth(request);
   const sessionId = pathParam(request, "id");
@@ -1094,6 +1122,13 @@ app.patch("/api/db/:table", async (request) => {
 
     if (table === "certificates") {
       await syncAiIndexForRecord(table, updatedRow);
+      const patchData = body.data as Record<string, unknown>;
+      if (patchData.is_verified === true && (updatedRow as any).filePath) {
+        const r = updatedRow as any;
+        triggerRacerIngest(r.filePath, r.fileName, r.id).catch((err: any) =>
+          app.log.warn(`RACER auto-ingest failed for ${r.fileName}: ${err?.message}`)
+        );
+      }
     }
   }
 
@@ -1414,13 +1449,57 @@ app.setErrorHandler((error: any, _request, reply) => {
 // ── RACER Smart Cities RAG proxy ──────────────────────────────────────────
 const RACER_URL = process.env.RACER_URL ?? "http://localhost:8000";
 
+async function sendPdfToRacer(absolutePath: string, fileName: string, documentId?: string) {
+  const fileBuffer = await fs.readFile(absolutePath);
+  const blob = new Blob([fileBuffer], { type: "application/pdf" });
+  const form = new FormData();
+  form.append("file", blob, fileName);
+  if (documentId) form.append("document_id", documentId);
+  const resp = await fetch(`${RACER_URL}/ingest/pdf`, { method: "POST", body: form });
+  return await resp.json() as any;
+}
+
+async function triggerRacerIngest(filePath: string, fileName: string, documentId: string) {
+  const absolutePath = bucketFilePath("certificates", filePath);
+  await sendPdfToRacer(absolutePath, fileName, documentId);
+}
+
 app.get("/api/racer/health", async (_req, reply) => {
   try {
     const resp = await fetch(`${RACER_URL}/health`);
-    return reply.code(resp.status).send(await resp.json());
+    const json = await resp.json() as any;
+    return reply.code(resp.status).send({ data: json, error: null });
   } catch {
-    return reply.code(503).send({ status: "unavailable", detail: "RACER server not reachable" });
+    return reply.code(503).send({ data: null, error: { message: "RACER server not reachable" } });
   }
+});
+
+app.get("/api/racer/docs", async (req, reply) => {
+  requireAuth(req);
+  const metadataPath = path.join(process.cwd(), "../racer/data/metadata.jsonl");
+  let raw: string;
+  try {
+    raw = await fs.readFile(metadataPath, "utf-8");
+  } catch {
+    return reply.send({ data: [], error: null });
+  }
+  const docs = raw
+    .split("\n")
+    .filter(l => l.trim())
+    .map(l => { try { return JSON.parse(l); } catch { return null; } })
+    .filter(Boolean)
+    .map((obj: any) => ({
+      document_id:     obj.document_id,
+      source_file:     obj.source_file,
+      doc_type:        obj.doc_type,
+      client:          obj.client,
+      country:         obj.country,
+      year:            obj.year,
+      is_apostilled:   obj.is_apostilled,
+      summary_one_line: obj.summary_one_line,
+      ingested_at:     obj.ingested_at,
+    }));
+  return reply.send({ data: docs, error: null });
 });
 
 app.post("/api/racer/query", async (req, reply) => {
@@ -1430,9 +1509,25 @@ app.post("/api/racer/query", async (req, reply) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(req.body),
     });
-    return reply.code(resp.status).send(await resp.json());
+    const json = await resp.json();
+    return reply.code(resp.status).send(resp.ok ? { data: json, error: null } : { data: null, error: json });
   } catch {
-    return reply.code(503).send({ error: "RACER server not reachable" });
+    return reply.code(503).send({ data: null, error: { message: "RACER server not reachable" } });
+  }
+});
+
+app.post("/api/racer/reingest-metadata", async (req, reply) => {
+  requireAuth(req);
+  try {
+    const resp = await fetch(`${RACER_URL}/reingest/metadata`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(req.body),
+    });
+    const json = await resp.json();
+    return reply.code(resp.status).send(resp.ok ? { data: json, error: null } : { data: null, error: json });
+  } catch {
+    return reply.code(503).send({ data: null, error: { message: "RACER server not reachable" } });
   }
 });
 
@@ -1443,9 +1538,212 @@ app.post("/api/racer/rfp", async (req, reply) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(req.body),
     });
-    return reply.code(resp.status).send(await resp.json());
+    const json = await resp.json();
+    return reply.code(resp.status).send(resp.ok ? { data: json, error: null } : { data: null, error: json });
   } catch {
-    return reply.code(503).send({ error: "RACER server not reachable" });
+    return reply.code(503).send({ data: null, error: { message: "RACER server not reachable" } });
   }
+});
+
+app.post("/api/racer/ingest-batch", async (req, reply) => {
+  requireAuth(req);
+  const { files } = req.body as {
+    files: Array<{ bucket: string; filePath: string; documentId?: string }>;
+  };
+  if (!Array.isArray(files) || files.length === 0) {
+    throw app.httpErrors.badRequest("files array is required");
+  }
+
+  const results: Array<{ filePath: string; status: string; chunks_added?: number; duplicate_of?: string; error?: string }> = [];
+
+  for (const file of files) {
+    const absolutePath = bucketFilePath(file.bucket, file.filePath);
+    const filename     = path.basename(file.filePath);
+    try {
+      const json = await sendPdfToRacer(absolutePath, filename, file.documentId);
+      results.push({
+        filePath:     file.filePath,
+        status:       json.status ?? "ok",
+        chunks_added: json.chunks_added,
+        duplicate_of: json.duplicate_of,
+      });
+    } catch (err: any) {
+      results.push({ filePath: file.filePath, status: "error", error: err?.message });
+    }
+  }
+
+  return reply.send({ data: { results, total: results.length }, error: null });
+});
+
+app.post("/api/racer/ingest", async (req, reply) => {
+  const user = requireAuth(req);
+  const body = req.body as { bucket: string; filePath: string; documentId?: string };
+  const { bucket, filePath, documentId } = body;
+
+  if (!bucket || !filePath) {
+    throw app.httpErrors.badRequest("bucket y filePath son requeridos");
+  }
+
+  const absolutePath = bucketFilePath(bucket, filePath);
+  const filename     = path.basename(filePath);
+
+  try {
+    const json = await sendPdfToRacer(absolutePath, filename, documentId);
+
+    if (json.status === "empty") {
+      return reply.send({ data: null, error: { message: "No se pudo extraer texto del archivo" } });
+    }
+
+    if (json.status !== "duplicate") {
+      try {
+        const stat = await fs.stat(absolutePath).catch(() => ({ size: 0 }));
+        const title = filename.replace(/\.pdf$/i, "").replace(/[-_]/g, " ");
+        const meta = json.metadata || {};
+        const existing = await prisma.certificate.findFirst({ where: { filePath } });
+        if (!existing) {
+          await prisma.certificate.create({
+            data: {
+              userId: user.id,
+              title,
+              fileName: filename,
+              filePath,
+              fileSize: (stat as any).size ?? 0,
+              mimeType: "application/pdf",
+              isVerified: true,
+              issuingOrganization: meta.client ?? null,
+              country: meta.country ?? null,
+              description: meta.summary_one_line ?? null,
+              tags: meta.project_domain ? meta.project_domain : undefined,
+            },
+          });
+        }
+      } catch (e: any) {
+        app.log.warn("Certificate record creation skipped: " + String(e?.message));
+      }
+    }
+    return reply.send({ data: json, error: null });
+  } catch {
+    return reply.code(503).send({ data: null, error: { message: "RACER server not reachable" } });
+  }
+});
+
+// ── Dashboard stats ────────────────────────────────────────────────────────
+app.get("/api/stats/dashboard", async (req, reply) => {
+  requireAuth(req);
+  const [
+    totalStories,
+    totalCerts,
+    totalProfCerts,
+    pendingCerts,
+    pendingStories,
+    totalUsers,
+    recentCerts,
+    recentStories,
+  ] = await Promise.all([
+    prisma.successStory.count({ where: { isVerified: true } }),
+    prisma.certificate.count(),
+    prisma.professionalCertificate.count(),
+    prisma.certificate.count({ where: { isVerified: false } }),
+    prisma.successStory.count({ where: { isVerified: false } }),
+    prisma.user.count(),
+    prisma.certificate.findMany({
+      take: 5,
+      orderBy: { createdAt: "desc" },
+      include: { user: { include: { profile: true } } },
+    }),
+    prisma.successStory.findMany({
+      take: 5,
+      orderBy: { createdAt: "desc" },
+      include: { user: { include: { profile: true } } },
+    }),
+  ]);
+
+  type ActivityItem = { id: string; action: string; document: string; user: string; time: string; type: string };
+  const activities: ActivityItem[] = [];
+
+  for (const cert of recentCerts) {
+    const userName = (cert as any).user?.profile?.fullName || (cert as any).user?.email || "Usuario";
+    activities.push({
+      id: cert.id,
+      action: cert.isVerified ? "añadió un certificado" : "envió certificado para revisión",
+      document: cert.title,
+      user: userName,
+      time: cert.createdAt.toISOString(),
+      type: cert.isVerified ? "success" : "info",
+    });
+  }
+  for (const story of recentStories) {
+    const userName = (story as any).user?.profile?.fullName || (story as any).user?.email || "Usuario";
+    activities.push({
+      id: story.id,
+      action: story.isVerified ? "publicó historia" : "envió historia para revisión",
+      document: (story as any).titlePt || (story as any).titleEs || (story as any).titleEn || "Sin título",
+      user: userName,
+      time: story.createdAt.toISOString(),
+      type: story.isVerified ? "success" : "info",
+    });
+  }
+
+  activities.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
+
+  return reply.send({
+    data: {
+      totalStories,
+      totalCerts,
+      totalProfCerts,
+      pendingApprovals: pendingCerts + pendingStories,
+      pendingCerts,
+      pendingStories,
+      totalUsers,
+      recentActivity: activities.slice(0, 6),
+    },
+    error: null,
+  });
+});
+
+// ── Seed RACER documents as certificates ──────────────────────────────────
+app.post("/api/admin/seed-racer", async (req, reply) => {
+  const user = requireAdmin(req);
+  const metadataPath = path.join(process.cwd(), "../racer/data/metadata.jsonl");
+  let raw: string;
+  try {
+    raw = await fs.readFile(metadataPath, "utf-8");
+  } catch {
+    throw app.httpErrors.notFound("metadata.jsonl not found at " + metadataPath);
+  }
+
+  const lines = raw.split("\n").filter(l => l.trim());
+  let created = 0;
+  let skipped = 0;
+
+  for (const line of lines) {
+    let obj: any;
+    try { obj = JSON.parse(line); } catch { skipped++; continue; }
+    const sourceFile: string = String(obj.source_file || "").trim();
+    if (!sourceFile) { skipped++; continue; }
+    try {
+      const existing = await prisma.certificate.findFirst({ where: { fileName: sourceFile } });
+      if (existing) { skipped++; continue; }
+      const title = sourceFile.replace(/\.pdf$/i, "").replace(/[-_]/g, " ");
+      await prisma.certificate.create({
+        data: {
+          userId: user.id,
+          title,
+          fileName: sourceFile,
+          filePath: String(obj.relative_path || `racer-seeded/${sourceFile}`),
+          fileSize: 0,
+          mimeType: "application/pdf",
+          isVerified: true,
+          issuingOrganization: obj.client ? String(obj.client) : null,
+          country: obj.country ? String(obj.country) : null,
+          description: obj.summary_one_line ? String(obj.summary_one_line) : null,
+          tags: Array.isArray(obj.project_domain) ? obj.project_domain : undefined,
+        },
+      });
+      created++;
+    } catch { skipped++; }
+  }
+
+  return reply.send({ data: { created, skipped, total: lines.length }, error: null });
 });
 app.listen({ port: env.port, host: env.host });

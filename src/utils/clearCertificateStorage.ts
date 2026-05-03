@@ -2,9 +2,9 @@ import { apiClient } from '@/lib/api-client';
 
 export const clearCertificateStorage = async () => {
   try {
-    console.log('Iniciando limpeza do storage de certificados...');
+    console.log('Iniciando limpeza del storage de certificados...');
     
-    // Listar todos os arquivos no bucket de certificados
+    // Listar todos os archivos no bucket de certificados
     const { data: files, error: listError } = await apiClient.storage
       .from('certificates')
       .list('', {
@@ -13,23 +13,23 @@ export const clearCertificateStorage = async () => {
       });
 
     if (listError) {
-      console.error('Erro ao listar arquivos:', listError);
+      console.error('Error ao listar archivos:', listError);
       return { success: false, error: listError.message };
     }
 
     if (!files || files.length === 0) {
-      console.log('Nenhum arquivo encontrado no storage.');
-      return { success: true, message: 'Nenhum arquivo para limpar.' };
+      console.log('Ningún archivo encontrado no storage.');
+      return { success: true, message: 'Ningún archivo para limpar.' };
     }
 
-    console.log(`Encontrados ${files.length} arquivos para deletar.`);
+    console.log(`Encontrados ${files.length} archivos para deletar.`);
 
-    // Listar arquivos em todas as pastas de usuários
+    // Listar archivos em todas as pastas de usuarios
     const allFilePaths: string[] = [];
     
     for (const file of files) {
       if (file.name && file.name !== '.emptyFolderPlaceholder') {
-        // Se for uma pasta (diretório de usuário)
+        // Si es uma carpeta (directorio de usuario)
         const { data: userFiles, error: userListError } = await apiClient.storage
           .from('certificates')
           .list(file.name, {
@@ -47,33 +47,33 @@ export const clearCertificateStorage = async () => {
       }
     }
 
-    console.log(`Total de arquivos para deletar: ${allFilePaths.length}`);
+    console.log(`Total de archivos para deletar: ${allFilePaths.length}`);
 
     if (allFilePaths.length > 0) {
-      // Deletar todos os arquivos
+      // Deletar todos os archivos
       const { data: deleteData, error: deleteError } = await apiClient.storage
         .from('certificates')
         .remove(allFilePaths);
 
       if (deleteError) {
-        console.error('Erro ao deletar arquivos:', deleteError);
+        console.error('Error ao deletar archivos:', deleteError);
         return { success: false, error: deleteError.message };
       }
 
-      console.log('Arquivos deletados com sucesso:', deleteData);
+      console.log('Arquivos deletados com éxito:', deleteData);
     }
 
     return { 
       success: true, 
-      message: `Limpeza concluída. ${allFilePaths.length} arquivos deletados.`,
+      message: `Limpeza concluída. ${allFilePaths.length} archivos deletados.`,
       deletedFiles: allFilePaths.length
     };
 
   } catch (error) {
-    console.error('Erro durante limpeza do storage:', error);
+    console.error('Error durante limpeza del storage:', error);
     return { 
       success: false, 
-      error: error instanceof Error ? error.message : 'Erro desconhecido' 
+      error: error instanceof Error ? error.message : 'Error desconhecido' 
     };
   }
 };

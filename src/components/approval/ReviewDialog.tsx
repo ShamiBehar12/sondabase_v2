@@ -61,7 +61,7 @@ export function ReviewDialog({
           break;
         case 'reject':
           if (!comment.trim()) {
-            alert('Comentário é obrigatório para rejeição');
+            alert('Comentário é obrigatório para rechazo');
             return;
           }
           await onReject(item.id, comment);
@@ -81,7 +81,7 @@ export function ReviewDialog({
   };
 
   const renderFieldValue = (field: any, value: any) => {
-    if (!value && value !== 0) return <span className="text-muted-foreground">Não informado</span>;
+    if (!value && value !== 0) return <span className="text-muted-foreground">No informado</span>;
     
     switch (field.type) {
       case 'date':
@@ -108,7 +108,7 @@ export function ReviewDialog({
       <DialogContent className="max-w-4xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            Revisar Item: {itemData?.titulo || 'Sem título'}
+            Revisar Item: {itemData?.titulo || 'Sin título'}
             <Badge variant="outline">v{item.version}</Badge>
           </DialogTitle>
         </DialogHeader>
@@ -177,7 +177,7 @@ export function ReviewDialog({
                     {reviews.map((review) => (
                       <div key={review.id} className="p-2 border rounded-sm text-xs">
                         <div className="flex items-center gap-1 mb-1">
-                          {review.decisao === 'aprovar' && <CheckCircle className="w-3 h-3 text-green-600" />}
+                          {review.decisao === 'aprobar' && <CheckCircle className="w-3 h-3 text-green-600" />}
                           {review.decisao === 'rejeitar' && <XCircle className="w-3 h-3 text-red-600" />}
                           {review.decisao === 'ajustes' && <AlertCircle className="w-3 h-3 text-orange-600" />}
                           <span className="font-medium">{review.reviewer_name}</span>
@@ -197,9 +197,9 @@ export function ReviewDialog({
             <div>
               <h4 className="font-semibold mb-2">Decisão de Revisão</h4>
               <Textarea
-                placeholder="Adicione um comentário (obrigatório para rejeição e ajustes)"
+                placeholder="Añade un comentário (obrigatório para rechazo y ajustes)"
                 value={comment}
-                onChange={(e) => setComment(e.target.value)}
+                onChange={(y) => setComment(y.target.value)}
                 rows={3}
                 className="mb-3"
               />

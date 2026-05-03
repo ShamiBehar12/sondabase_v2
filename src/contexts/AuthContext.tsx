@@ -111,12 +111,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) {
         toast({
           variant: "destructive",
-          title: "Erro no login",
+          title: "Error no login",
           description: error.message === "Invalid login credentials" ? "Credenciais inválidas" : error.message,
         });
       } else {
         toast({
-          title: "Login realizado com sucesso!",
+          title: "Login realizado com éxito!",
           description: "Bem-vindo de volta.",
         });
       }
@@ -125,8 +125,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Erro inesperado",
-        description: "Ocorreu um erro durante o login.",
+        title: "Error inesperado",
+        description: "Ocorreu un error durante o login.",
       });
       return { error };
     }
@@ -147,12 +147,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) {
         toast({
           variant: "destructive",
-          title: "Erro no cadastro",
+          title: "Error no cadastro",
           description: error.message,
         });
       } else {
         toast({
-          title: "Cadastro realizado com sucesso!",
+          title: "Cadastro realizado com éxito!",
           description: "Verifique seu email para confirmar a conta.",
         });
       }
@@ -161,8 +161,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Erro inesperado",
-        description: "Ocorreu um erro durante o cadastro.",
+        title: "Error inesperado",
+        description: "Ocorreu un error durante o cadastro.",
       });
       return { error };
     }
@@ -178,8 +178,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Erro no logout",
-        description: "Ocorreu um erro ao fazer logout.",
+        title: "Error no logout",
+        description: "Ocorreu un error ao fazer logout.",
       });
     }
   };

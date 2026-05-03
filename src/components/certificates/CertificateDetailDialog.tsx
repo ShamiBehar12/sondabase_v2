@@ -114,8 +114,8 @@ export function CertificateDetailDialog({
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Erro ao carregar PDF",
-        description: "Não foi possível carregar o arquivo PDF.",
+        title: "Error ao carregar PDF",
+        description: "No fue posible carregar o archivo PDF.",
       });
     }
   };
@@ -142,8 +142,8 @@ export function CertificateDetailDialog({
     } catch {
       toast({
         variant: "destructive",
-        title: "Erro ao baixar PDF",
-        description: "Não foi possível baixar o arquivo PDF.",
+        title: "Error ao descargar PDF",
+        description: "No fue posible descargar o archivo PDF.",
       });
     }
   };
@@ -152,8 +152,8 @@ export function CertificateDetailDialog({
     if (!certificate || !rejectionReason.trim()) {
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Por favor, forneça um motivo para a rejeição.",
+        title: "Error",
+        description: "Por favor, forneça un motivo para a rechazo.",
       });
       return;
     }
@@ -165,7 +165,7 @@ export function CertificateDetailDialog({
   };
 
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Não informado';
+    if (!dateString) return 'No informado';
     return new Date(dateString).toLocaleDateString('pt-BR');
   };
 
@@ -196,9 +196,9 @@ export function CertificateDetailDialog({
               <div className="bg-muted/20 p-4 rounded-lg">
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
                   <User className="w-4 h-4" />
-                  Informações do Usuário
+                  Informações del Usuario
                 </h3>
-                <p><strong>Nome:</strong> {certificate.full_name || 'Nome não disponível'}</p>
+                <p><strong>Nombre:</strong> {certificate.full_name || 'Nombre no disponible'}</p>
                 <p><strong>Criado em:</strong> {formatDate(certificate.created_at)}</p>
                 <p><strong>Atualizado em:</strong> {formatDate(certificate.updated_at)}</p>
               </div>
@@ -235,9 +235,9 @@ export function CertificateDetailDialog({
               </div>
 
               <div className="bg-muted/20 p-4 rounded-lg">
-                <h3 className="font-semibold mb-3">Informações do Arquivo</h3>
+                <h3 className="font-semibold mb-3">Informações del Arquivo</h3>
                 <div className="space-y-2">
-                  <p><strong>Nome do arquivo:</strong> {certificate.file_name}</p>
+                  <p><strong>Nombre del archivo:</strong> {certificate.file_name}</p>
                   <p><strong>Tipo:</strong> {certificate.mime_type}</p>
                   <p><strong>Tamanho:</strong> {formatFileSize(certificate.file_size)}</p>
                 </div>
@@ -263,7 +263,7 @@ export function CertificateDetailDialog({
                       <p><strong>Data fim contrato:</strong> {formatDate((certificate as Certificate).contract_end_date)}</p>
                     )}
                     {(certificate as Certificate).certificate_number && (
-                      <p><strong>Número do certificado:</strong> {(certificate as Certificate).certificate_number}</p>
+                      <p><strong>Número del certificado:</strong> {(certificate as Certificate).certificate_number}</p>
                     )}
                   </div>
                 </div>
@@ -287,7 +287,7 @@ export function CertificateDetailDialog({
                       <p><strong>Área de especialização:</strong> {certificate.specialization_area}</p>
                     )}
                     {'course_hours' in certificate && certificate.course_hours && (
-                      <p><strong>Horas do curso:</strong> {certificate.course_hours}</p>
+                      <p><strong>Horas del curso:</strong> {certificate.course_hours}</p>
                     )}
                     {'valid_from' in certificate && certificate.valid_from && (
                       <p><strong>Válido de:</strong> {formatDate(certificate.valid_from)}</p>
@@ -320,7 +320,7 @@ export function CertificateDetailDialog({
             {/* Right Column - PDF Viewer */}
             <div className="space-y-4">
               <div className="bg-muted/20 p-4 rounded-lg">
-                <h3 className="font-semibold mb-3">Visualização do Documento</h3>
+                <h3 className="font-semibold mb-3">Visualização del Documento</h3>
                 <div className="flex gap-2 mb-4">
                   <Button onClick={handleViewPdf} className="flex-1">
                     <FileText className="w-4 h-4 mr-2" />
@@ -337,7 +337,7 @@ export function CertificateDetailDialog({
                     <iframe
                       src={pdfUrl}
                       className="w-full h-96"
-                      title="Visualização do Certificado"
+                      title="Visualização del Certificado"
                     />
                   </div>
                 )}
@@ -345,16 +345,16 @@ export function CertificateDetailDialog({
 
               {showApprovalActions && (
                 <div className="bg-muted/20 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-3">Ações de Aprovação</h3>
+                  <h3 className="font-semibold mb-3">Ações de Aprobación</h3>
                   {certificate.has_rejection_history ? (
                     <div className="mb-3 rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-foreground">
-                      Este certificado já foi rejeitado anteriormente e foi reenviado para revisão. Nesta etapa ele pode ser revisado e aprovado, mas não deve ser rejeitado novamente.
+                      Este certificado já foi rechazado anteriormente y foi reenviado para revisão. Nesta etapa ele pode ser revisado y aprovado, mas no deve ser rechazado novamente.
                     </div>
                   ) : null}
                   <div className="flex gap-2">
                     <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      onClick={(y) => {
+                        y.stopPropagation();
                         onApprove(type === 'certificate' ? 'certificates' : 'professional_certificates', certificate.id);
                       }}
                       disabled={loading}
@@ -365,8 +365,8 @@ export function CertificateDetailDialog({
                     </Button>
                     {canReject ? (
                       <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
+                        onClick={(y) => {
+                          y.stopPropagation();
                           setShowRejectDialog(true);
                         }}
                         disabled={loading}
@@ -394,13 +394,13 @@ export function CertificateDetailDialog({
           <div className="space-y-4">
             <div>
               <Label htmlFor="rejection-reason">
-                Motivo da rejeição <span className="text-destructive">*</span>
+                Motivo de la rechazo <span className="text-destructive">*</span>
               </Label>
               <Textarea
                 id="rejection-reason"
-                placeholder="Explique o motivo da rejeição para que o usuário possa corrigir..."
+                placeholder="Explique o motivo del rechazo para que el usuario pueda corregir..."
                 value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
+                onChange={(y) => setRejectionReason(y.target.value)}
                 className="mt-2"
                 rows={4}
               />
@@ -414,7 +414,7 @@ export function CertificateDetailDialog({
                 onClick={handleReject}
                 disabled={loading || !rejectionReason.trim()}
               >
-                Confirmar Rejeição
+                Confirmar Rechazo
               </Button>
             </div>
           </div>

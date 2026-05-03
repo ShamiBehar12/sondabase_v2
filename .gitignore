@@ -20,6 +20,7 @@ uploads/avatars/*
 !uploads/avatars/default/**
 .env
 backend/.env
+racer/.env
 
 # Editor directories and files
 .vscode/*

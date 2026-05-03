@@ -47,7 +47,7 @@ interface SuccessStoryWithUser {
   image_04?: string;
   tags?: string[];
   is_verified: boolean;
-  status: 'rascunho' | 'em_revisao' | 'aprovado' | 'rejeitado';
+  status: 'rascunho' | 'em_revisao' | 'aprovado' | 'rechazado';
   created_at: string;
   updated_at: string;
   // Profile information
@@ -120,8 +120,8 @@ export default function SuccessStoryApproval() {
       if (error) {
         console.error('Error fetching success stories:', error);
         toast({
-          title: "Erro",
-          description: "Erro ao carregar histórias de sucesso pendentes",
+          title: "Error",
+          description: "Error ao carregar historias de éxito pendentes",
           variant: "destructive",
         });
         return;
@@ -147,7 +147,7 @@ export default function SuccessStoryApproval() {
 
       const storiesWithUsers = data.map(story => ({
         ...story,
-        full_name: profiles?.find(p => p.user_id === story.user_id)?.full_name || 'Usuário não encontrado'
+        full_name: profiles?.find(p => p.user_id === story.user_id)?.full_name || 'Usuario no encontrado'
       }));
 
       console.log('Loaded success stories with users:', storiesWithUsers);
@@ -155,8 +155,8 @@ export default function SuccessStoryApproval() {
     } catch (err) {
       console.error('Unexpected error fetching success stories:', err);
       toast({
-        title: "Erro",
-        description: "Erro inesperado ao carregar histórias de sucesso",
+        title: "Error",
+        description: "Error inesperado ao carregar historias de éxito",
         variant: "destructive",
       });
     } finally {
@@ -173,8 +173,8 @@ export default function SuccessStoryApproval() {
   const handleApprove = async (storyId: string) => {
     if (!user || (userRole !== 'admin' && userRole !== 'reviewer')) {
       toast({
-        title: "Erro",
-        description: "Você não tem permissão para aprovar histórias de sucesso.",
+        title: "Error",
+        description: "No tienes permiso para aprobar historias de éxito.",
         variant: "destructive",
       });
       return;
@@ -214,8 +214,8 @@ export default function SuccessStoryApproval() {
       }
 
       toast({
-        title: "Sucesso",
-        description: "História de sucesso aprovada com sucesso!",
+        title: "Éxito",
+        description: "Historia de éxito aprovada com éxito!",
       });
 
       // Refresh the list
@@ -223,8 +223,8 @@ export default function SuccessStoryApproval() {
     } catch (error: any) {
       console.error('Error approving success story:', error);
       toast({
-        title: "Erro",
-        description: error.message || "Erro ao aprovar história de sucesso",
+        title: "Error",
+        description: error.message || "Error ao aprobar historia de éxito",
         variant: "destructive",
       });
     } finally {
@@ -235,8 +235,8 @@ export default function SuccessStoryApproval() {
   const handleReject = async () => {
     if (!storyToReject || !rejectionReason.trim()) {
       toast({
-        title: "Erro",
-        description: "Por favor, forneça um motivo para a rejeição.",
+        title: "Error",
+        description: "Por favor, forneça un motivo para a rechazo.",
         variant: "destructive",
       });
       return;
@@ -244,8 +244,8 @@ export default function SuccessStoryApproval() {
 
     if (!user || (userRole !== 'admin' && userRole !== 'reviewer')) {
       toast({
-        title: "Erro",
-        description: "Você não tem permissão para rejeitar histórias de sucesso.",
+        title: "Error",
+        description: "No tienes permiso para rejeitar historias de éxito.",
         variant: "destructive",
       });
       return;
@@ -275,7 +275,7 @@ export default function SuccessStoryApproval() {
       // Update story status to rejected
       const { error: updateError } = await apiClient
         .from('success_stories')
-        .update({ status: 'rejeitado' })
+        .update({ status: 'rechazado' })
         .eq('id', storyToReject.id);
 
       if (updateError) {
@@ -283,8 +283,8 @@ export default function SuccessStoryApproval() {
       }
 
       toast({
-        title: "Sucesso",
-        description: "História de sucesso rejeitada.",
+        title: "Éxito",
+        description: "Historia de éxito rechazada.",
       });
 
       // Close dialog and refresh
@@ -295,8 +295,8 @@ export default function SuccessStoryApproval() {
     } catch (error: any) {
       console.error('Error rejecting success story:', error);
       toast({
-        title: "Erro",
-        description: error.message || "Erro ao rejeitar história de sucesso",
+        title: "Error",
+        description: error.message || "Error ao rejeitar historia de éxito",
         variant: "destructive",
       });
     } finally {
@@ -329,7 +329,7 @@ export default function SuccessStoryApproval() {
         <Card>
           <CardContent className="p-6 text-center">
             <p className="text-muted-foreground">
-              Nenhuma história de sucesso aguardando aprovação.
+              Ninguna historia de éxito esperando aprobación.
             </p>
           </CardContent>
         </Card>
@@ -339,7 +339,7 @@ export default function SuccessStoryApproval() {
             <TableHeader>
               <TableRow>
                 <TableHead>Título</TableHead>
-                <TableHead>Usuário</TableHead>
+                <TableHead>Usuario</TableHead>
                 <TableHead>Cliente</TableHead>
                 <TableHead>País</TableHead>
                 <TableHead>Criado em</TableHead>
@@ -351,21 +351,21 @@ export default function SuccessStoryApproval() {
               {unverifiedStories.map((story) => (
                 <TableRow key={story.id}>
                   <TableCell className="font-medium">
-                    {story.title_pt || story.title_en || story.title_es || 'Sem título'}
+                    {story.title_pt || story.title_en || story.title_es || 'Sin título'}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <User className="w-4 h-4 text-muted-foreground" />
-                      <span>{story.full_name || 'Nome não disponível'}</span>
+                      <span>{story.full_name || 'Nombre no disponible'}</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Building className="w-4 h-4 text-muted-foreground" />
-                      <span>{story.client_pt || story.client_en || story.client_es || 'Não informado'}</span>
+                      <span>{story.client_pt || story.client_en || story.client_es || 'No informado'}</span>
                     </div>
                   </TableCell>
-                  <TableCell>{story.country_pt || story.country_en || story.country_es || 'Não informado'}</TableCell>
+                  <TableCell>{story.country_pt || story.country_en || story.country_es || 'No informado'}</TableCell>
                   <TableCell>
                     {new Date(story.created_at).toLocaleDateString('pt-BR')}
                   </TableCell>
@@ -375,8 +375,8 @@ export default function SuccessStoryApproval() {
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
+                        onClick={(y) => {
+                          y.stopPropagation();
                           setSelectedStory(story);
                           setDetailDialogOpen(true);
                         }}
@@ -422,18 +422,18 @@ export default function SuccessStoryApproval() {
       <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Rejeitar História de Sucesso</DialogTitle>
+            <DialogTitle>Rejeitar Historia de Éxito</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
               <Label htmlFor="rejection-reason">
-                Motivo da rejeição <span className="text-destructive">*</span>
+                Motivo de la rechazo <span className="text-destructive">*</span>
               </Label>
               <Textarea
                 id="rejection-reason"
-                placeholder="Explique o motivo da rejeição para que o usuário possa corrigir..."
+                placeholder="Explique o motivo del rechazo para que el usuario pueda corregir..."
                 value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
+                onChange={(y) => setRejectionReason(y.target.value)}
                 className="mt-2"
                 rows={4}
               />
@@ -455,8 +455,8 @@ export default function SuccessStoryApproval() {
                   if (!storyToReject || !rejectionReason.trim()) {
                     toast({
                       variant: "destructive",
-                      title: "Erro",
-                      description: "Por favor, forneça um motivo para a rejeição.",
+                      title: "Error",
+                      description: "Por favor, forneça un motivo para a rechazo.",
                     });
                     return;
                   }
@@ -468,7 +468,7 @@ export default function SuccessStoryApproval() {
                 }}
                 disabled={loading || !rejectionReason.trim()}
               >
-                Confirmar Rejeição
+                Confirmar Rechazo
               </Button>
             </div>
           </div>

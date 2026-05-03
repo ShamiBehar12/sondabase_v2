@@ -119,7 +119,7 @@ export default function MyCertificates() {
 
       if (rejectionsError) {
         console.error('Error fetching rejected certificates:', rejectionsError);
-        toast.error('Erro ao carregar certificados rejeitados: ' + rejectionsError.message);
+        toast.error('Error ao carregar certificados rejeitados: ' + rejectionsError.message);
       }
 
       // Fetch approved certificates from certificate_approvals table
@@ -142,7 +142,7 @@ export default function MyCertificates() {
 
       if (approvalsError) {
         console.error('Error fetching approved certificates:', approvalsError);
-        toast.error('Erro ao carregar certificados aprovados: ' + approvalsError.message);
+        toast.error('Error ao carregar certificados aprovados: ' + approvalsError.message);
       }
 
       // Filter rejections for current user only (already filtered at DB level, but separate by type)
@@ -210,7 +210,7 @@ export default function MyCertificates() {
               approverName = adminProfile?.full_name || t('myCertificates.unknownAdmin');
             } else {
               // Legacy approved certificate without approval record
-              approverName = 'Sistema de Aprovação';
+              approverName = 'Sistema de Aprobación';
             }
           }
           // For pending certificates, leave approver_name undefined
@@ -239,7 +239,7 @@ export default function MyCertificates() {
               approverName = adminProfile?.full_name || t('myCertificates.unknownAdmin');
             } else {
               // Legacy approved certificate without approval record
-              approverName = 'Sistema de Aprovação';
+              approverName = 'Sistema de Aprobación';
             }
           }
           // For pending certificates, leave approver_name undefined
@@ -334,7 +334,7 @@ export default function MyCertificates() {
         }
         
         if (!fullCert) {
-          toast.error('Certificado não encontrado ou foi removido.');
+          toast.error('Certificado no encontrado o fue eliminado.');
           return;
         }
         
@@ -342,7 +342,7 @@ export default function MyCertificates() {
         setEditDialogOpen(true);
       } else if (cert.type === 'professional_certificate') {
         if (cert.is_verified === null) {
-          toast.error('Certificados profissionais rejeitados não podem ser editados. Crie um novo certificado.');
+          toast.error('Certificados profissionais rejeitados no pueden ser editados. Crea un nuevo certificado.');
           return;
         }
         
@@ -358,15 +358,15 @@ export default function MyCertificates() {
         }
         
         if (!fullCert) {
-          toast.error('Certificado profissional não encontrado ou foi removido.');
+          toast.error('Certificado profissional no encontrado o fue eliminado.');
           return;
         }
         
-        toast.error('Edição de certificados profissionais ainda não implementada');
+        toast.error('Edición de certificados profissionais aún no implementada');
       }
     } catch (error) {
       console.error('Error fetching certificate for editing:', error);
-      toast.error('Erro ao carregar certificado para edição');
+      toast.error('Error ao carregar certificado para edição');
     }
   };
 
@@ -434,7 +434,7 @@ export default function MyCertificates() {
     <div className="flex-1 space-y-6 p-8 pt-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-gradient">{t('myCertificates.title')}</h2>
+          <h2 className="text-3xl font-bold text-white">{t('myCertificates.title')}</h2>
           <p className="text-muted-foreground mt-2">
             {t('myCertificates.subtitle')}
           </p>
@@ -490,7 +490,7 @@ export default function MyCertificates() {
         <Input
           placeholder={t('myCertificates.searchPlaceholder')}
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(y) => setSearchTerm(y.target.value)}
           className="pl-10"
         />
       </div>
@@ -519,7 +519,7 @@ export default function MyCertificates() {
                   <TableHead>{t('myCertificates.created')}</TableHead>
                   <TableHead>{t('myCertificates.approver')}</TableHead>
                   <TableHead>{t('myCertificates.status')}</TableHead>
-                  <TableHead>Ações</TableHead>
+                  <TableHead>Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -588,7 +588,7 @@ export default function MyCertificates() {
                   <TableHead>{t('myCertificates.created')}</TableHead>
                   <TableHead>{t('myCertificates.approver')}</TableHead>
                   <TableHead>{t('myCertificates.status')}</TableHead>
-                  <TableHead>Ações</TableHead>
+                  <TableHead>Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -642,7 +642,7 @@ export default function MyCertificates() {
                   <TableHead>{t('myCertificates.created')}</TableHead>
                   <TableHead>{t('myCertificates.approver')}</TableHead>
                   <TableHead>{t('myCertificates.status')}</TableHead>
-                  <TableHead>Ações</TableHead>
+                  <TableHead>Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -696,7 +696,7 @@ export default function MyCertificates() {
                   <TableHead>{t('myCertificates.created')}</TableHead>
                   <TableHead>{t('myCertificates.approver')}</TableHead>
                   <TableHead>{t('myCertificates.status')}</TableHead>
-                  <TableHead>Ações</TableHead>
+                  <TableHead>Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

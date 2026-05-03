@@ -144,7 +144,7 @@ export function DynamicContentForm({
             {...formField}
             type="number"
             placeholder={`Digite ${fieldConfig[`label_${currentLang}`] || fieldConfig.label_pt}`}
-            onChange={(e) => formField.onChange(parseInt(e.target.value) || 0)}
+            onChange={(y) => formField.onChange(parseInt(y.target.value) || 0)}
           />
         );
       
@@ -176,7 +176,7 @@ export function DynamicContentForm({
     <Card className={className}>
       <CardHeader>
         <CardTitle>
-          {isEditing ? 'Editar' : 'Criar'} {contentType[`name_${currentLang}`] || contentType.name_pt}
+          {isEditing ? 'Editar' : 'Crear'} {contentType[`name_${currentLang}`] || contentType.name_pt}
         </CardTitle>
       </CardHeader>
       <CardContent>

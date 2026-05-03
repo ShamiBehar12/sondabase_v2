@@ -20,7 +20,7 @@ const formSchema = z.object({
   title_pt: z.string().min(1, 'Título em português é obrigatório'),
   title_en: z.string().optional(),
   title_es: z.string().optional(),
-  client_pt: z.string().min(1, 'Nome do cliente em português é obrigatório'),
+  client_pt: z.string().min(1, 'Nombre del cliente em português é obrigatório'),
   client_en: z.string().optional(),
   client_es: z.string().optional(),
   country: z.string().optional(),
@@ -66,9 +66,9 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
   const countries = [
     'Brasil', 'Estados Unidos', 'Canadá', 'Reino Unido', 'Alemanha', 'França', 'Espanha', 'Itália',
     'Portugal', 'Holanda', 'Suécia', 'Noruega', 'Dinamarca', 'Finlândia', 'Suíça', 'Áustria',
-    'Bélgica', 'Irlanda', 'Austrália', 'Nova Zelândia', 'Japão', 'Coreia do Sul', 'Singapura',
+    'Bélgica', 'Irlanda', 'Austrália', 'Nova Zelândia', 'Japão', 'Coreia del Sul', 'Singapura',
     'Hong Kong', 'Israel', 'Emirados Árabes Unidos', 'Argentina', 'Chile', 'Colômbia', 'México',
-    'Peru', 'Uruguai', 'Costa Rica', 'Panamá', 'África do Sul', 'Índia', 'China', 'Rússia'
+    'Peru', 'Uruguai', 'Costa Rica', 'Panamá', 'África del Sul', 'Índia', 'China', 'Rússia'
   ].sort();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -107,23 +107,23 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
     loadPopularTags();
   }, []);
 
-  const handleImageDrag = (e: React.DragEvent, fieldName: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
+  const handleImageDrag = (y: React.DragEvent, fieldName: string) => {
+    y.preventDefault();
+    y.stopPropagation();
+    if (y.type === 'dragenter' || y.type === 'dragover') {
       setDragActive(fieldName);
-    } else if (e.type === 'dragleave') {
+    } else if (y.type === 'dragleave') {
       setDragActive(null);
     }
   };
 
-  const handleImageDrop = (e: React.DragEvent, fieldName: string) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleImageDrop = (y: React.DragEvent, fieldName: string) => {
+    y.preventDefault();
+    y.stopPropagation();
     setDragActive(null);
 
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
+    if (y.dataTransfer.files && y.dataTransfer.files[0]) {
+      const file = y.dataTransfer.files[0];
       if (file.type.startsWith('image/')) {
         if (file.size <= 5 * 1024 * 1024) { // 5MB limit
           form.setValue(fieldName as any, file);
@@ -137,9 +137,9 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
     }
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
+  const handleImageChange = (y: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
+    if (y.target.files && y.target.files[0]) {
+      const file = y.target.files[0];
       if (file.type.startsWith('image/')) {
         if (file.size <= 5 * 1024 * 1024) { // 5MB limit
           form.setValue(fieldName as any, file);
@@ -184,11 +184,11 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
     }
   };
 
-  const handleTagKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
+  const handleTagKeyPress = (y: React.KeyboardEvent) => {
+    if (y.key === 'Enter') {
+      y.preventDefault();
       addTag();
-    } else if (e.key === 'Escape') {
+    } else if (y.key === 'Escape') {
       setShowSuggestions(false);
     }
   };
@@ -249,10 +249,10 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
               ? 'border-primary bg-primary/10 scale-[1.02]'
               : 'border-border hover:border-primary/50 hover:bg-surface/50'
           }`}
-          onDragEnter={(e) => handleImageDrag(e, fieldName)}
-          onDragLeave={(e) => handleImageDrag(e, fieldName)}
-          onDragOver={(e) => handleImageDrag(e, fieldName)}
-          onDrop={(e) => handleImageDrop(e, fieldName)}
+          onDragEnter={(y) => handleImageDrag(y, fieldName)}
+          onDragLeave={(y) => handleImageDrag(y, fieldName)}
+          onDragOver={(y) => handleImageDrag(y, fieldName)}
+          onDrop={(y) => handleImageDrop(y, fieldName)}
         >
           {selectedFile ? (
             <div className="space-y-2">
@@ -278,7 +278,7 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
             <div className="space-y-2">
               <Upload className="mx-auto h-8 w-8 text-primary" />
               <p className="text-sm text-foreground-muted">
-                Arraste uma imagem ou clique para selecionar
+                Arraste uma imagem o clique para selecionar
               </p>
               <p className="text-xs text-foreground-muted">
                 Imagens de até 5MB
@@ -297,7 +297,7 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={(e) => handleImageChange(e, fieldName)}
+                onChange={(y) => handleImageChange(y, fieldName)}
               />
             </div>
           )}
@@ -314,9 +314,9 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
   return (
     <Card className="premium-card">
       <CardHeader>
-        <CardTitle className="text-gradient">Cadastrar História de Sucesso</CardTitle>
+        <CardTitle className="text-gradient">Cadastrar Historia de Éxito</CardTitle>
         <CardDescription>
-          Compartilhe um caso de sucesso da sua empresa. Organize as informações por categoria usando as abas abaixo.
+          Compartilhe un caso de éxito de la sua empresa. Organize as informações por categoria usando as abas abaixo.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -352,7 +352,7 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
                     <Label className="text-base font-semibold">Informações Básicas</Label>
                   </div>
                   <p className="text-sm text-foreground-muted">
-                    Dados essenciais da história de sucesso. Os campos marcados com * são obrigatórios apenas em português.
+                    Dados essenciais de la historia de éxito. Os campos marcados com * são obrigatórios apenas em português.
                   </p>
                   
                   {/* Campos básicos sem abas aninhadas */}
@@ -384,7 +384,7 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
                       </Button>
                     </div>
 
-                    {/* Sempre renderizar todos os campos, mas mostrar apenas os do idioma ativo */}
+                    {/* Sempre renderizar todos os campos, mas mostrar apenas os del idioma ativo */}
                     <div style={{ display: activeLanguageTab === 'pt' ? 'block' : 'none' }}>
                       <div className="space-y-4">
                         <FormField
@@ -586,7 +586,7 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
                     <Label className="text-base font-semibold">Conteúdo Detalhado</Label>
                   </div>
                   <p className="text-sm text-foreground-muted">
-                    Descreva o desafio, solução implementada e benefícios obtidos.
+                    Descreva o desafio, solução implementada y benefícios obtidos.
                   </p>
                   
                   <div className="space-y-4">
@@ -627,7 +627,7 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
                               <FormLabel>Desafio</FormLabel>
                               <FormControl>
                                 <Textarea 
-                                  placeholder="Descreva o desafio ou problema que o cliente enfrentava..."
+                                  placeholder="Descreva o desafio o problema que o cliente enfrentava..."
                                   rows={4}
                                   {...field}
                                 />
@@ -663,7 +663,7 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
                               <FormLabel>Benefícios</FormLabel>
                               <FormControl>
                                 <Textarea 
-                                  placeholder="Descreva os benefícios e resultados obtidos..."
+                                  placeholder="Descreva os benefícios y resultados obtidos..."
                                   rows={4}
                                   {...field}
                                 />
@@ -799,14 +799,14 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <Camera className="h-5 w-5 text-primary" />
-                    <Label className="text-base font-semibold">Imagens e Logo</Label>
+                    <Label className="text-base font-semibold">Imagens y Logo</Label>
                   </div>
                   <p className="text-sm text-foreground-muted">
-                    Adicione o logo do cliente e imagens que ilustrem o caso de sucesso.
+                    Añade o logo del cliente y imagens que ilustrem o caso de éxito.
                   </p>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <ImageUploadField fieldName="client_logo" label="Logo do Cliente" />
+                    <ImageUploadField fieldName="client_logo" label="Logo del Cliente" />
                     <ImageUploadField fieldName="image_01" label="Imagem 1" />
                     <ImageUploadField fieldName="image_02" label="Imagem 2" />
                     <ImageUploadField fieldName="image_03" label="Imagem 3" />
@@ -823,7 +823,7 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
                     <Label className="text-base font-semibold">Configurações Adicionais</Label>
                   </div>
                   <p className="text-sm text-foreground-muted">
-                    Informações complementares sobre o projeto e tags para categorização.
+                    Informações complementares sobre o projeto y tags para categorização.
                   </p>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -832,7 +832,7 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
                       name="contract_period"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Período do Contrato</FormLabel>
+                          <FormLabel>Período del Contrato</FormLabel>
                           <FormControl>
                             <Input placeholder="Ex: 6 meses" {...field} />
                           </FormControl>
@@ -846,7 +846,7 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
                       name="contract_value"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Valor do Contrato</FormLabel>
+                          <FormLabel>Valor del Contrato</FormLabel>
                           <FormControl>
                             <Input placeholder="Ex: R$ 50.000" {...field} />
                           </FormControl>
@@ -877,15 +877,15 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
                       Tags de Categorização
                     </Label>
                     <p className="text-sm text-foreground-muted">
-                      Adicione palavras-chave para facilitar a busca e categorização.
+                      Añade palavras-chave para facilitar a busca y categorização.
                     </p>
                     
                     <div className="relative">
                       <div className="flex gap-2">
                         <Input
-                          placeholder="Digite uma tag e pressione Enter"
+                          placeholder="Digite uma tag y pressione Enter"
                           value={tagInput}
-                          onChange={(e) => handleTagInputChange(e.target.value)}
+                          onChange={(y) => handleTagInputChange(y.target.value)}
                           onKeyDown={handleTagKeyPress}
                           className="flex-1"
                         />
@@ -942,7 +942,7 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
                     Enviando...
                   </>
                 ) : (
-                  'Cadastrar História de Sucesso'
+                  'Cadastrar Historia de Éxito'
                 )}
               </Button>
             </div>

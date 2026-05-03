@@ -101,7 +101,7 @@ export const useCertificates = () => {
       const message = (error as { message?: unknown }).message;
       if (typeof message === 'string' && message.trim()) return message;
     }
-    return "Erro desconhecido";
+    return "Error desconhecido";
   };
 
   // Fetch all approved certificates (for Certificates page)
@@ -127,7 +127,7 @@ export const useCertificates = () => {
       // Only show error if user is still authenticated
       if (user && error?.message !== 'Load failed') {
         toast({
-          title: "Erro ao carregar certificados",
+          title: "Error ao carregar certificados",
           description: getErrorMessage(error),
           variant: "destructive",
         });
@@ -212,7 +212,7 @@ export const useCertificates = () => {
       if (error) throw error;
 
       toast({
-        title: "Certificado enviado com sucesso",
+        title: "Certificado enviado com éxito",
         description: `${certificateData.title} foi adicionado aos seus certificados.`,
       });
 
@@ -220,7 +220,7 @@ export const useCertificates = () => {
       return data;
     } catch (error) {
       toast({
-        title: "Erro ao enviar certificado",
+        title: "Error ao enviar certificado",
         description: getErrorMessage(error),
         variant: "destructive",
       });
@@ -281,7 +281,7 @@ export const useCertificates = () => {
       }
 
       if (!filePath || !fileName) {
-        throw new Error('Nenhum PDF disponível para recriar o certificado.');
+        throw new Error('Ningún PDF disponible para recriar o certificado.');
       }
 
       const { data, error } = await apiClient
@@ -315,15 +315,15 @@ export const useCertificates = () => {
       if (error) throw error;
 
       toast({
-        title: "Certificado reenviado com sucesso",
-        description: `${certificateData.title} foi reenviado para aprovação.`,
+        title: "Certificado reenviado com éxito",
+        description: `${certificateData.title} foi reenviado para aprobación.`,
       });
 
       await fetchCertificates();
       return data;
     } catch (error) {
       toast({
-        title: "Erro ao recriar certificado rejeitado",
+        title: "Error ao recriar certificado rechazado",
         description: getErrorMessage(error),
         variant: "destructive",
       });
@@ -361,15 +361,15 @@ export const useCertificates = () => {
       if (error) throw error;
 
       toast({
-        title: "Certificado atualizado com sucesso",
-        description: `${certificateData.title} foi atualizado e enviado novamente para aprovação.`,
+        title: "Certificado atualizado com éxito",
+        description: `${certificateData.title} foi atualizado y enviado novamente para aprobación.`,
       });
 
       await fetchCertificates(); // Refresh list
       return data;
     } catch (error) {
       toast({
-        title: "Erro ao atualizar certificado",
+        title: "Error ao atualizar certificado",
         description: getErrorMessage(error),
         variant: "destructive",
       });
@@ -399,15 +399,15 @@ export const useCertificates = () => {
       if (error) throw error;
 
       toast({
-        title: "Certificado removido",
-        description: "O certificado foi removido com sucesso.",
+        title: "Certificado eliminado",
+        description: "O certificado fue eliminado com éxito.",
       });
 
       await fetchCertificates(); // Refresh list
       return true;
     } catch (error) {
       toast({
-        title: "Erro ao remover certificado",
+        title: "Error ao remover certificado",
         description: getErrorMessage(error),
         variant: "destructive",
       });
@@ -433,7 +433,7 @@ export const useCertificates = () => {
       return null;
     } catch (error) {
       toast({
-        title: "Erro ao gerar link",
+        title: "Error ao gerar link",
         description: getErrorMessage(error),
         variant: "destructive",
       });
@@ -493,7 +493,7 @@ export const useCertificates = () => {
       return mockCertificate;
     } catch (error) {
       toast({
-        title: "Erro ao carregar dados do certificado rejeitado",
+        title: "Error ao carregar dados del certificado rechazado",
         description: getErrorMessage(error),
         variant: "destructive",
       });

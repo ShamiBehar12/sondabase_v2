@@ -11,7 +11,7 @@ export const CleanupCertificates = () => {
   const { toast } = useToast();
 
   const handleClearStorage = async () => {
-    if (!confirm('Tem certeza que deseja limpar TODOS os arquivos de certificados do storage? Esta ação não pode ser desfeita.')) {
+    if (!confirm('¿Estás seguro que deseja limpiar TODOS os archivos de certificados del storage? Esta acción no pode ser deshacerse.')) {
       return;
     }
 
@@ -24,22 +24,22 @@ export const CleanupCertificates = () => {
 
       if (result.success) {
         toast({
-          title: "Storage limpo com sucesso",
+          title: "Storage limpo com éxito",
           description: result.message,
         });
       } else {
         toast({
           variant: "destructive",
-          title: "Erro ao limpar storage",
+          title: "Error ao limpar storage",
           description: result.error,
         });
       }
     } catch (error) {
-      console.error('Erro:', error);
+      console.error('Error:', error);
       toast({
         variant: "destructive",
-        title: "Erro inesperado",
-        description: "Ocorreu um erro durante a limpeza.",
+        title: "Error inesperado",
+        description: "Ocorreu un error durante a limpeza.",
       });
     } finally {
       setIsClearing(false);
@@ -51,7 +51,7 @@ export const CleanupCertificates = () => {
       <div>
         <h1 className="text-3xl font-bold">Limpeza de Certificados</h1>
         <p className="text-muted-foreground mt-2">
-          Ferramenta para limpeza completa dos arquivos de certificados no storage
+          Ferramenta para limpeza completa dos archivos de certificados no storage
         </p>
       </div>
 
@@ -59,16 +59,16 @@ export const CleanupCertificates = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-orange-500" />
-            Limpeza do Storage de Certificados
+            Limpeza del Storage de Certificados
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
             <h3 className="font-semibold text-orange-800 mb-2">⚠️ Atenção</h3>
             <p className="text-orange-700 text-sm">
-              Esta ação irá deletar TODOS os arquivos de certificados do storage. 
-              A base de dados já foi limpa, mas os arquivos físicos precisam ser removidos separadamente.
-              Esta ação não pode ser desfeita.
+              Esta acción irá deletar TODOS os archivos de certificados del storage. 
+              A base de dados já foi limpa, mas os archivos físicos precisam ser removidos separadamente.
+              Esta acción no pode ser deshacerse.
             </p>
           </div>
 
@@ -91,7 +91,7 @@ export const CleanupCertificates = () => {
               <h3 className={`font-semibold mb-2 ${
                 clearResult.success ? 'text-green-800' : 'text-red-800'
               }`}>
-                {clearResult.success ? '✅ Sucesso' : '❌ Erro'}
+                {clearResult.success ? '✅ Éxito' : '❌ Error'}
               </h3>
               <p className={`text-sm ${
                 clearResult.success ? 'text-green-700' : 'text-red-700'
@@ -107,7 +107,7 @@ export const CleanupCertificates = () => {
           )}
 
           <div className="text-sm text-muted-foreground">
-            <h4 className="font-medium mb-2">O que foi limpo da base de dados:</h4>
+            <h4 className="font-medium mb-2">O que foi limpo de la base de dados:</h4>
             <ul className="list-disc list-inside space-y-1">
               <li>✅ Tabela certificates (0 registros restantes)</li>
               <li>✅ Tabela professional_certificates (0 registros restantes)</li>
@@ -117,9 +117,9 @@ export const CleanupCertificates = () => {
             
             <h4 className="font-medium mb-2 mt-4">O que foi mantido:</h4>
             <ul className="list-disc list-inside space-y-1">
-              <li>✅ Usuários (auth.users)</li>
-              <li>✅ Perfis de usuários (profiles)</li>
-              <li>✅ Roles de usuários (user_roles)</li>
+              <li>✅ Usuarios (auth.users)</li>
+              <li>✅ Perfis de usuarios (profiles)</li>
+              <li>✅ Roles de usuarios (user_roles)</li>
               <li>✅ Todas as outras configurações</li>
             </ul>
           </div>

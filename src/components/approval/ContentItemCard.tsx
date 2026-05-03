@@ -47,7 +47,7 @@ export function ContentItemCard({
             Aprovado
           </Badge>
         );
-      case 'rejeitado':
+      case 'rechazado':
         return (
           <Badge variant="destructive" className="gap-1">
             <XCircle className="w-3 h-3" />
@@ -65,10 +65,10 @@ export function ContentItemCard({
   };
 
   const itemData = item.dados as any;
-  const title = itemData?.titulo || 'Sem título';
+  const title = itemData?.titulo || 'Sin título';
   const description = itemData?.descricao || itemData?.empresa || '';
 
-  const canEdit = item.status === 'rascunho' || item.status === 'rejeitado';
+  const canEdit = item.status === 'rascunho' || item.status === 'rechazado';
   const canSubmitForReview = item.status === 'rascunho' && onSubmitForReview;
 
   return (

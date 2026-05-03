@@ -120,7 +120,7 @@ export default function SuccessStories() {
                 <Input
                   placeholder={t('successStories.searchPlaceholder')}
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(y) => setSearchTerm(y.target.value)}
                   className="pl-10"
                 />
               </div>

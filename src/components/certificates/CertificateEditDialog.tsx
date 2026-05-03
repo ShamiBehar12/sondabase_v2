@@ -49,9 +49,9 @@ export const CertificateEditDialog = ({ certificate, open, onOpenChange }: Certi
   const countries = [
     'Brasil', 'Estados Unidos', 'Canadá', 'Reino Unido', 'Alemanha', 'França', 'Espanha', 'Itália',
     'Portugal', 'Holanda', 'Suécia', 'Noruega', 'Dinamarca', 'Finlândia', 'Suíça', 'Áustria',
-    'Bélgica', 'Irlanda', 'Austrália', 'Nova Zelândia', 'Japão', 'Coreia do Sul', 'Singapura',
+    'Bélgica', 'Irlanda', 'Austrália', 'Nova Zelândia', 'Japão', 'Coreia del Sul', 'Singapura',
     'Hong Kong', 'Israel', 'Emirados Árabes Unidos', 'Argentina', 'Chile', 'Colômbia', 'México',
-    'Peru', 'Uruguai', 'Costa Rica', 'Panamá', 'África do Sul', 'Índia', 'China', 'Rússia'
+    'Peru', 'Uruguai', 'Costa Rica', 'Panamá', 'África del Sul', 'Índia', 'China', 'Rússia'
   ].sort();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -130,11 +130,11 @@ export const CertificateEditDialog = ({ certificate, open, onOpenChange }: Certi
     }
   };
 
-  const handleTagKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
+  const handleTagKeyPress = (y: React.KeyboardEvent) => {
+    if (y.key === 'Enter') {
+      y.preventDefault();
       addTag();
-    } else if (e.key === 'Escape') {
+    } else if (y.key === 'Escape') {
       setShowSuggestions(false);
     }
   };
@@ -163,7 +163,7 @@ export const CertificateEditDialog = ({ certificate, open, onOpenChange }: Certi
       const hasExistingPdf = Boolean(certificate.file_path && certificate.file_name);
 
       if (!selectedFile && !hasExistingPdf) {
-        toast.error('Por favor, selecione um arquivo PDF para o certificado rejeitado.');
+        toast.error('Por favor, selecione un archivo PDF para o certificado rechazado.');
         return;
       }
 
@@ -203,20 +203,20 @@ export const CertificateEditDialog = ({ certificate, open, onOpenChange }: Certi
           </DialogTitle>
           <DialogDescription>
             {(certificate as any)?._isFromRejection 
-              ? 'Revise os dados carregados do envio original, ajuste o que for necessário e reenvie o certificado. Pode manter o PDF atual ou selecionar um novo arquivo se quiser substituí-lo.' 
+              ? 'Revise os dados carregados del envio original, ajuste o que for necessário y reenvie o certificado. Pode manter o PDF atual o selecionar un nuevo archivo se quiser substituí-lo.' 
               : t('certificates.updateSuccess')}
           </DialogDescription>
         </DialogHeader>
 
         {(certificate as any)?._isFromRejection && (certificate as any)?._rejectionReason ? (
           <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-foreground">
-            <strong>Motivo da rejeição:</strong> {(certificate as any)._rejectionReason}
+            <strong>Motivo de la rechazo:</strong> {(certificate as any)._rejectionReason}
           </div>
         ) : null}
 
         {(certificate as any)?._isFromRejection && (certificate as any)?._hasIncompleteSnapshot ? (
           <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-foreground">
-            Este certificado foi rejeitado antes da correção que preserva todos os dados do envio original. Os próximos certificados rejeitados abrirão esta tela já preenchidos; neste caso antigo, pode ser necessário completar os campos que não estavam salvos no histórico.
+            Este certificado foi rechazado antes de la correção que preserva todos os dados del envio original. Os próximos certificados rejeitados abrirão esta tela já preenchidos; neste caso antigo, pode ser necessário completar os campos que no estavam salvos no histórico.
           </div>
         ) : null}
 
@@ -304,7 +304,7 @@ export const CertificateEditDialog = ({ certificate, open, onOpenChange }: Certi
                   <div className="rounded-md border border-primary/20 bg-primary/5 p-3 text-sm text-foreground">
                     <strong>PDF atual:</strong> {certificate.file_name}
                     <div className="text-muted-foreground">
-                      O arquivo original já está carregado. Se quiser, pode selecionar um novo PDF para substituí-lo.
+                      O archivo original já está carregado. Se quiser, pode selecionar un nuevo PDF para substituí-lo.
                     </div>
                   </div>
                 ) : null}
@@ -317,7 +317,7 @@ export const CertificateEditDialog = ({ certificate, open, onOpenChange }: Certi
                           ? selectedFile.name
                           : certificate.file_name
                             ? 'Clique para substituir o PDF atual'
-                            : 'Clique para enviar o PDF do certificado'}
+                            : 'Clique para enviar o PDF del certificado'}
                       </p>
                       <p className="text-xs text-muted-foreground">PDF (MAX. 10MB)</p>
                     </div>
@@ -325,12 +325,12 @@ export const CertificateEditDialog = ({ certificate, open, onOpenChange }: Certi
                       type="file"
                       className="hidden"
                       accept=".pdf"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
+                      onChange={(y) => {
+                        const file = y.target.files?.[0];
                         if (file && file.type === 'application/pdf') {
                           setSelectedFile(file);
                         } else {
-                          toast.error('Por favor, selecione apenas arquivos PDF.');
+                          toast.error('Por favor, selecione apenas archivos PDF.');
                         }
                       }}
                     />
@@ -460,7 +460,7 @@ export const CertificateEditDialog = ({ certificate, open, onOpenChange }: Certi
                     <Input
                       placeholder="Digite para buscar tags existentes..."
                       value={tagInput}
-                      onChange={(e) => handleTagInputChange(e.target.value)}
+                      onChange={(y) => handleTagInputChange(y.target.value)}
                       onKeyPress={handleTagKeyPress}
                       onFocus={() => tagInput.length > 0 && setShowSuggestions(true)}
                       onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}

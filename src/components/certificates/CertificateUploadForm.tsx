@@ -23,17 +23,17 @@ const formSchema = z.object({
   description_pt: z.string().optional(),
   file: z.instanceof(File).refine(
     (file) => file.type === 'application/pdf',
-    'Apenas arquivos PDF são permitidos'
+    'Apenas archivos PDF são permitidos'
   ).refine(
     (file) => file.size <= 10 * 1024 * 1024, // 10MB
-    'O arquivo deve ter no máximo 10MB'
+    'O archivo deve ter no máximo 10MB'
   ),
   ocr_file: z.instanceof(File).optional().refine(
     (file) => !file || file.type === 'application/pdf',
-    'Apenas arquivos PDF são permitidos'
+    'Apenas archivos PDF são permitidos'
   ).refine(
     (file) => !file || file.size <= 10 * 1024 * 1024,
-    'O arquivo OCR deve ter no máximo 10MB'
+    'O archivo OCR deve ter no máximo 10MB'
   ),
   issued_date: z.string().optional(),
   contract_start_date: z.string().optional(),
@@ -61,9 +61,9 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
   const countries = [
     'Brasil', 'Estados Unidos', 'Canadá', 'Reino Unido', 'Alemanha', 'França', 'Espanha', 'Itália',
     'Portugal', 'Holanda', 'Suécia', 'Noruega', 'Dinamarca', 'Finlândia', 'Suíça', 'Áustria',
-    'Bélgica', 'Irlanda', 'Austrália', 'Nova Zelândia', 'Japão', 'Coreia do Sul', 'Singapura',
+    'Bélgica', 'Irlanda', 'Austrália', 'Nova Zelândia', 'Japão', 'Coreia del Sul', 'Singapura',
     'Hong Kong', 'Israel', 'Emirados Árabes Unidos', 'Argentina', 'Chile', 'Colômbia', 'México',
-    'Peru', 'Uruguai', 'Costa Rica', 'Panamá', 'África do Sul', 'Índia', 'China', 'Rússia'
+    'Peru', 'Uruguai', 'Costa Rica', 'Panamá', 'África del Sul', 'Índia', 'China', 'Rússia'
   ].sort();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -93,64 +93,64 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
     loadPopularTags();
   }, [getPopularTags]);
 
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
+  const handleDrag = (y: React.DragEvent) => {
+    y.preventDefault();
+    y.stopPropagation();
+    if (y.type === 'dragenter' || y.type === 'dragover') {
       setDragActive(true);
-    } else if (e.type === 'dragleave') {
+    } else if (y.type === 'dragleave') {
       setDragActive(false);
     }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleDrop = (y: React.DragEvent) => {
+    y.preventDefault();
+    y.stopPropagation();
     setDragActive(false);
 
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
+    if (y.dataTransfer.files && y.dataTransfer.files[0]) {
+      const file = y.dataTransfer.files[0];
       if (file.type === 'application/pdf') {
         if (file.size <= 10 * 1024 * 1024) { // 10MB limit
           form.setValue('file', file);
           form.clearErrors('file');
         } else {
-          form.setError('file', { message: 'O arquivo deve ter no máximo 10MB' });
+          form.setError('file', { message: 'O archivo deve ter no máximo 10MB' });
         }
       } else {
-        form.setError('file', { message: 'Apenas arquivos PDF são permitidos' });
+        form.setError('file', { message: 'Apenas archivos PDF são permitidos' });
       }
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
+  const handleFileChange = (y: React.ChangeEvent<HTMLInputElement>) => {
+    if (y.target.files && y.target.files[0]) {
+      const file = y.target.files[0];
       if (file.type === 'application/pdf') {
         if (file.size <= 10 * 1024 * 1024) { // 10MB limit
           form.setValue('file', file);
           form.clearErrors('file');
         } else {
-          form.setError('file', { message: 'O arquivo deve ter no máximo 10MB' });
+          form.setError('file', { message: 'O archivo deve ter no máximo 10MB' });
         }
       } else {
-        form.setError('file', { message: 'Apenas arquivos PDF são permitidos' });
+        form.setError('file', { message: 'Apenas archivos PDF são permitidos' });
       }
     }
   };
 
-  const handleOcrFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
+  const handleOcrFileChange = (y: React.ChangeEvent<HTMLInputElement>) => {
+    if (y.target.files && y.target.files[0]) {
+      const file = y.target.files[0];
       if (file.type === 'application/pdf') {
         if (file.size <= 10 * 1024 * 1024) {
           form.setValue('ocr_file', file);
           form.clearErrors('ocr_file');
         } else {
-          form.setError('ocr_file', { message: 'O arquivo OCR deve ter no máximo 10MB' });
+          form.setError('ocr_file', { message: 'O archivo OCR deve ter no máximo 10MB' });
         }
       } else {
-        form.setError('ocr_file', { message: 'Apenas arquivos PDF são permitidos' });
+        form.setError('ocr_file', { message: 'Apenas archivos PDF são permitidos' });
       }
     }
   };
@@ -186,11 +186,11 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
     }
   };
 
-  const handleTagKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
+  const handleTagKeyPress = (y: React.KeyboardEvent) => {
+    if (y.key === 'Enter') {
+      y.preventDefault();
       addTag();
-    } else if (e.key === 'Escape') {
+    } else if (y.key === 'Escape') {
       setShowSuggestions(false);
     }
   };
@@ -270,13 +270,13 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
                     className="mt-2"
                   >
                     <X className="h-4 w-4 mr-2" />
-                    Remover arquivo
+                    Remover archivo
                   </Button>
                 </div>
               ) : (
                 <div className="space-y-3">
                   <p className="text-sm text-foreground-muted">
-                    <strong>Arraste o PDF original aqui</strong> ou clique para selecionar
+                    <strong>Arraste o PDF original aqui</strong> o clique para selecionar
                   </p>
                   <p className="text-xs text-foreground-muted">
                     Arquivos PDF de até 10MB
@@ -311,7 +311,7 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
               <div>
                 <Label>Arquivo OCR para IA (opcional)</Label>
                 <p className="text-xs text-foreground-muted mt-1">
-                  Envia aqui a versão OCR/textual do documento apenas para a indexação da IA. O download e a visualização do certificado continuarão a usar sempre o PDF original.
+                  Envia aqui a versão OCR/textual del documento apenas para a indexação de la IA. O download y a visualização del certificado continuarão a usar sempre o PDF original.
                 </p>
               </div>
 
@@ -342,7 +342,7 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
                 <div className="rounded-lg border border-dashed border-border p-4">
                   <div className="space-y-3">
                     <p className="text-sm text-foreground-muted">
-                      Se tiveres uma versão OCR do documento, adiciona-a aqui para melhorar o RAG.
+                      Se tiveres uma versão OCR del documento, adiciona-a aqui para melhorar o RAG.
                     </p>
                     <Button
                       type="button"
@@ -453,7 +453,7 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
                 name="contract_start_date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Data Início do Contrato</FormLabel>
+                    <FormLabel>Data Início del Contrato</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
                     </FormControl>
@@ -467,7 +467,7 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
                 name="contract_end_date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Data Fim do Contrato</FormLabel>
+                    <FormLabel>Data Fim del Contrato</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
                     </FormControl>
@@ -483,7 +483,7 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
               name="issued_date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Data de Emissão do Certificado</FormLabel>
+                  <FormLabel>Data de Emissão del Certificado</FormLabel>
                   <FormControl>
                     <Input type="date" {...field} />
                   </FormControl>
@@ -538,7 +538,7 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
               name="certificate_number"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Número do Certificado</FormLabel>
+                  <FormLabel>Número del Certificado</FormLabel>
                   <FormControl>
                     <Input placeholder="Ex: 123456789" {...field} />
                   </FormControl>
@@ -567,7 +567,7 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
                     <Input
                       placeholder="Digite para buscar tags existentes..."
                       value={tagInput}
-                      onChange={(e) => handleTagInputChange(e.target.value)}
+                      onChange={(y) => handleTagInputChange(y.target.value)}
                       onKeyPress={handleTagKeyPress}
                       onFocus={() => tagInput.length > 0 && setShowSuggestions(true)}
                       onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
