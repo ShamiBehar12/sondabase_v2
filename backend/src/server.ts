@@ -714,6 +714,34 @@ app.get("/api/ai/chat/sessions/:id/messages", async (request) => {
   return { data: messages, error: null };
 });
 
+app.post("/api/ai/chat/sessions/:id/messages", async (request) => {
+  const user = requireAuth(request);
+  const sessionId = pathParam(request, "id");
+  const body = request.body as { role: string; content: string; sourcesJson?: unknown };
+
+  const session = await prisma.aiChatSession.findUnique({ where: { id: sessionId } });
+  if (!session) throw app.httpErrors.notFound("Session not found");
+  if (user.role !== "admin" && session.userId !== user.id)
+    throw app.httpErrors.forbidden("Operation not allowed");
+
+  const msg = await prisma.aiChatMessage.create({
+    data: {
+      sessionId,
+      userId: user.id,
+      role: body.role,
+      content: body.content,
+      sourcesJson: (body.sourcesJson as any) ?? undefined,
+    },
+  });
+
+  await prisma.aiChatSession.update({
+    where: { id: sessionId },
+    data: { updatedAt: new Date() },
+  });
+
+  return { data: msg, error: null };
+});
+
 app.delete("/api/ai/chat/sessions/:id", async (request) => {
   const user = requireAuth(request);
   const sessionId = pathParam(request, "id");
