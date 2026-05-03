@@ -76,19 +76,19 @@ export function AppSidebar() {
     <Sidebar className={collapsed ? "w-16" : "w-64"}>
       <SidebarContent className="bg-sidebar border-r border-sidebar-border">
         {/* Logo Area */}
-        <div className="p-6 border-b border-sidebar-border">
+        <div className="p-4 border-b border-sidebar-border">
           {!collapsed ? (
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+            <div className="flex items-center gap-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm px-3 py-2.5">
+              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20 flex-shrink-0">
                 <Award className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="font-bold text-lg text-gradient">StoryCert</h2>
+                <h2 className="font-bold text-lg text-blue-400">StoryCert</h2>
                 <p className="text-xs text-foreground-muted">Enterprise Platform</p>
               </div>
             </div>
           ) : (
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center mx-auto">
+            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center mx-auto shadow-lg shadow-blue-500/20">
               <Award className="w-5 h-5 text-white" />
             </div>
           )}
