@@ -1,13 +1,20 @@
 {
   "navigation": {
     "dashboard": "Dashboard",
-    "certificates": "Certificados",
+    "main": "Principal",
+    "certificates": "Documentos",
     "professionalCertificates": "Certificados Profissionais",
     "successStories": "Histórias de Sucesso",
     "users": "Usuários",
     "settings": "Configurações",
-    "certificateApproval": "Aprovação de Certificados",
-    "successStoriesApproval": "Aprovação de Histórias"
+    "aiAssistant": "Assistente IA",
+    "certificateApproval": "Aprovação de Documentos",
+    "successStoriesApproval": "Aprovação de Histórias",
+    "administration": "Administração",
+    "myCertificates": "Meus Documentos",
+    "newConversation": "Nova conversa",
+    "documentExplorer": "Explorador de Documentos",
+    "adminConversations": "Auditoria de Chats"
   },
   "common": {
     "search": "Buscar",
@@ -264,7 +271,14 @@
     "activeUsers": "Usuários Ativos",
     "newUsersThisMonth": "novos usuários este mês",
     "views": "Visualizações",
-    "averageReviewTime": "Tempo Médio de Revisão"
+    "averageReviewTime": "Tempo Médio de Revisão",
+    "activity": {
+      "added_certificate": "adicionou um certificado",
+      "submitted_certificate": "enviou certificado para revisão",
+      "published_story": "publicou uma história",
+      "submitted_story": "enviou história para revisão"
+    },
+    "recentDocumentsCount": "{{count}} documentos recentes"
   },
   "approval": {
     "title": "Sistema de Aprovação",

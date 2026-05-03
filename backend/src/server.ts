@@ -1665,7 +1665,7 @@ app.get("/api/stats/dashboard", async (req, reply) => {
     const userName = (cert as any).user?.profile?.fullName || (cert as any).user?.email || "Usuario";
     activities.push({
       id: cert.id,
-      action: cert.isVerified ? "añadió un certificado" : "envió certificado para revisión",
+      action: cert.isVerified ? "added_certificate" : "submitted_certificate",
       document: cert.title,
       user: userName,
       time: cert.createdAt.toISOString(),
@@ -1676,7 +1676,7 @@ app.get("/api/stats/dashboard", async (req, reply) => {
     const userName = (story as any).user?.profile?.fullName || (story as any).user?.email || "Usuario";
     activities.push({
       id: story.id,
-      action: story.isVerified ? "publicó historia" : "envió historia para revisión",
+      action: story.isVerified ? "published_story" : "submitted_story",
       document: (story as any).titlePt || (story as any).titleEs || (story as any).titleEn || "Sin título",
       user: userName,
       time: story.createdAt.toISOString(),
@@ -1746,4 +1746,227 @@ app.post("/api/admin/seed-racer", async (req, reply) => {
 
   return reply.send({ data: { created, skipped, total: lines.length }, error: null });
 });
+
+// ── Admin: audit all chat sessions with user info ─────────────────────────
+app.get("/api/admin/chat/sessions", async (request, reply) => {
+  requireAdmin(request);
+  const sessions = await prisma.aiChatSession.findMany({
+    orderBy: { updatedAt: "desc" },
+    take: 200,
+    include: {
+      user: {
+        select: {
+          id: true,
+          email: true,
+          profile: { select: { fullName: true } },
+        },
+      },
+    },
+  });
+
+  const result = sessions.map((s: any) => ({
+    id: s.id,
+    title: s.title,
+    createdAt: s.createdAt,
+    updatedAt: s.updatedAt,
+    userId: s.userId,
+    user: {
+      id: s.user?.id,
+      email: s.user?.email,
+      fullName: s.user?.profile?.fullName ?? null,
+    },
+  }));
+
+  return reply.send({ data: result, error: null });
+});
+
+// ── Document Explorer: combined certificates + stories with filters ────────
+app.get("/api/documents", async (request, reply) => {
+  const user = requireAuth(request);
+  const query = request.query as Record<string, string>;
+  const { type, country, organization, year, tags, search } = query;
+
+  const tagList = tags ? tags.split(",").filter(Boolean) : [];
+  const yearNum = year ? parseInt(year, 10) : undefined;
+
+  // Apply user access policy (admin/reviewer see everything)
+  let accessPolicy: Record<string, any> | null = null;
+  if (user.role === "user" || user.role === "moderator") {
+    const profile = await prisma.profile.findUnique({
+      where: { userId: user.id },
+      select: { accessFilters: true },
+    });
+    accessPolicy = (profile?.accessFilters as Record<string, any>) ?? null;
+  }
+
+  const applyPolicyToWhere = (base: Record<string, any>) => {
+    if (!accessPolicy) return base;
+    const result = { ...base };
+    if (accessPolicy.countries?.length) {
+      result.country = { in: accessPolicy.countries };
+    }
+    if (accessPolicy.tags?.length) {
+      result.tags = { hasSome: accessPolicy.tags };
+    }
+    if (accessPolicy.years?.length) {
+      const yearDates = accessPolicy.years.flatMap((y: number) => [
+        { issuedDate: { gte: new Date(`${y}-01-01`), lt: new Date(`${y + 1}-01-01`) } },
+      ]);
+      result.OR = yearDates;
+    }
+    return result;
+  };
+
+  const results: any[] = [];
+
+  if (!type || type === "certificate") {
+    const where: any = applyPolicyToWhere({ isVerified: true });
+    if (country) where.country = country;
+    if (organization) where.issuingOrganization = { contains: organization };
+    if (yearNum) where.issuedDate = { gte: new Date(`${yearNum}-01-01`), lt: new Date(`${yearNum + 1}-01-01`) };
+    if (tagList.length) where.tags = { hasSome: tagList };
+    if (search) where.OR = [{ title: { contains: search } }, { issuingOrganization: { contains: search } }];
+
+    const certs = await prisma.certificate.findMany({
+      where,
+      select: {
+        id: true,
+        title: true,
+        issuingOrganization: true,
+        country: true,
+        tags: true,
+        issuedDate: true,
+        isVerified: true,
+        createdAt: true,
+      },
+      take: 100,
+      orderBy: { createdAt: "desc" },
+    });
+
+    for (const c of certs) {
+      results.push({
+        id: c.id,
+        type: "certificate",
+        title: c.title,
+        organization: c.issuingOrganization ?? undefined,
+        country: c.country ?? undefined,
+        tags: (c.tags as string[]) ?? [],
+        year: c.issuedDate ? new Date(c.issuedDate).getFullYear() : undefined,
+        isVerified: c.isVerified,
+        createdAt: c.createdAt.toISOString(),
+      });
+    }
+  }
+
+  if (!type || type === "story") {
+    const where: any = applyPolicyToWhere({ isVerified: true });
+    if (country) where.countryEn = { contains: country };
+    if (organization) where.clientEn = { contains: organization };
+    if (search) {
+      where.OR = [
+        { titleEn: { contains: search } },
+        { titlePt: { contains: search } },
+        { clientEn: { contains: search } },
+      ];
+    }
+
+    const stories = await prisma.successStory.findMany({
+      where,
+      select: {
+        id: true,
+        titleEn: true,
+        titlePt: true,
+        titleEs: true,
+        clientEn: true,
+        countryEn: true,
+        closureYear: true,
+        isVerified: true,
+        createdAt: true,
+      },
+      take: 100,
+      orderBy: { createdAt: "desc" },
+    });
+
+    for (const s of stories) {
+      results.push({
+        id: s.id,
+        type: "story",
+        title: s.titleEn || s.titlePt || s.titleEs || "Untitled",
+        organization: s.clientEn ?? undefined,
+        country: s.countryEn ?? undefined,
+        tags: [],
+        year: s.closureYear ?? undefined,
+        isVerified: s.isVerified,
+        createdAt: s.createdAt.toISOString(),
+      });
+    }
+  }
+
+  results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  return reply.send({ data: results, error: null });
+});
+
+// ── Document Explorer: filter options ────────────────────────────────────
+app.get("/api/documents/filters", async (request, reply) => {
+  requireAuth(request);
+
+  const [certs, stories] = await Promise.all([
+    prisma.certificate.findMany({
+      where: { isVerified: true },
+      select: { country: true, issuingOrganization: true, tags: true, issuedDate: true },
+    }),
+    prisma.successStory.findMany({
+      where: { isVerified: true },
+      select: { countryEn: true, clientEn: true, closureYear: true },
+    }),
+  ]);
+
+  const countries = [...new Set([
+    ...certs.map((c: any) => c.country).filter(Boolean),
+    ...stories.map((s: any) => s.countryEn).filter(Boolean),
+  ])].sort();
+
+  const organizations = [...new Set([
+    ...certs.map((c: any) => c.issuingOrganization).filter(Boolean),
+    ...stories.map((s: any) => s.clientEn).filter(Boolean),
+  ])].sort();
+
+  const years = [...new Set([
+    ...certs.map((c: any) => c.issuedDate ? new Date(c.issuedDate).getFullYear() : null).filter(Boolean),
+    ...stories.map((s: any) => s.closureYear).filter(Boolean),
+  ])].sort((a, b) => (b as number) - (a as number));
+
+  const tags = [...new Set(
+    certs.flatMap((c: any) => Array.isArray(c.tags) ? c.tags : []).filter(Boolean)
+  )].sort();
+
+  return reply.send({ data: { countries, organizations, years, tags }, error: null });
+});
+
+// ── User document access policy ───────────────────────────────────────────
+app.get("/api/users/:userId/document-policy", async (request, reply) => {
+  requireAdmin(request);
+  const userId = pathParam(request, "userId");
+  const profile = await prisma.profile.findUnique({
+    where: { userId },
+    select: { accessFilters: true },
+  });
+  return reply.send({ data: { accessFilters: profile?.accessFilters ?? null }, error: null });
+});
+
+app.put("/api/users/:userId/document-policy", async (request, reply) => {
+  requireAdmin(request);
+  const userId = pathParam(request, "userId");
+  const body = request.body as { accessFilters: Record<string, any> | null };
+
+  await prisma.profile.upsert({
+    where: { userId },
+    create: { userId, accessFilters: body.accessFilters ?? undefined },
+    update: { accessFilters: body.accessFilters ?? null },
+  });
+
+  return reply.send({ data: { ok: true }, error: null });
+});
+
 app.listen({ port: env.port, host: env.host });

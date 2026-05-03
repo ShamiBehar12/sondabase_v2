@@ -4,20 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { useAIChat } from "@/hooks/useAI";
+import { useAIChatContext } from "@/contexts/AIChatContext";
 import { apiFetch } from "@/lib/api-client";
-import { Bot, MessageSquarePlus, Send, Trash2 } from "lucide-react";
+import { Bot, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -31,7 +20,7 @@ type RacerSource = {
 };
 
 export default function AIChat() {
-  const { sessions, messages, activeSessionId, setActiveSessionId, loading, createSession, deleteSession, reloadSessions } = useAIChat();
+  const { messages, activeSessionId, setActiveSessionId, loading, createSession, reloadSessions } = useAIChatContext();
   const { toast } = useToast();
   const [question, setQuestion] = useState("");
   const [sending, setSending] = useState(false);
@@ -102,100 +91,19 @@ export default function AIChat() {
     }
   };
 
-  const handleDeleteSession = async (sessionId: string) => {
-    const { error } = await deleteSession(sessionId);
-    if (error) {
-      toast({ variant: "destructive", title: "Error al eliminar conversación", description: error.message });
-      return;
-    }
-    toast({ title: "Conversación eliminada", description: "La sesión fue eliminada con éxito." });
-  };
-
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gradient flex items-center gap-3">
-          <Bot className="w-8 h-8" />
+        <h1 className="text-2xl font-bold text-gradient flex items-center gap-3">
+          <Bot className="w-6 h-6" />
           Asistente de Certificados
         </h1>
-        <p className="text-foreground-muted mt-2">
+        <p className="text-sm text-foreground-muted mt-1">
           Consulta en lenguaje natural y recibe los documentos más relevantes con fuentes y contexto.
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[320px_1fr_360px]">
-        {/* Sessions panel */}
-        <Card className="premium-card">
-          <CardHeader>
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <CardTitle>Conversaciones</CardTitle>
-                <CardDescription>Sesiones recientes del asistente.</CardDescription>
-              </div>
-              <Button size="icon" variant="outline" onClick={handleNewSession}>
-                <MessageSquarePlus className="w-4 h-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[460px] pr-3">
-              <div className="space-y-2">
-                {sessions.map((session) => (
-                  <div
-                    key={session.id}
-                    className={`group flex items-start gap-2 rounded-lg border px-3 py-2 transition ${
-                      activeSessionId === session.id ? "border-primary bg-primary/10" : "border-border"
-                    }`}
-                  >
-                    <button
-                      className="min-w-0 flex-1 overflow-hidden pr-2 text-left"
-                      onClick={() => setActiveSessionId(session.id)}
-                    >
-                      <div className="break-words text-sm font-medium leading-snug">
-                        {session.title || "Sin título"}
-                      </div>
-                      <div className="text-xs text-foreground-muted mt-1">
-                        {new Date(session.updatedAt).toLocaleString("pt-BR")}
-                      </div>
-                    </button>
-
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          type="button"
-                          size="icon"
-                          variant="ghost"
-                          className="h-8 w-8 shrink-0 text-foreground-muted opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100 focus-visible:opacity-100"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-surface border-border">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle className="text-foreground">Excluir conversación</AlertDialogTitle>
-                          <AlertDialogDescription className="text-foreground-muted">
-                            ¿Estás seguro de que deseas eliminar la conversación "{session.title || "Sin título"}"? Esta acción no se puede deshacer.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                          <AlertDialogAction
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            onClick={() => handleDeleteSession(session.id)}
-                          >
-                            Excluir
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </CardContent>
-        </Card>
-
+      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         {/* Chat panel */}
         <Card className="premium-card">
           <CardHeader>
