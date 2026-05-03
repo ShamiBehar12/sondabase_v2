@@ -16,95 +16,99 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useAIChat } from "@/hooks/useAI";
-import { apiClient } from "@/lib/api-client";
+import { apiFetch } from "@/lib/api-client";
 import { Bot, MessageSquarePlus, Send, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+type RacerSource = {
+  archivo: string;
+  pais: string;
+  ano: string;
+  apostillado: boolean;
+  distancia: number;
+};
 
 export default function AIChat() {
-  const { sessions, messages, activeSessionId, setActiveSessionId, loading, createSession, deleteSession, sendMessage } = useAIChat();
+  const { sessions, messages, activeSessionId, setActiveSessionId, loading, createSession, deleteSession, reloadSessions } = useAIChat();
   const { toast } = useToast();
   const [question, setQuestion] = useState("");
-  const latestAssistantSources = useMemo(
-    () => [...messages].reverse().find((message) => message.role === "assistant" && Array.isArray(message.sourcesJson))?.sourcesJson || [],
-    [messages],
-  );
+  const [sending, setSending] = useState(false);
 
-  const formatReference = (reason: string) => {
-    if (!reason?.trim()) {
-      return "Referência localizada no documento indexado.";
-    }
-
-    return reason
-      .replace(/^Correspondencia encontrada para:\s*/i, "Referência encontrada para: ")
-      .replace(/^Correspondencia baseada em metadados gerais del certificado\.?$/i, "Referência localizada nos metadados del certificado.");
-  };
-
-  const formatMatch = (reason?: string) => {
-    if (!reason?.trim()) {
-      return null;
-    }
-
-    const normalized = reason
-      .replace(/^Correspondencia encontrada para:\s*/i, "")
-      .replace(/\.$/, "")
-      .trim();
-
-    if (!normalized || /metadados gerais/i.test(reason)) {
-      return null;
-    }
-
-    return normalized;
-  };
-
-  const formatReferencePages = (pages?: number[]) => {
-    if (!pages || pages.length === 0) {
-      return null;
-    }
-
-    return pages.length === 1 ? `Página ${pages[0]}` : `Páginas ${pages.join(", ")}`;
-  };
+  const racerSources = useMemo<RacerSource[]>(() => {
+    const lastAssistant = [...messages].reverse().find(m => m.role === "assistant" && Array.isArray(m.sourcesJson));
+    if (!lastAssistant?.sourcesJson) return [];
+    const sources = lastAssistant.sourcesJson as unknown[];
+    if (!sources.length || !(sources[0] as any)?.archivo) return [];
+    return sources as RacerSource[];
+  }, [messages]);
 
   const handleNewSession = async () => {
     const { error } = await createSession("Nova conversación");
     if (error) {
-      toast({
-        variant: "destructive",
-        title: "Error ao crear conversación",
-        description: error.message,
-      });
+      toast({ variant: "destructive", title: "Error ao crear conversación", description: error.message });
     }
   };
 
   const handleSubmit = async () => {
-    if (!question.trim()) return;
-    const prompt = question;
+    const prompt = question.trim();
+    if (!prompt || sending) return;
     setQuestion("");
+    setSending(true);
 
-    const { error } = await sendMessage(prompt);
-    if (error) {
-      toast({
-        variant: "destructive",
-        title: "Error no chat",
-        description: error.message,
+    try {
+      let sessionId = activeSessionId;
+      if (!sessionId) {
+        const created = await createSession(prompt.slice(0, 60));
+        sessionId = created.data?.id ?? null;
+        if (!sessionId) throw new Error("No se pudo crear la sesión");
+      }
+
+      const { data, error } = await apiFetch<{
+        answer: string;
+        sources: RacerSource[];
+        tipo: string;
+        filtros: Record<string, unknown>;
+      }>("/api/racer/query", {
+        method: "POST",
+        body: { question: prompt },
       });
+
+      if (error || !data) {
+        throw new Error(error?.message ?? "Error al consultar el asistente");
+      }
+
+      await apiFetch(`/api/ai/chat/sessions/${sessionId}/messages`, {
+        method: "POST",
+        body: { role: "user", content: prompt },
+      });
+
+      await apiFetch(`/api/ai/chat/sessions/${sessionId}/messages`, {
+        method: "POST",
+        body: {
+          role: "assistant",
+          content: data.answer,
+          sourcesJson: data.sources,
+        },
+      });
+
+      await reloadSessions();
+      setActiveSessionId(sessionId);
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Error en el chat", description: err.message });
+    } finally {
+      setSending(false);
     }
   };
 
   const handleDeleteSession = async (sessionId: string) => {
     const { error } = await deleteSession(sessionId);
     if (error) {
-      toast({
-        variant: "destructive",
-        title: "Error ao excluir conversación",
-        description: error.message,
-      });
+      toast({ variant: "destructive", title: "Error ao excluir conversación", description: error.message });
       return;
     }
-
-    toast({
-      title: "Conversa excluída",
-      description: "A sessão foi removida com éxito.",
-    });
+    toast({ title: "Conversa excluída", description: "A sessão foi removida com éxito." });
   };
 
   return (
@@ -120,6 +124,7 @@ export default function AIChat() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[320px_1fr_360px]">
+        {/* Sessions panel */}
         <Card className="premium-card">
           <CardHeader>
             <div className="flex items-center justify-between gap-3">
@@ -161,7 +166,7 @@ export default function AIChat() {
                           size="icon"
                           variant="ghost"
                           className="h-8 w-8 shrink-0 text-foreground-muted opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100 focus-visible:opacity-100"
-                          onClick={(event) => event.stopPropagation()}
+                          onClick={(e) => e.stopPropagation()}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -170,7 +175,7 @@ export default function AIChat() {
                         <AlertDialogHeader>
                           <AlertDialogTitle className="text-foreground">Excluir conversación</AlertDialogTitle>
                           <AlertDialogDescription className="text-foreground-muted">
-                            ¿Estás seguro de que deseas eliminar a conversación "{session.title || "Sin título"}"? Esta acción no pode ser deshacerse.
+                            ¿Estás seguro de que deseas eliminar la conversación "{session.title || "Sin título"}"? Esta acción no pode ser deshacerse.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
@@ -191,6 +196,7 @@ export default function AIChat() {
           </CardContent>
         </Card>
 
+        {/* Chat panel */}
         <Card className="premium-card">
           <CardHeader>
             <CardTitle>Chat</CardTitle>
@@ -202,7 +208,7 @@ export default function AIChat() {
                 {loading && <div className="text-sm text-foreground-muted">Carregando conversas...</div>}
                 {!loading && messages.length === 0 && (
                   <div className="text-sm text-foreground-muted">
-                    Aún no há mensajes. Ejemplo: "Qué certificados cumplen con una experiencia en gestión de contratos en Chile?"
+                    Aún no há mensajes. Ejemplo: "¿Qué contratos tenemos apostillados en Chile?"
                   </div>
                 )}
                 {messages.map((message) => (
@@ -210,24 +216,33 @@ export default function AIChat() {
                     <div className="text-xs uppercase tracking-wide text-foreground-muted mb-2">
                       {message.role === "user" ? "Pergunta" : "Assistente"}
                     </div>
-                    <div className="whitespace-pre-wrap text-sm">{message.content}</div>
+                    <div className="text-sm prose prose-invert prose-sm max-w-none
+                      [&_table]:w-full [&_table]:border-collapse [&_table]:text-xs
+                      [&_th]:border [&_th]:border-border [&_th]:px-2 [&_th]:py-1 [&_th]:bg-muted [&_th]:text-left
+                      [&_td]:border [&_td]:border-border [&_td]:px-2 [&_td]:py-1
+                      [&_tr:nth-child(even)]:bg-muted/30
+                      [&_p]:mb-2 [&_ul]:pl-4 [&_li]:mb-1">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
+                    </div>
                   </div>
                 ))}
+                {sending && (
+                  <div className="rounded-xl p-4 bg-surface text-sm text-foreground-muted animate-pulse">
+                    Consultando documentos...
+                  </div>
+                )}
               </div>
             </ScrollArea>
 
             <div className="flex gap-3">
               <Input
                 value={question}
-                onChange={(event) => setQuestion(event.target.value)}
+                onChange={(e) => setQuestion(e.target.value)}
                 placeholder="Descreve o perfil, tecnologia o requisito que queres atender..."
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    handleSubmit();
-                  }
-                }}
+                disabled={sending}
+                onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
               />
-              <Button onClick={handleSubmit} className="bg-gradient-primary hover:opacity-90">
+              <Button onClick={handleSubmit} disabled={sending} className="bg-gradient-primary hover:opacity-90">
                 <Send className="w-4 h-4 mr-2" />
                 Enviar
               </Button>
@@ -235,63 +250,34 @@ export default function AIChat() {
           </CardContent>
         </Card>
 
+        {/* Sources panel */}
         <Card className="premium-card">
           <CardHeader>
-            <CardTitle>Ranking</CardTitle>
-            <CardDescription>Certificados encontrados na última resposta.</CardDescription>
+            <CardTitle>Fuentes</CardTitle>
+            <CardDescription>Documentos encontrados en la última respuesta.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {latestAssistantSources.length === 0 ? (
-              <div className="text-sm text-foreground-muted">O ranking aparecerá aqui depois de la primeira resposta.</div>
-            ) : (
-              latestAssistantSources.map((match) => (
-                <div key={`${match.recordType}-${match.recordId}`} className="rounded-lg border border-border p-4 space-y-3">
-                  {(() => {
-                    const pdfBaseUrl = apiClient.storage
-                      .from("certificates")
-                      .getPublicUrl(match.filePath, { fileName: match.fileName }).data.publicUrl;
-                    const firstPage = match.referencePages?.[0];
-                    const pdfUrl = firstPage ? `${pdfBaseUrl}#page=${firstPage}` : pdfBaseUrl;
-                    const matchText = formatMatch(match.reason);
-                    const pageLabel = formatReferencePages(match.referencePages);
-                    const matchTermsLabel = match.matchTerms?.length ? match.matchTerms.join(", ") : matchText;
-
-                    return (
-                      <>
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <div className="font-semibold">{match.title}</div>
-                            <div className="text-xs text-foreground-muted">{match.fileName}</div>
-                          </div>
-                          <Badge variant="outline">Score {match.score}</Badge>
-                        </div>
-
-                        {pageLabel && (
-                          <div className="text-xs text-foreground-muted">
-                            Páginas no PDF original: <span className="font-medium text-foreground">{pageLabel}</span>
-                          </div>
-                        )}
-
-                        {matchTermsLabel && (
-                          <div className="text-xs text-foreground-muted">
-                            Match encontrado: <span className="font-medium text-foreground">{matchTermsLabel}</span>
-                          </div>
-                        )}
-
-                        <a
-                          className="text-sm text-primary underline"
-                          href={pdfUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Abrir PDF
-                        </a>
-                      </>
-                    );
-                  })()}
+          <CardContent>
+            <ScrollArea className="h-[460px] pr-2">
+              {racerSources.length === 0 ? (
+                <div className="text-sm text-foreground-muted">
+                  Las fuentes aparecerán aquí tras la primera consulta.
                 </div>
-              ))
-            )}
+              ) : (
+                <div className="space-y-3">
+                  {racerSources.map((src, i) => (
+                    <div key={i} className="rounded-lg border border-border p-3 space-y-1">
+                      <p className="text-sm font-medium break-all">{src.archivo}</p>
+                      <div className="flex flex-wrap gap-1 text-xs">
+                        {src.pais && <Badge variant="secondary">{src.pais}</Badge>}
+                        {src.ano && <Badge variant="outline">{src.ano}</Badge>}
+                        {src.apostillado && <Badge className="bg-green-600 text-white">Apostillado</Badge>}
+                      </div>
+                      <p className="text-xs text-foreground-muted">distancia: {src.distancia}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
           </CardContent>
         </Card>
       </div>

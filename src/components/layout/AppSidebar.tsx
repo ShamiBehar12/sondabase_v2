@@ -40,21 +40,21 @@ export function AppSidebar() {
 
   const navigationItems = [
     { title: t('navigation.dashboard'), url: "/dashboard", icon: Home },
-    { title: t('navigation.successStories'), url: "/success-stories", icon: FileText },
+    // { title: t('navigation.successStories'), url: "/success-stories", icon: FileText },
     { title: t('navigation.certificates'), url: "/certificates", icon: Award },
-    { title: t('navigation.professionalCertificates'), url: "/professional-certificates", icon: GraduationCap },
+    // { title: t('navigation.professionalCertificates'), url: "/professional-certificates", icon: GraduationCap },
     { title: t('myCertificates.title'), url: "/my-certificates", icon: ClipboardList },
-    { title: "Minhas Historias", url: "/my-success-stories", icon: FileText },
+    // { title: "Minhas Historias", url: "/my-success-stories", icon: FileText },
     { title: "Assistente IA", url: "/ai-chat", icon: Bot },
-    { title: "Smart Cities RAG", url: "/smart-cities", icon: MapPin },
-    { title: "Carga Masiva RAG", url: "/smart-cities/ingest", icon: Upload },
+    // { title: "Smart Cities RAG", url: "/smart-cities", icon: MapPin },
+    // { title: "Carga Masiva RAG", url: "/smart-cities/ingest", icon: Upload },
   ];
 
   const adminItems = [
     { title: "Aprobación de Certificados", url: "/certificate-approval", icon: CheckCircle },
-    { title: "Aprobación de Historias", url: "/success-story-approval", icon: FileText },
+    // { title: "Aprobación de Historias", url: "/success-story-approval", icon: FileText },
     { title: t('navigation.users'), url: "/users", icon: Users },
-    { title: "Administração IA", url: "/ai-admin", icon: Bot },
+    // { title: "Administração IA", url: "/ai-admin", icon: Bot },
   ];
 
   const isActive = (path: string) => {
