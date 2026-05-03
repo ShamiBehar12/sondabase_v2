@@ -172,7 +172,7 @@ export default function Certificates() {
     <div className="flex-1 space-y-6 p-8 pt-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-gradient">{t('certificates.title')}</h2>
+          <h2 className="text-3xl font-bold text-white">{t('certificates.title')}</h2>
           <p className="text-foreground-muted mt-2">{t('certificates.subtitle')}</p>
         </div>
       </div>

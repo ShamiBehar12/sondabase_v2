@@ -202,33 +202,16 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Main Stats Cards */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatsCard
-          title={t('dashboard.totalStories')}
-          value={dashStats ? dashStats.totalStories : "..."}
-          change={dashStats ? `${dashStats.pendingStories} pendentes` : t('dashboard.loading')}
-          changeType="neutral"
-          icon={FileText}
-        />
         <StatsCard
           title={t('dashboard.totalCertificates')}
           value={loading ? "..." : certificateStats.totalCertificates}
-          change={loading ? t('dashboard.loading') : 
-            certificateStats.activeCertificates > 0 ? 
-            `${certificateStats.activeCertificates} ${t('dashboard.active')}` : 
+          change={loading ? t('dashboard.loading') :
+            certificateStats.activeCertificates > 0 ?
+            `${certificateStats.activeCertificates} ${t('dashboard.active')}` :
             t('dashboard.none')}
           changeType={certificateStats.activeCertificates > 0 ? "positive" : "neutral"}
-          icon={Award}
-        />
-        <StatsCard
-          title={t('dashboard.totalProfessionalCertificates')}
-          value={professionalLoading ? "..." : professionalStats.totalProfessional}
-          change={professionalLoading ? t('dashboard.loading') : 
-            professionalStats.activeProfessional > 0 ? 
-            `${professionalStats.activeProfessional} ${t('dashboard.active')}` : 
-            t('dashboard.none')}
-          changeType={professionalStats.activeProfessional > 0 ? "positive" : "neutral"}
           icon={Award}
         />
         <StatsCard
@@ -237,6 +220,20 @@ export default function Dashboard() {
           change={t('dashboard.thisWeek')}
           changeType="neutral"
           icon={Edit}
+        />
+        <StatsCard
+          title={t('approval.pending') + ' ' + t('approval.certificateApproval').split(' ')[0]}
+          value={dashStats ? dashStats.pendingApprovals : "..."}
+          change={dashStats ? `${dashStats.pendingCerts} cert. · ${dashStats.pendingStories} hist.` : t('dashboard.loading')}
+          changeType={dashStats && dashStats.pendingApprovals > 0 ? "neutral" : "positive"}
+          icon={AlertTriangle}
+        />
+        <StatsCard
+          title={t('dashboard.activeUsers')}
+          value={dashStats ? dashStats.totalUsers : "..."}
+          change={dashStats ? `${dashStats.totalUsers} ${t('users.role')}s` : t('dashboard.loading')}
+          changeType="positive"
+          icon={Users}
         />
       </div>
 
@@ -362,10 +359,10 @@ export default function Dashboard() {
                         )}
                         <div className="text-right">
                           <p className="text-xs text-foreground-muted">
-                            {new Date(doc.lastEdited).toLocaleDateString('pt-BR')}
+                            {new Date(doc.lastEdited).toLocaleDateString('es-CL')}
                           </p>
                           <p className="text-xs text-foreground-muted">
-                            {new Date(doc.lastEdited).toLocaleTimeString('pt-BR', { 
+                            {new Date(doc.lastEdited).toLocaleTimeString('es-CL', { 
                               hour: '2-digit', 
                               minute: '2-digit' 
                             })}
@@ -442,75 +439,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Secondary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatsCard
-          title="Aprovações pendentes"
-          value={dashStats ? dashStats.pendingApprovals : "..."}
-          change={dashStats ? `${dashStats.pendingCerts} cert. · ${dashStats.pendingStories} hist.` : t('dashboard.loading')}
-          changeType={dashStats && dashStats.pendingApprovals > 0 ? "neutral" : "positive"}
-          icon={AlertTriangle}
-        />
-        <StatsCard
-          title={t('dashboard.activeUsers')}
-          value={dashStats ? dashStats.totalUsers : "..."}
-          change={dashStats ? `${dashStats.totalUsers} cadastrados` : t('dashboard.loading')}
-          changeType="positive"
-          icon={Users}
-        />
-        <StatsCard
-          title="Historias publicadas"
-          value={dashStats ? dashStats.totalStories : "..."}
-          change={dashStats ? `${dashStats.pendingStories} esperando revisão` : t('dashboard.loading')}
-          changeType="neutral"
-          icon={FileText}
-        />
-        <StatsCard
-          title="Cert. profissionais"
-          value={dashStats ? dashStats.totalProfCerts : "..."}
-          change={professionalLoading ? t('dashboard.loading') : `${professionalStats.activeProfessional} ativos`}
-          changeType="positive"
-          icon={Award}
-        />
-      </div>
-
-      {/* Quick Actions Enhanced */}
-      <div className="premium-card p-6">
-        <h2 className="text-xl font-semibold text-foreground mb-6">{t('dashboard.quickActions')}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Button variant="outline" className="h-auto p-6 flex flex-col gap-3">
-            <FileText className="w-8 h-8 text-primary" />
-            <div className="text-center">
-              <p className="font-medium">{t('dashboard.newSuccessStory')}</p>
-              <p className="text-sm text-foreground-muted">{t('dashboard.createSuccessCase')}</p>
-            </div>
-          </Button>
-          
-          <Button variant="outline" className="h-auto p-6 flex flex-col gap-3">
-            <Award className="w-8 h-8 text-primary" />
-            <div className="text-center">
-              <p className="font-medium">{t('dashboard.uploadCertificate')}</p>
-              <p className="text-sm text-foreground-muted">{t('dashboard.addCertificate')}</p>
-            </div>
-          </Button>
-          
-          <Button variant="outline" className="h-auto p-6 flex flex-col gap-3">
-            <BarChart3 className="w-8 h-8 text-primary" />
-            <div className="text-center">
-              <p className="font-medium">{t('dashboard.completeReport')}</p>
-              <p className="text-sm text-foreground-muted">{t('dashboard.consolidatedAnalysis')}</p>
-            </div>
-          </Button>
-          
-          <Button variant="outline" className="h-auto p-6 flex flex-col gap-3">
-            <Users className="w-8 h-8 text-primary" />
-            <div className="text-center">
-              <p className="font-medium">{t('dashboard.manageUsers')}</p>
-              <p className="text-sm text-foreground-muted">{t('dashboard.accessControl')}</p>
-            </div>
-          </Button>
-        </div>
-      </div>
 
       {/* Modal de Resumo del Documento */}
       <Dialog open={documentSummaryOpen} onOpenChange={setDocumentSummaryOpen}>
@@ -591,28 +519,28 @@ export default function Dashboard() {
                 {selectedDocument.issued_date && (
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">{t('dashboard.issueDate')}</label>
-                    <p className="mt-1">{new Date(selectedDocument.issued_date).toLocaleDateString('pt-BR')}</p>
+                    <p className="mt-1">{new Date(selectedDocument.issued_date).toLocaleDateString('es-CL')}</p>
                   </div>
                 )}
                 {selectedDocument.contract_start_date && (
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">{t('dashboard.contractStart')}</label>
-                    <p className="mt-1">{new Date(selectedDocument.contract_start_date).toLocaleDateString('pt-BR')}</p>
+                    <p className="mt-1">{new Date(selectedDocument.contract_start_date).toLocaleDateString('es-CL')}</p>
                   </div>
                 )}
                 {selectedDocument.contract_end_date && (
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">{t('dashboard.contractEnd')}</label>
-                    <p className="mt-1">{new Date(selectedDocument.contract_end_date).toLocaleDateString('pt-BR')}</p>
+                    <p className="mt-1">{new Date(selectedDocument.contract_end_date).toLocaleDateString('es-CL')}</p>
                   </div>
                 )}
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">{t('dashboard.createdAt')}</label>
-                  <p className="mt-1">{new Date(selectedDocument.created_at).toLocaleDateString('pt-BR')}</p>
+                  <p className="mt-1">{new Date(selectedDocument.created_at).toLocaleDateString('es-CL')}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">{t('dashboard.lastEdit')}</label>
-                  <p className="mt-1">{new Date(selectedDocument.lastEdited).toLocaleDateString('pt-BR')}</p>
+                  <p className="mt-1">{new Date(selectedDocument.lastEdited).toLocaleDateString('es-CL')}</p>
                 </div>
               </div>
 

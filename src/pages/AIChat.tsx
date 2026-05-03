@@ -116,7 +116,7 @@ export default function AIChat() {
       <div>
         <h1 className="text-3xl font-bold text-gradient flex items-center gap-3">
           <Bot className="w-8 h-8" />
-          Assistente de Certificados
+          Asistente de Certificados
         </h1>
         <p className="text-foreground-muted mt-2">
           Consulta en lenguaje natural y recibe los documentos más relevantes con fuentes y contexto.
