@@ -1665,7 +1665,7 @@ app.get("/api/stats/dashboard", async (req, reply) => {
     const userName = (cert as any).user?.profile?.fullName || (cert as any).user?.email || "Usuario";
     activities.push({
       id: cert.id,
-      action: cert.isVerified ? "añadió un certificado" : "envió certificado para revisión",
+      action: cert.isVerified ? "added_certificate" : "submitted_certificate",
       document: cert.title,
       user: userName,
       time: cert.createdAt.toISOString(),
@@ -1676,7 +1676,7 @@ app.get("/api/stats/dashboard", async (req, reply) => {
     const userName = (story as any).user?.profile?.fullName || (story as any).user?.email || "Usuario";
     activities.push({
       id: story.id,
-      action: story.isVerified ? "publicó historia" : "envió historia para revisión",
+      action: story.isVerified ? "published_story" : "submitted_story",
       document: (story as any).titlePt || (story as any).titleEs || (story as any).titleEn || "Sin título",
       user: userName,
       time: story.createdAt.toISOString(),

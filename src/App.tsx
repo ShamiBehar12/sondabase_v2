@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { AIChatProvider } from "@/contexts/AIChatContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/*" element={
               <ProtectedRoute>
+                <AIChatProvider>
                 <SidebarProvider>
                   <div className="min-h-screen flex w-full">
                     <AppSidebar />
@@ -92,6 +94,7 @@ const App = () => (
                     </div>
                   </div>
                 </SidebarProvider>
+                </AIChatProvider>
               </ProtectedRoute>
             } />
           </Routes>

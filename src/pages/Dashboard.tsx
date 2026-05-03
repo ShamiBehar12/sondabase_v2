@@ -401,7 +401,7 @@ export default function Dashboard() {
               <h2 className="text-base font-semibold text-foreground">
                 {t('dashboard.recentActivities')}
               </h2>
-              <p className="text-xs text-foreground-muted mt-0.5">Últimas acciones del sistema</p>
+              <p className="text-xs text-foreground-muted mt-0.5">{t('dashboard.recentActivities')}</p>
             </div>
             <Button variant="ghost" size="sm" className="w-7 h-7 p-0 text-foreground-muted hover:text-foreground">
               <Clock className="w-3.5 h-3.5" />
@@ -424,7 +424,7 @@ export default function Dashboard() {
             ) : dashStats.recentActivity.length === 0 ? (
               <div className="text-center py-6">
                 <Clock className="w-7 h-7 text-muted-foreground/40 mx-auto mb-2" />
-                <p className="text-xs text-foreground-muted">Ninguna actividad reciente</p>
+                <p className="text-xs text-foreground-muted">{t('dashboard.noRecentDocuments')}</p>
               </div>
             ) : (
               <div className="relative">
@@ -449,7 +449,7 @@ export default function Dashboard() {
                         <div className="flex-1 min-w-0 pt-0.5">
                           <p className="text-xs text-foreground leading-relaxed">
                             <span className="font-semibold">{activity.user}</span>
-                            {' '}{activity.action}{' '}
+                            {' '}{t(`dashboard.activity.${activity.action}`, { defaultValue: activity.action })}{' '}
                             <span className="font-medium text-foreground-secondary truncate">{activity.document}</span>
                           </p>
                           <p className="text-[10px] text-foreground-muted mt-0.5">{timeAgo(activity.time)}</p>

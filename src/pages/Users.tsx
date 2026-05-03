@@ -174,13 +174,13 @@ export default function Users() {
         </div>
         <Select value={selectedRole} onValueChange={setSelectedRole}>
           <SelectTrigger className="w-[180px] bg-surface border-border">
-            <SelectValue placeholder="Filtrar por função" />
+            <SelectValue placeholder={t('users.filterByRole')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todas as funções</SelectItem>
-            <SelectItem value="admin">Administrador</SelectItem>
-            <SelectItem value="moderator">Moderador</SelectItem>
-            <SelectItem value="user">Usuario</SelectItem>
+            <SelectItem value="all">{t('users.allRoles')}</SelectItem>
+            <SelectItem value="admin">{t('users.administrator')}</SelectItem>
+            <SelectItem value="moderator">{t('users.moderator')}</SelectItem>
+            <SelectItem value="user">{t('users.user')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -189,13 +189,13 @@ export default function Users() {
         {loading ? (
           <Card className="premium-card">
             <CardContent className="p-6">
-              <div className="text-center text-foreground-muted">Carregando usuarios...</div>
+              <div className="text-center text-foreground-muted">{t('users.loading')}</div>
             </CardContent>
           </Card>
         ) : filteredUsers.length === 0 ? (
           <Card className="premium-card">
             <CardContent className="p-6">
-              <div className="text-center text-foreground-muted">Ningún usuario encontrado</div>
+              <div className="text-center text-foreground-muted">{t('users.noUsersFound')}</div>
             </CardContent>
           </Card>
         ) : (
@@ -211,16 +211,16 @@ export default function Users() {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="font-semibold text-foreground">{user.full_name || 'Nombre no informado'}</h3>
+                      <h3 className="font-semibold text-foreground">{user.full_name || t('users.nameNotProvided')}</h3>
                       <p className="text-sm text-foreground-muted">{user.email}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge variant={getRoleBadgeVariant(user.role)} className="flex items-center gap-1">
                           {getRoleIcon(user.role)}
-                          {user.role === 'admin' ? 'Administrador' : 
-                           user.role === 'moderator' ? 'Moderador' : 'Usuario'}
+                          {user.role === 'admin' ? t('users.administrator') :
+                           user.role === 'moderator' ? t('users.moderator') : t('users.user')}
                         </Badge>
                         <span className="text-xs text-foreground-muted">
-                          Membro desde {new Date(user.created_at).toLocaleDateString('pt-BR')}
+                          {t('users.memberSince')} {new Date(user.created_at).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
