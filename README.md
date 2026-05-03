@@ -130,12 +130,16 @@ python rebuild_chromadb.py
 
 ---
 
-### Paso 5 — Frontend
+### Paso 5 — Instalar dependencias
+
+Instala las dependencias de frontend, backend y RACER en un solo comando:
 
 ```bash
 # Desde la raíz del proyecto
-npm install
+npm run setup
 ```
+
+Equivale a: `npm install` + `npm --prefix backend install` + `pip install -r racer/requirements.txt`.
 
 ---
 
@@ -155,7 +159,18 @@ Levanta todos los servicios (ver sección siguiente) y comprueba:
 
 ## Arranque diario
 
-Una vez configurado, el orden de arranque recomendado:
+### Opción rápida — un solo comando
+
+Levanta frontend, backend y RACER en paralelo (con logs en colores por servicio):
+
+```bash
+docker compose up -d mysql   # MySQL primero, siempre por separado
+npm run dev:all              # FE + BE + RACER en una sola terminal
+```
+
+> `npm run dev:all` usa `concurrently` y muestra los logs de los tres servicios con prefijos `[FE]`, `[BE]`, `[RACER]`. Pulsa `Ctrl+C` para detener los tres a la vez.
+
+### Opción manual — una terminal por servicio
 
 **Terminal 1 — MySQL**
 ```bash
@@ -457,10 +472,12 @@ sondabase_v2/
 
 ## Scripts
 
-### Frontend
+### Frontend / proyecto completo
 ```bash
-npm run dev        # Servidor de desarrollo
-npm run build      # Build de producción
+npm run setup      # Instala dependencias de FE + BE + RACER (pip) de una vez
+npm run dev:all    # Levanta FE + BE + RACER en paralelo con logs por colores
+npm run dev        # Solo el frontend
+npm run build      # Build de producción del frontend
 npm run lint       # Lint
 ```
 
