@@ -2,17 +2,19 @@
   "navigation": {
     "dashboard": "Dashboard",
     "main": "Principal",
-    "certificates": "Certificados",
+    "certificates": "Documentos",
     "professionalCertificates": "Certificados Profissionais",
     "successStories": "Histórias de Sucesso",
     "users": "Usuários",
     "settings": "Configurações",
     "aiAssistant": "Assistente IA",
-    "certificateApproval": "Aprovação de Certificados",
+    "certificateApproval": "Aprovação de Documentos",
     "successStoriesApproval": "Aprovação de Histórias",
     "administration": "Administração",
-    "myCertificates": "Meus Certificados",
-    "newConversation": "Nova conversa"
+    "myCertificates": "Meus Documentos",
+    "newConversation": "Nova conversa",
+    "documentExplorer": "Explorador de Documentos",
+    "adminConversations": "Auditoria de Chats"
   },
   "common": {
     "search": "Buscar",

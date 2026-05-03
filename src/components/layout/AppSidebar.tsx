@@ -8,6 +8,8 @@ import {
   ChevronDown,
   MessageSquarePlus,
   Trash2,
+  FolderSearch,
+  MessagesSquare,
 } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
@@ -57,16 +59,20 @@ export function AppSidebar() {
   const isAIChat = currentPath.startsWith("/ai-chat");
   const [aiOpen, setAiOpen] = useState(isAIChat);
 
+  const isAdminOrReviewer = userRole === 'admin' || userRole === 'reviewer';
+
   const navigationItems = [
-    { title: t('navigation.dashboard'), url: "/dashboard", icon: Home },
+    ...(isAdminOrReviewer ? [{ title: t('navigation.dashboard'), url: "/dashboard", icon: Home }] : []),
     { title: t('navigation.certificates'), url: "/certificates", icon: Award },
     { title: t('myCertificates.title'), url: "/my-certificates", icon: ClipboardList },
+    { title: t('navigation.documentExplorer'), url: "/documents", icon: FolderSearch },
   ];
 
   const adminItems = [
-    { title: t('navigation.certificateApproval'), url: "/certificate-approval", icon: CheckCircle },
-    { title: t('navigation.users'), url: "/users", icon: Users },
-  ];
+    { title: t('navigation.certificateApproval'), url: "/certificate-approval", icon: CheckCircle, roles: ['admin', 'reviewer'] },
+    { title: t('navigation.users'), url: "/users", icon: Users, roles: ['admin'] },
+    { title: t('navigation.adminConversations'), url: "/admin/conversations", icon: MessagesSquare, roles: ['admin'] },
+  ].filter(item => item.roles.includes(userRole || ''));
 
   const isActive = (path: string) => {
     if (path === "/") return currentPath === "/";
@@ -222,7 +228,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         {/* Admin Section */}
-        {(userRole === 'admin' || userRole === 'reviewer') && (
+        {isAdminOrReviewer && adminItems.length > 0 && (
           <SidebarGroup className="px-3 pt-2">
             {!collapsed && <div className="border-t border-sidebar-border/60 mb-3 mt-1" />}
             {!collapsed && (

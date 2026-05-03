@@ -2,16 +2,18 @@
   "navigation": {
     "dashboard": "Dashboard",
     "main": "Main",
-    "certificates": "Certificates",
+    "certificates": "Documents",
     "professionalCertificates": "Professional Certificates",
     "successStories": "Success Stories",
     "users": "Users",
     "settings": "Settings",
     "aiAssistant": "AI Assistant",
-    "certificateApproval": "Certificate Approval",
+    "certificateApproval": "Document Approval",
     "administration": "Administration",
-    "myCertificates": "My Certificates",
-    "newConversation": "New conversation"
+    "myCertificates": "My Documents",
+    "newConversation": "New conversation",
+    "documentExplorer": "Document Explorer",
+    "adminConversations": "Chat Audit"
   },
   "common": {
     "search": "Search",

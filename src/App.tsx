@@ -29,6 +29,8 @@ import AIAdmin from "./pages/AIAdmin";
 import AIChat from "./pages/AIChat";
 import SmartCitiesChat from "./pages/SmartCitiesChat";
 import SmartCitiesIngest from "./pages/SmartCitiesIngest";
+import AdminConversations from "./pages/AdminConversations";
+import DocumentExplorer from "./pages/DocumentExplorer";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -56,15 +58,21 @@ const App = () => (
                           <Route path="/certificates" element={<Certificates />} />
                           <Route path="/professional-certificates" element={<ProfessionalCertificates />} />
                            <Route path="/certificate-approval" element={
-                             <ProtectedRoute requireRole="admin">
+                             <ProtectedRoute requireRole={['admin', 'reviewer']}>
                                <CertificateApproval />
                              </ProtectedRoute>
                             } />
                            <Route path="/success-story-approval" element={
-                             <ProtectedRoute requireRole="admin">
+                             <ProtectedRoute requireRole={['admin', 'reviewer']}>
                                <SuccessStoryApproval />
                              </ProtectedRoute>
                             } />
+                          <Route path="/documents" element={<DocumentExplorer />} />
+                          <Route path="/admin/conversations" element={
+                            <ProtectedRoute requireRole="admin">
+                              <AdminConversations />
+                            </ProtectedRoute>
+                          } />
         <Route path="/content-management" element={<ContentManagement />} />
         <Route path="/my-certificates" element={<MyCertificates />} />
         <Route path="/my-success-stories" element={<MySuccessStories />} />

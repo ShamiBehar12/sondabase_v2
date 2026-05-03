@@ -74,7 +74,7 @@ const getActivityIcon = (type: string) => {
 
 export default function Dashboard() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const { certificates, loading, refetch } = useCertificates();
   const { certificates: professionalCertificates, loading: professionalLoading } = useProfessionalCertificates();
   const { documents: recentDocuments, loading: documentsLoading, refetch: refetchDocuments } = useRecentDocuments();
@@ -83,6 +83,12 @@ export default function Dashboard() {
   const [dashStats, setDashStats] = useState<DashStats | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<RecentDocument | null>(null);
   const [documentSummaryOpen, setDocumentSummaryOpen] = useState(false);
+
+  useEffect(() => {
+    if (userRole === 'user') {
+      navigate('/certificates', { replace: true });
+    }
+  }, [userRole, navigate]);
 
   useEffect(() => {
     apiFetch<DashStats>("/api/stats/dashboard").then(({ data }) => {
