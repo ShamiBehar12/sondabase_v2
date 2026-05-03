@@ -1,10 +1,10 @@
-import { 
-  BarChart3, 
-  FileText, 
-  Award, 
-  Search, 
-  Settings, 
-  Users, 
+import {
+  BarChart3,
+  FileText,
+  Award,
+  Search,
+  Settings,
+  Users,
   Download,
   Home,
   GraduationCap,
@@ -12,7 +12,9 @@ import {
   ClipboardList,
   Bot,
   MapPin,
-  Upload
+  Upload,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
@@ -32,7 +34,7 @@ import {
 
 export function AppSidebar() {
   const { t } = useTranslation();
-  const { state } = useSidebar();
+  const { state, toggleSidebar } = useSidebar();
   const { userRole } = useAuth();
   const location = useLocation();
   const currentPath = location.pathname;
@@ -45,7 +47,7 @@ export function AppSidebar() {
     // { title: t('navigation.professionalCertificates'), url: "/professional-certificates", icon: GraduationCap },
     { title: t('myCertificates.title'), url: "/my-certificates", icon: ClipboardList },
     // { title: "Minhas Historias", url: "/my-success-stories", icon: FileText },
-    { title: "Assistente IA", url: "/ai-chat", icon: Bot },
+    { title: "Asistente IA", url: "/ai-chat", icon: Bot },
     // { title: "Smart Cities RAG", url: "/smart-cities", icon: MapPin },
     // { title: "Carga Masiva RAG", url: "/smart-cities/ingest", icon: Upload },
   ];
@@ -78,18 +80,32 @@ export function AppSidebar() {
         {/* Logo Area */}
         <div className="p-4 border-b border-sidebar-border">
           {!collapsed ? (
-            <div className="flex items-center gap-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm px-3 py-2.5">
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20 flex-shrink-0">
+            <div className="flex items-center gap-3 rounded-xl bg-gradient-to-br from-blue-500/15 to-indigo-500/10 border border-white/15 backdrop-blur-sm px-3 py-2.5 relative">
+              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/25 flex-shrink-0">
                 <Award className="w-5 h-5 text-white" />
               </div>
-              <div>
+              <div className="flex-1 min-w-0">
                 <h2 className="font-bold text-lg text-blue-400">StoryCert</h2>
                 <p className="text-xs text-foreground-muted">Enterprise Platform</p>
               </div>
+              <button
+                onClick={toggleSidebar}
+                className="w-6 h-6 flex items-center justify-center rounded-md text-foreground-muted hover:text-foreground hover:bg-white/10 transition-colors flex-shrink-0"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
             </div>
           ) : (
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center mx-auto shadow-lg shadow-blue-500/20">
-              <Award className="w-5 h-5 text-white" />
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/25">
+                <Award className="w-5 h-5 text-white" />
+              </div>
+              <button
+                onClick={toggleSidebar}
+                className="w-6 h-6 flex items-center justify-center rounded-md text-foreground-muted hover:text-foreground hover:bg-white/10 transition-colors"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
           )}
         </div>
@@ -123,7 +139,7 @@ export function AppSidebar() {
         {(userRole === 'admin' || userRole === 'reviewer') && (
           <SidebarGroup>
             <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>
-              Administração
+              Administración
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
