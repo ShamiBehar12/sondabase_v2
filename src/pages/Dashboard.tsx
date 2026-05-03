@@ -191,19 +191,19 @@ export default function Dashboard() {
   }, [professionalCertificates]);
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="p-6 space-y-7">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">{t('dashboard.title')}</h1>
-          <p className="text-foreground-secondary">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">{t('dashboard.title')}</h1>
+          <p className="text-sm text-foreground-muted mt-0.5">
             {t('dashboard.subtitle')}
           </p>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           title={t('dashboard.totalCertificates')}
           value={loading ? "..." : certificateStats.totalCertificates}
@@ -239,145 +239,154 @@ export default function Dashboard() {
 
       {/* Alerts Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="premium-card p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-warning"></div>
-              <h3 className="font-semibold text-sm">{t('dashboard.alertsExpiring')}</h3>
+        {/* Expiring Alert */}
+        <div className="premium-card p-4 relative overflow-hidden">
+          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-warning rounded-l-xl" />
+          <div className="pl-3">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-semibold text-sm text-foreground">{t('dashboard.alertsExpiring')}</h3>
+              <Badge variant="outline" className="text-xs font-semibold border-warning/30 text-warning bg-warning/5">
+                {certificateStats.expiringSoon}
+              </Badge>
             </div>
-            <Badge variant="outline" className="text-xs">{certificateStats.expiringSoon}</Badge>
+            <p className="text-xs text-foreground-muted leading-relaxed">{certificateStats.expiringSoon} {t('dashboard.alertsExpiringMessage')}</p>
           </div>
-          <p className="text-sm text-foreground-secondary">{certificateStats.expiringSoon} {t('dashboard.alertsExpiringMessage')}</p>
         </div>
-        <div className="premium-card p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-info"></div>
-              <h3 className="font-semibold text-sm">{t('dashboard.alertsPending')}</h3>
+
+        {/* Pending Alert */}
+        <div className="premium-card p-4 relative overflow-hidden">
+          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-info rounded-l-xl" />
+          <div className="pl-3">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-semibold text-sm text-foreground">{t('dashboard.alertsPending')}</h3>
+              <Badge variant="outline" className="text-xs font-semibold border-info/30 text-info bg-info/5">
+                {dashStats ? dashStats.pendingApprovals : "..."}
+              </Badge>
             </div>
-            <Badge variant="outline" className="text-xs">{dashStats ? dashStats.pendingApprovals : "..."}</Badge>
+            <p className="text-xs text-foreground-muted leading-relaxed">{dashStats ? dashStats.pendingApprovals : "..."} {t('dashboard.alertsPendingMessage')}</p>
           </div>
-          <p className="text-sm text-foreground-secondary">{dashStats ? dashStats.pendingApprovals : "..."} {t('dashboard.alertsPendingMessage')}</p>
         </div>
-        <div className="premium-card p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-success"></div>
-              <h3 className="font-semibold text-sm">{t('dashboard.alertsGoal')}</h3>
+
+        {/* Goal Alert */}
+        <div className="premium-card p-4 relative overflow-hidden">
+          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-success rounded-l-xl" />
+          <div className="pl-3">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-semibold text-sm text-foreground">{t('dashboard.alertsGoal')}</h3>
+              <Badge variant="outline" className="text-xs font-semibold border-success/30 text-success bg-success/5">
+                {dashStats && dashStats.totalCerts > 0
+                  ? Math.round(((dashStats.totalCerts - dashStats.pendingCerts) / dashStats.totalCerts) * 100)
+                  : 0}%
+              </Badge>
             </div>
-            <Badge variant="outline" className="text-xs">
+            <p className="text-xs text-foreground-muted leading-relaxed mb-3">
               {dashStats && dashStats.totalCerts > 0
                 ? Math.round(((dashStats.totalCerts - dashStats.pendingCerts) / dashStats.totalCerts) * 100)
-                : 0}%
-            </Badge>
+                : 0}% {t('dashboard.alertsGoalMessage')}
+            </p>
+            <Progress
+              value={dashStats && dashStats.totalCerts > 0
+                ? Math.round(((dashStats.totalCerts - dashStats.pendingCerts) / dashStats.totalCerts) * 100)
+                : 0}
+              className="h-1.5"
+            />
           </div>
-          <p className="text-sm text-foreground-secondary">
-            {dashStats && dashStats.totalCerts > 0
-              ? Math.round(((dashStats.totalCerts - dashStats.pendingCerts) / dashStats.totalCerts) * 100)
-              : 0}% {t('dashboard.alertsGoalMessage')}
-          </p>
-          <Progress
-            value={dashStats && dashStats.totalCerts > 0
-              ? Math.round(((dashStats.totalCerts - dashStats.pendingCerts) / dashStats.totalCerts) * 100)
-              : 0}
-            className="mt-3 h-2"
-          />
         </div>
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Recent Documents - Takes 2/3 */}
-        <div className="xl:col-span-2 space-y-6">
+        <div className="xl:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-foreground">
-              {t('dashboard.recentDocuments')}
-            </h2>
-            <Button variant="ghost" size="sm">
+            <div>
+              <h2 className="text-base font-semibold text-foreground">
+                {t('dashboard.recentDocuments')}
+              </h2>
+              <p className="text-xs text-foreground-muted mt-0.5">{recentDocuments.length} documentos recientes</p>
+            </div>
+            <Button variant="ghost" size="sm" className="text-xs text-foreground-muted hover:text-foreground h-7 px-2">
               {t('dashboard.viewAll')}
             </Button>
           </div>
-          
-          <div className="space-y-4">
+
+          <div className="premium-card overflow-hidden">
             {documentsLoading ? (
-              <div className="space-y-4">
+              <div className="divide-y divide-border/40">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="premium-card p-4">
+                  <div key={i} className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-muted rounded-lg animate-pulse"></div>
+                      <div className="w-8 h-8 bg-muted rounded-lg animate-pulse flex-shrink-0" />
                       <div className="flex-1 space-y-2">
-                        <div className="h-4 bg-muted rounded animate-pulse"></div>
-                        <div className="h-3 bg-muted rounded animate-pulse w-2/3"></div>
+                        <div className="h-3.5 bg-muted rounded animate-pulse w-3/4" />
+                        <div className="h-3 bg-muted rounded animate-pulse w-1/2" />
                       </div>
-                      <div className="w-16 h-4 bg-muted rounded animate-pulse"></div>
+                      <div className="w-14 h-5 bg-muted rounded animate-pulse" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : recentDocuments.length > 0 ? (
-              recentDocuments.map((doc) => {
-                const Icon = getDocumentIcon(doc.type);
-                const isNewDocument = doc.isNew || false;
-                const isEdited = doc.wasEdited || false;
-                
-                return (
-                  <div 
-                    key={doc.id} 
-                    className="premium-card p-4 cursor-pointer hover:bg-muted/30 transition-colors"
-                    onClick={() => handleDocumentClick(doc.id, doc.type)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="p-2 bg-gradient-primary rounded-lg">
-                          <Icon className="w-4 h-4 text-white" />
+              <div className="divide-y divide-border/40">
+                {recentDocuments.map((doc) => {
+                  const Icon = getDocumentIcon(doc.type);
+                  const isNewDocument = doc.isNew || false;
+                  const isEdited = doc.wasEdited || false;
+
+                  return (
+                    <div
+                      key={doc.id}
+                      className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-white/[0.03] transition-colors group"
+                      onClick={() => handleDocumentClick(doc.id, doc.type)}
+                    >
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="p-1.5 bg-primary/10 rounded-md flex-shrink-0 group-hover:bg-primary/15 transition-colors">
+                          <Icon className="w-3.5 h-3.5 text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-medium text-foreground truncate">
-                              {doc.title}
-                            </h3>
-                          </div>
-                          <p className="text-sm text-foreground-secondary">
-                            {doc.client || t('dashboard.noOrganization')} • por {doc.editedBy}
+                          <h3 className="text-sm font-medium text-foreground truncate">
+                            {doc.title}
+                          </h3>
+                          <p className="text-xs text-foreground-muted mt-0.5 truncate">
+                            {doc.client || t('dashboard.noOrganization')} · {doc.editedBy}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        {/* Substituir status ativo por badge de editado o nuevo */}
+                      <div className="flex items-center gap-3 flex-shrink-0 ml-3">
                         {isEdited ? (
-                          <Badge variant="outline" className="text-xs bg-warning/10 text-warning border-warning/20">
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5 bg-warning/8 text-warning border-warning/25 font-medium">
                             {t('dashboard.edited')}
                           </Badge>
                         ) : isNewDocument ? (
-                          <Badge variant="outline" className="text-xs bg-success/10 text-success border-success/20">
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5 bg-success/8 text-success border-success/25 font-medium">
                             {t('dashboard.new')}
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="text-xs bg-muted/50 text-muted-foreground border-muted/20">
-                            -
-                          </Badge>
+                          <span className="w-1 h-1 rounded-full bg-border block" />
                         )}
-                        <div className="text-right">
-                          <p className="text-xs text-foreground-muted">
+                        <div className="text-right w-[70px]">
+                          <p className="text-xs text-foreground-muted tabular-nums">
                             {new Date(doc.lastEdited).toLocaleDateString('es-CL')}
                           </p>
-                          <p className="text-xs text-foreground-muted">
-                            {new Date(doc.lastEdited).toLocaleTimeString('es-CL', { 
-                              hour: '2-digit', 
-                              minute: '2-digit' 
+                          <p className="text-[10px] text-foreground-muted/70 tabular-nums">
+                            {new Date(doc.lastEdited).toLocaleTimeString('es-CL', {
+                              hour: '2-digit',
+                              minute: '2-digit'
                             })}
                           </p>
                         </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })
+                  );
+                })}
+              </div>
             ) : (
-              <div className="premium-card p-8 text-center">
-                <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="font-medium text-foreground mb-2">{t('dashboard.noRecentDocuments')}</h3>
-                <p className="text-sm text-foreground-secondary">
+              <div className="p-10 text-center">
+                <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center mx-auto mb-3">
+                  <FileText className="w-5 h-5 text-muted-foreground" />
+                </div>
+                <h3 className="text-sm font-medium text-foreground mb-1">{t('dashboard.noRecentDocuments')}</h3>
+                <p className="text-xs text-foreground-muted">
                   {t('dashboard.noRecentDocumentsText')}
                 </p>
               </div>
@@ -386,55 +395,71 @@ export default function Dashboard() {
         </div>
 
         {/* Activity Timeline - Takes 1/3 */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-foreground">
-              {t('dashboard.recentActivities')}
-            </h2>
-            <Button variant="ghost" size="sm">
-              <Clock className="w-4 h-4" />
+            <div>
+              <h2 className="text-base font-semibold text-foreground">
+                {t('dashboard.recentActivities')}
+              </h2>
+              <p className="text-xs text-foreground-muted mt-0.5">Últimas acciones del sistema</p>
+            </div>
+            <Button variant="ghost" size="sm" className="w-7 h-7 p-0 text-foreground-muted hover:text-foreground">
+              <Clock className="w-3.5 h-3.5" />
             </Button>
           </div>
-          
-          <div className="premium-card p-4 space-y-4">
+
+          <div className="premium-card p-4">
             {!dashStats ? (
-              <div className="space-y-3">
-                {[1,2,3].map(i => (
+              <div className="space-y-4">
+                {[1, 2, 3].map(i => (
                   <div key={i} className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-muted rounded-full animate-pulse"></div>
-                    <div className="flex-1 space-y-1">
-                      <div className="h-3 bg-muted rounded animate-pulse"></div>
-                      <div className="h-2 bg-muted rounded animate-pulse w-1/3"></div>
+                    <div className="w-5 h-5 bg-muted rounded-full animate-pulse flex-shrink-0" />
+                    <div className="flex-1 space-y-1.5 pt-0.5">
+                      <div className="h-3 bg-muted rounded animate-pulse" />
+                      <div className="h-2.5 bg-muted rounded animate-pulse w-1/3" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : dashStats.recentActivity.length === 0 ? (
-              <p className="text-sm text-foreground-muted text-center py-4">Ninguna actividad reciente</p>
-            ) : dashStats.recentActivity.map((activity) => {
-              const Icon = getActivityIcon(activity.type);
-              return (
-                <div key={activity.id} className="flex items-start gap-3">
-                  <div className={`p-1.5 rounded-full ${
-                    activity.type === "success" ? "bg-success/20" :
-                    activity.type === "warning" ? "bg-warning/20" : "bg-info/20"
-                  }`}>
-                    <Icon className={`w-3 h-3 ${
-                      activity.type === "success" ? "text-success" :
-                      activity.type === "warning" ? "text-warning" : "text-info"
-                    }`} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-foreground">
-                      <span className="font-medium">{activity.user}</span>
-                      {' '}{activity.action}{' '}
-                      <span className="font-medium truncate">{activity.document}</span>
-                    </p>
-                    <p className="text-xs text-foreground-muted">{timeAgo(activity.time)}</p>
-                  </div>
+              <div className="text-center py-6">
+                <Clock className="w-7 h-7 text-muted-foreground/40 mx-auto mb-2" />
+                <p className="text-xs text-foreground-muted">Ninguna actividad reciente</p>
+              </div>
+            ) : (
+              <div className="relative">
+                {/* Vertical connector line */}
+                {dashStats.recentActivity.length > 1 && (
+                  <div className="timeline-connector" />
+                )}
+                <div className="space-y-4">
+                  {dashStats.recentActivity.map((activity) => {
+                    const Icon = getActivityIcon(activity.type);
+                    return (
+                      <div key={activity.id} className="flex items-start gap-3 relative">
+                        <div className={`p-1 rounded-full flex-shrink-0 z-10 ring-2 ring-surface ${
+                          activity.type === "success" ? "bg-success/20" :
+                          activity.type === "warning" ? "bg-warning/20" : "bg-info/20"
+                        }`}>
+                          <Icon className={`w-3 h-3 ${
+                            activity.type === "success" ? "text-success" :
+                            activity.type === "warning" ? "text-warning" : "text-info"
+                          }`} />
+                        </div>
+                        <div className="flex-1 min-w-0 pt-0.5">
+                          <p className="text-xs text-foreground leading-relaxed">
+                            <span className="font-semibold">{activity.user}</span>
+                            {' '}{activity.action}{' '}
+                            <span className="font-medium text-foreground-secondary truncate">{activity.document}</span>
+                          </p>
+                          <p className="text-[10px] text-foreground-muted mt-0.5">{timeAgo(activity.time)}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              );
-            })}
+              </div>
+            )}
           </div>
         </div>
       </div>

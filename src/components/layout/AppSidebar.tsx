@@ -67,11 +67,11 @@ export function AppSidebar() {
   };
 
   const getNavClass = (path: string) => {
-    const baseClass = "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 font-medium";
+    const baseClass = "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 text-sm";
     if (isActive(path)) {
-      return `${baseClass} bg-gradient-primary text-white shadow-primary`;
+      return `${baseClass} bg-primary/[0.12] text-primary font-semibold`;
     }
-    return `${baseClass} text-foreground-secondary hover:text-foreground hover:bg-surface-hover`;
+    return `${baseClass} text-foreground-secondary font-medium hover:text-foreground hover:bg-white/[0.05]`;
   };
 
   return (
@@ -111,21 +111,23 @@ export function AppSidebar() {
         </div>
 
         {/* Main Navigation */}
-        <SidebarGroup>
-          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>
-            {t('navigation.dashboard')}
-          </SidebarGroupLabel>
+        <SidebarGroup className="px-3 pt-3">
+          {!collapsed && (
+            <SidebarGroupLabel className="nav-section-label">
+              {t('navigation.dashboard')}
+            </SidebarGroupLabel>
+          )}
           <SidebarGroupContent>
             <SidebarMenu>
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
+                    <NavLink
+                      to={item.url}
                       className={getNavClass(item.url)}
                       title={collapsed ? item.title : undefined}
                     >
-                      <item.icon className="w-5 h-5 flex-shrink-0" />
+                      <item.icon className="w-4 h-4 flex-shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
@@ -137,21 +139,26 @@ export function AppSidebar() {
 
         {/* Admin Section - Only show for admins */}
         {(userRole === 'admin' || userRole === 'reviewer') && (
-          <SidebarGroup>
-            <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>
-              Administración
-            </SidebarGroupLabel>
+          <SidebarGroup className="px-3 pt-2">
+            {!collapsed && (
+              <div className="border-t border-sidebar-border/60 mb-3 mt-1" />
+            )}
+            {!collapsed && (
+              <SidebarGroupLabel className="nav-section-label">
+                Administración
+              </SidebarGroupLabel>
+            )}
             <SidebarGroupContent>
               <SidebarMenu>
                 {adminItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
-                      <NavLink 
-                        to={item.url} 
+                      <NavLink
+                        to={item.url}
                         className={getNavClass(item.url)}
                         title={collapsed ? item.title : undefined}
                       >
-                        <item.icon className="w-5 h-5 flex-shrink-0" />
+                        <item.icon className="w-4 h-4 flex-shrink-0" />
                         {!collapsed && <span>{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>

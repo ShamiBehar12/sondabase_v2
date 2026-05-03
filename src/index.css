@@ -17,8 +17,8 @@
     
     /* Text Colors */
     --foreground: 210 40% 98%;
-    --foreground-secondary: 215 15% 75%;
-    --foreground-muted: 215 15% 65%;
+    --foreground-secondary: 215 15% 82%;
+    --foreground-muted: 215 12% 58%;
     
     /* Brand Colors */
     --primary: 217 91% 60%;
@@ -32,15 +32,16 @@
     --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
     
     /* Shadows */
-    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.12);
-    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.15);
-    --shadow-primary: 0 8px 32px rgba(59, 130, 246, 0.25);
+    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.14);
+    --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.12);
+    --shadow-card-hover: 0 6px 24px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.16);
+    --shadow-primary: 0 6px 24px rgba(59, 130, 246, 0.22);
     
     /* Success/Warning/Error */
-    --success: 142 76% 36%;
-    --warning: 38 92% 50%;
-    --error: 0 84% 60%;
-    --info: 199 89% 48%;
+    --success: 142 69% 42%;
+    --warning: 38 90% 52%;
+    --error: 0 78% 58%;
+    --info: 199 85% 50%;
 
     /* Component Colors */
     --card: var(--surface);
@@ -61,8 +62,8 @@
     --destructive: var(--error);
     --destructive-foreground: var(--foreground);
     
-    --border: 215 20% 20%;
-    --input: 215 20% 20%;
+    --border: 215 18% 22%;
+    --input: 215 18% 22%;
     --ring: var(--primary);
 
     /* Layout */
@@ -113,13 +114,23 @@
   
   /* Premium Cards */
   .premium-card {
-    @apply bg-surface/90 backdrop-blur-md border border-white/10 rounded-xl transition-all duration-300;
+    @apply bg-surface/90 backdrop-blur-md border border-white/[0.07] rounded-xl transition-all duration-200;
     box-shadow: var(--shadow-card);
   }
-  
+
   .premium-card:hover {
-    @apply border-primary/30 transform scale-[1.02];
-    box-shadow: var(--shadow-primary);
+    @apply border-white/[0.13];
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  /* Clickable premium card rows */
+  .premium-card-row {
+    @apply premium-card cursor-pointer;
+  }
+
+  .premium-card-row:hover {
+    @apply bg-surface border-primary/[0.22];
+    box-shadow: var(--shadow-card-hover);
   }
   
   /* Gradient Backgrounds */
@@ -139,6 +150,21 @@
     background-clip: text;
   }
   
+  /* Section separator */
+  .section-divider {
+    @apply border-t border-border/60 pt-6;
+  }
+
+  /* Sidebar nav label */
+  .nav-section-label {
+    @apply text-[10px] font-semibold uppercase tracking-[0.1em] text-foreground-muted px-3 py-1 mb-0.5;
+  }
+
+  /* Timeline connector */
+  .timeline-connector {
+    @apply absolute left-[13px] top-7 bottom-2 w-px bg-border/50;
+  }
+
   /* Animations */
   .animate-slide-up {
     animation: slideUp 0.5s ease-out;
@@ -186,20 +212,20 @@
 
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--background-secondary));
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary));
-  border-radius: 4px;
+  background: hsl(var(--border));
+  border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary-hover));
+  background: hsl(var(--primary) / 0.6);
 }
 
 /* Scrollbar personalizada para melhor UX */
