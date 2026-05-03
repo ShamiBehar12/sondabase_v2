@@ -36,11 +36,11 @@ type DashStats = {
 
 function timeAgo(iso: string): string {
   const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
-  if (mins < 1) return "agora";
-  if (mins < 60) return `há ${mins} min`;
+  if (mins < 1) return "ahora";
+  if (mins < 60) return `hace ${mins} min`;
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `há ${hours}h`;
-  return `há ${Math.floor(hours / 24)}d`;
+  if (hours < 24) return `hace ${hours}h`;
+  return `hace ${Math.floor(hours / 24)}d`;
 }
 
 const getDocumentIcon = (type: string) => {
@@ -413,7 +413,7 @@ export default function Dashboard() {
                 ))}
               </div>
             ) : dashStats.recentActivity.length === 0 ? (
-              <p className="text-sm text-foreground-muted text-center py-4">Ninguna atividade recente</p>
+              <p className="text-sm text-foreground-muted text-center py-4">Ninguna actividad reciente</p>
             ) : dashStats.recentActivity.map((activity) => {
               const Icon = getActivityIcon(activity.type);
               return (

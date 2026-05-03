@@ -490,10 +490,10 @@ export default function CertificateApproval() {
       <Tabs defaultValue="certificates" className="space-y-4">
         <TabsList>
           <TabsTrigger value="certificates">
-            Certificados de Experiência ({unverifiedCertificates.length})
+            Certificados de Experiencia ({unverifiedCertificates.length})
           </TabsTrigger>
           <TabsTrigger value="professional">
-            Certificados Profissionais ({unverifiedProfessionalCertificates.length})
+            Certificados Profesionales ({unverifiedProfessionalCertificates.length})
           </TabsTrigger>
         </TabsList>
 
@@ -513,11 +513,11 @@ export default function CertificateApproval() {
                   <TableRow>
                     <TableHead>Título</TableHead>
                     <TableHead>Usuario</TableHead>
-                    <TableHead>Organização</TableHead>
+                    <TableHead>Organización</TableHead>
                     <TableHead>País</TableHead>
-                    <TableHead>Criado em</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
+                    <TableHead>Creado el</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -540,11 +540,11 @@ export default function CertificateApproval() {
                       </TableCell>
                       <TableCell>{certificate.country || 'No informado'}</TableCell>
                       <TableCell>
-                        {new Date(certificate.created_at).toLocaleDateString('pt-BR')}
+                        {new Date(certificate.created_at).toLocaleDateString('es-CL')}
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline">
-                          {certificate.has_rejection_history ? 'Reenviado para revisão' : 'Pendente'}
+                          {certificate.has_rejection_history ? 'Reenviado para revisión' : 'Pendiente'}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
@@ -561,7 +561,7 @@ export default function CertificateApproval() {
                             className="flex items-center gap-2"
                           >
                             <Eye className="w-4 h-4" />
-                            Ver Detalhes
+                            Ver Detalles
                           </Button>
                           <Button
                             onClick={() => handleApprove('certificates', certificate.id)}
@@ -570,7 +570,7 @@ export default function CertificateApproval() {
                             className="flex items-center gap-2"
                           >
                             <CheckCircle className="w-4 h-4" />
-                            Aprovar
+                            Aprobar
                           </Button>
                           {!certificate.has_rejection_history ? (
                             <Button
@@ -584,7 +584,7 @@ export default function CertificateApproval() {
                               className="flex items-center gap-2"
                             >
                               <XCircle className="w-4 h-4" />
-                              Rejeitar
+                              Rechazar
                             </Button>
                           ) : null}
                         </div>
@@ -603,7 +603,7 @@ export default function CertificateApproval() {
             <Card>
               <CardContent className="p-6 text-center">
                 <p className="text-muted-foreground">
-                  Ningún certificado profissional esperando aprobación.
+                  Ningún certificado profesional esperando aprobación.
                 </p>
               </CardContent>
             </Card>
@@ -614,12 +614,12 @@ export default function CertificateApproval() {
                   <TableRow>
                     <TableHead>Título</TableHead>
                     <TableHead>Usuario</TableHead>
-                    <TableHead>Instituição</TableHead>
+                    <TableHead>Institución</TableHead>
                     <TableHead>Tipo</TableHead>
-                    <TableHead>Conselho</TableHead>
-                    <TableHead>Criado em</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
+                    <TableHead>Consejo</TableHead>
+                    <TableHead>Creado el</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -643,11 +643,11 @@ export default function CertificateApproval() {
                       <TableCell>{certificate.certification_type || 'No informado'}</TableCell>
                       <TableCell>{certificate.professional_council || 'No informado'}</TableCell>
                       <TableCell>
-                        {new Date(certificate.created_at).toLocaleDateString('pt-BR')}
+                        {new Date(certificate.created_at).toLocaleDateString('es-CL')}
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline">
-                          {certificate.has_rejection_history ? 'Reenviado para revisão' : 'Pendente'}
+                          {certificate.has_rejection_history ? 'Reenviado para revisión' : 'Pendiente'}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
@@ -664,7 +664,7 @@ export default function CertificateApproval() {
                             className="flex items-center gap-2"
                           >
                             <Eye className="w-4 h-4" />
-                            Ver Detalhes
+                            Ver Detalles
                           </Button>
                           <Button
                             onClick={() => handleApprove('professional_certificates', certificate.id)}
@@ -673,7 +673,7 @@ export default function CertificateApproval() {
                             className="flex items-center gap-2"
                           >
                             <CheckCircle className="w-4 h-4" />
-                            Aprovar
+                            Aprobar
                           </Button>
                           {!certificate.has_rejection_history ? (
                             <Button
@@ -687,7 +687,7 @@ export default function CertificateApproval() {
                               className="flex items-center gap-2"
                             >
                               <XCircle className="w-4 h-4" />
-                              Rejeitar
+                              Rechazar
                             </Button>
                           ) : null}
                         </div>
@@ -706,7 +706,7 @@ export default function CertificateApproval() {
       <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Rejeitar Certificado</DialogTitle>
+            <DialogTitle>Rechazar Certificado</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -715,7 +715,7 @@ export default function CertificateApproval() {
               </Label>
               <Textarea
                 id="rejection-reason"
-                placeholder="Explique o motivo del rechazo para que el usuario pueda corregir..."
+                placeholder="Explica el motivo del rechazo para que el usuario pueda corregirlo..."
                 value={rejectionReason}
                 onChange={(y) => setRejectionReason(y.target.value)}
                 className="mt-2"
@@ -740,7 +740,7 @@ export default function CertificateApproval() {
                     toast({
                       variant: "destructive",
                       title: "Error",
-                      description: "Por favor, forneça un motivo para a rechazo.",
+                      description: "Por favor, ingresa un motivo para el rechazo.",
                     });
                     return;
                   }
