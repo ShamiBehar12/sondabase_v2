@@ -93,16 +93,13 @@ Espera ~10 segundos a que MySQL termine de iniciar antes del siguiente paso.
 ### Paso 3 — Base de datos (migraciones)
 
 ```bash
-cd backend
-npm install
-npx prisma generate
-npx prisma migrate deploy
+npm run db:init     # prisma generate + migrate deploy
 ```
 
 Opcional — crear un usuario admin de prueba:
 
 ```bash
-npx ts-node scripts/seed.ts
+npm run db:setup    # prisma generate + migrate deploy + seed
 ```
 
 ---
@@ -475,6 +472,8 @@ sondabase_v2/
 ### Frontend / proyecto completo
 ```bash
 npm run setup      # Instala dependencias de FE + BE + RACER (pip) de una vez
+npm run db:init    # prisma generate + migrate (sin seed)
+npm run db:setup   # prisma generate + migrate + seed (con datos de prueba)
 npm run dev:all    # Levanta FE + BE + RACER en paralelo con logs por colores
 npm run dev        # Solo el frontend
 npm run build      # Build de producción del frontend

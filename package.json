@@ -10,6 +10,8 @@
     "dev:all": "concurrently -k -n FE,BE,RACER -c cyan,yellow,magenta \"npm run dev\" \"npm run dev:backend\" \"npm run dev:racer\"",
     "docker:mysql": "docker compose up -d mysql",
     "setup": "npm install && npm --prefix backend install && cd racer && pip install -r requirements.txt",
+    "db:init": "npm --prefix backend run db:init",
+    "db:setup": "npm --prefix backend run db:setup",
     "build": "vite build",
     "build:backend": "npm --prefix backend run build",
     "build:dev": "vite build --mode development",
