@@ -222,7 +222,7 @@ export default function Dashboard() {
           icon={Edit}
         />
         <StatsCard
-          title={t('approval.pending') + ' ' + t('approval.certificateApproval').split(' ')[0]}
+          title="Aprobaciones Pendientes"
           value={dashStats ? dashStats.pendingApprovals : "..."}
           change={dashStats ? `${dashStats.pendingCerts} cert. · ${dashStats.pendingStories} hist.` : t('dashboard.loading')}
           changeType={dashStats && dashStats.pendingApprovals > 0 ? "neutral" : "positive"}
@@ -231,7 +231,7 @@ export default function Dashboard() {
         <StatsCard
           title={t('dashboard.activeUsers')}
           value={dashStats ? dashStats.totalUsers : "..."}
-          change={dashStats ? `${dashStats.totalUsers} ${t('users.role')}s` : t('dashboard.loading')}
+          change={dashStats ? `${dashStats.totalUsers} registrados` : t('dashboard.loading')}
           changeType="positive"
           icon={Users}
         />
