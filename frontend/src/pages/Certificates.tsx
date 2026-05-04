@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Plus, Grid3x3, LayoutList, Upload, FolderOpen, CheckCircle, AlertCircle, Copy, Loader2, X, FileText as FileTextIcon } from 'lucide-react';
+import { Search, Plus, Grid3x3, LayoutList, Upload, FolderOpen, CheckCircle, AlertCircle, Copy, Loader2, X, FileText as FileTextIcon, RefreshCw } from 'lucide-react';
 import { CertificateUploadForm } from '@/components/certificates/CertificateUploadForm';
 import { CertificateList } from '@/components/certificates/CertificateList';
 import { useCertificates } from '@/hooks/useCertificates';
@@ -166,6 +166,8 @@ export default function Certificates() {
   };
 
   const clearBulk = () => setBulkFiles([]);
+  const retryErrors = () => setBulkFiles(prev => prev.map(f => f.status === "error" ? { ...f, status: "pending", error: undefined } : f));
+  const retryOne = (id: string) => setBulkFiles(prev => prev.map(f => f.id === id && f.status === "error" ? { ...f, status: "pending", error: undefined } : f));
   const bulkDone = bulkFiles.filter(f => f.status === "done").length;
   const bulkTotal = bulkFiles.length;
   const bulkProgress = bulkTotal ? Math.round((bulkFiles.filter(f =>
@@ -258,6 +260,11 @@ export default function Certificates() {
                       ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Procesando...</>
                       : <><Upload className="w-4 h-4 mr-2" />Ingestar {bulkFiles.filter(f => f.status === "pending").length} archivo(s)</>}
                   </Button>
+                  {bulkFiles.some(f => f.status === "error") && (
+                    <Button variant="outline" size="sm" onClick={retryErrors} disabled={bulkRunning}>
+                      <RefreshCw className="w-4 h-4 mr-1" />Reintentar errores ({bulkFiles.filter(f => f.status === "error").length})
+                    </Button>
+                  )}
                   <Button variant="outline" size="sm" onClick={clearBulk} disabled={bulkRunning}>
                     <X className="w-4 h-4 mr-1" />Limpiar
                   </Button>
@@ -300,9 +307,19 @@ export default function Certificates() {
                             </span>
                           )}
                           {entry.status === "error" && (
-                            <span className="text-xs text-red-400 truncate max-w-[140px]" title={entry.error}>
-                              {entry.error}
-                            </span>
+                            <>
+                              <span className="text-xs text-red-400 truncate max-w-[140px]" title={entry.error}>
+                                {entry.error}
+                              </span>
+                              <button
+                                onClick={() => retryOne(entry.id)}
+                                disabled={bulkRunning}
+                                className="text-foreground-muted hover:text-foreground transition-colors disabled:opacity-50"
+                                title="Reintentar"
+                              >
+                                <RefreshCw className="w-3.5 h-3.5" />
+                              </button>
+                            </>
                           )}
                         </div>
                       ))}
