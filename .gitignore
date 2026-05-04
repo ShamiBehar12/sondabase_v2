@@ -1,3 +1,31 @@
+# Dependencies
+node_modules
+frontend/node_modules
+backend/node_modules
+
+# Build outputs
+frontend/dist
+frontend/dist-ssr
+backend/dist
+
+# Environment variables
+.env
+frontend/.env
+frontend/.env.local
+backend/.env
+racer/.env
+
+# Uploads (keep folder structure but not contents)
+uploads/*
+!uploads/avatars/
+uploads/avatars/*
+!uploads/avatars/default/
+!uploads/avatars/default/**
+
+# RACER vector store (rebuild con rebuild_chromadb.py)
+racer/chroma/
+racer/08ChromaDB/
+
 # Logs
 logs
 *.log
@@ -7,22 +35,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-backend/node_modules
-dist
-backend/dist
-dist-ssr
-*.local
-uploads/*
-!uploads/avatars/
-uploads/avatars/*
-!uploads/avatars/default/
-!uploads/avatars/default/**
-.env
-backend/.env
-racer/.env
-
-# Editor directories and files
+# Editor
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -32,4 +45,7 @@ racer/.env
 *.njsproj
 *.sln
 *.sw?
+
+# Misc
 SONDABase RAG/
+*.local
