@@ -75,7 +75,7 @@ export default function Analytics() {
       return;
     }
     if (!userRole) return;
-    apiFetch<{ data: Summary; error: null }>('/api/analytics/summary')
+    apiFetch<{ data: Summary; error: null }>('/api/usage/summary')
       .then((res) => setSummary(res.data))
       .catch(console.error)
       .finally(() => setLoading(false));
