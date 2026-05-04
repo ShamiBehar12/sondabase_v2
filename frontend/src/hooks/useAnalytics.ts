@@ -21,7 +21,7 @@ async function flush() {
   try {
     await apiFetch('/api/usage/events', {
       method: 'POST',
-      body: JSON.stringify(batch),
+      body: batch as any,
     });
   } catch {
     // analytics never breaks the app
