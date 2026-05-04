@@ -3,7 +3,7 @@ RACER Smart Cities API
 Ejecutar desde la carpeta racer/:
     uvicorn server:app --host 0.0.0.0 --port 8000 --reload
 """
-import json, re, sqlite3, time
+import json, re, sqlite3, time, logging
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
@@ -17,7 +17,10 @@ import chromadb
 from chromadb import EmbeddingFunction, Embeddings
 import os
 from ingest import ingest_document
-from pdf_reader import extract_text_from_pdf
+from pdf_reader import extract_text_from_pdf, _ensure_ocr
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class OpenAIEmbeddingFunction(EmbeddingFunction):
     def __init__(self, api_key: str, model_name: str):
@@ -29,6 +32,10 @@ class OpenAIEmbeddingFunction(EmbeddingFunction):
         return [item.embedding for item in resp.data]
 
 load_dotenv()
+
+# Verificar OCR al arrancar
+_ocr_ok = _ensure_ocr()
+print(f"[RACER] OCR Tesseract: {'✓ disponible' if _ocr_ok else '✗ NO disponible — PDFs escaneados darán 0 chunks'}", flush=True)
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if not OPENAI_API_KEY:
