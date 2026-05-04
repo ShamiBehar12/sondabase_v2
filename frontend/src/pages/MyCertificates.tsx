@@ -519,7 +519,7 @@ export default function MyCertificates() {
                   <TableHead>{t('myCertificates.created')}</TableHead>
                   <TableHead>{t('myCertificates.approver')}</TableHead>
                   <TableHead>{t('myCertificates.status')}</TableHead>
-                  <TableHead>Ações</TableHead>
+                  <TableHead>Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -588,7 +588,7 @@ export default function MyCertificates() {
                   <TableHead>{t('myCertificates.created')}</TableHead>
                   <TableHead>{t('myCertificates.approver')}</TableHead>
                   <TableHead>{t('myCertificates.status')}</TableHead>
-                  <TableHead>Ações</TableHead>
+                  <TableHead>Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -642,7 +642,7 @@ export default function MyCertificates() {
                   <TableHead>{t('myCertificates.created')}</TableHead>
                   <TableHead>{t('myCertificates.approver')}</TableHead>
                   <TableHead>{t('myCertificates.status')}</TableHead>
-                  <TableHead>Ações</TableHead>
+                  <TableHead>Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -696,7 +696,7 @@ export default function MyCertificates() {
                   <TableHead>{t('myCertificates.created')}</TableHead>
                   <TableHead>{t('myCertificates.approver')}</TableHead>
                   <TableHead>{t('myCertificates.status')}</TableHead>
-                  <TableHead>Ações</TableHead>
+                  <TableHead>Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

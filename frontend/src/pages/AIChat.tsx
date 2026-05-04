@@ -110,10 +110,10 @@ export default function AIChat() {
   const handleDeleteSession = async (sessionId: string) => {
     const { error } = await deleteSession(sessionId);
     if (error) {
-      toast({ variant: "destructive", title: "Error ao excluir conversación", description: error.message });
+      toast({ variant: "destructive", title: "Error al eliminar conversación", description: error.message });
       return;
     }
-    toast({ title: "Conversa excluída", description: "A sessão foi removida com éxito." });
+    toast({ title: "Conversación eliminada", description: "La sesión fue eliminada con éxito." });
   };
 
   return (
@@ -124,7 +124,7 @@ export default function AIChat() {
           Assistente de Certificados
         </h1>
         <p className="text-foreground-muted mt-2">
-          Pergunta em linguagem natural y recebe os certificados aprovados mais aderentes, com ranking y fontes.
+          Consulta en lenguaje natural y recibe los documentos más relevantes con fuentes y contexto.
         </p>
       </div>
 
@@ -134,8 +134,8 @@ export default function AIChat() {
           <CardHeader>
             <div className="flex items-center justify-between gap-3">
               <div>
-                <CardTitle>Conversas</CardTitle>
-                <CardDescription>Sessões recentes del assistente.</CardDescription>
+                <CardTitle>Conversaciones</CardTitle>
+                <CardDescription>Sesiones recientes del asistente.</CardDescription>
               </div>
               <Button size="icon" variant="outline" onClick={handleNewSession}>
                 <MessageSquarePlus className="w-4 h-4" />
@@ -180,7 +180,7 @@ export default function AIChat() {
                         <AlertDialogHeader>
                           <AlertDialogTitle className="text-foreground">Excluir conversación</AlertDialogTitle>
                           <AlertDialogDescription className="text-foreground-muted">
-                            ¿Estás seguro de que deseas eliminar la conversación "{session.title || "Sin título"}"? Esta acción no pode ser deshacerse.
+                            ¿Estás seguro de que deseas eliminar la conversación "{session.title || "Sin título"}"? Esta acción no se puede deshacer.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
@@ -210,16 +210,16 @@ export default function AIChat() {
           <CardContent className="space-y-4">
             <ScrollArea className="h-[460px] rounded-lg border border-border p-4">
               <div className="space-y-4">
-                {loading && <div className="text-sm text-foreground-muted">Carregando conversas...</div>}
+                {loading && <div className="text-sm text-foreground-muted">Cargando conversaciones...</div>}
                 {!loading && messages.length === 0 && (
                   <div className="text-sm text-foreground-muted">
-                    Aún no há mensajes. Ejemplo: "¿Qué contratos tenemos apostillados en Chile?"
+                    Aún no hay mensajes. Ejemplo: "¿Qué contratos tenemos apostillados en Chile?"
                   </div>
                 )}
                 {messages.map((message) => (
                   <div key={message.id} className={`rounded-xl p-4 ${message.role === "user" ? "bg-primary/10" : "bg-surface"}`}>
                     <div className="text-xs uppercase tracking-wide text-foreground-muted mb-2">
-                      {message.role === "user" ? "Pergunta" : "Assistente"}
+                      {message.role === "user" ? "Pregunta" : "Asistente"}
                     </div>
                     <div className="text-sm prose prose-invert prose-sm max-w-none
                       [&_table]:w-full [&_table]:border-collapse [&_table]:text-xs
@@ -243,7 +243,7 @@ export default function AIChat() {
               <Input
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Descreve o perfil, tecnologia o requisito que queres atender..."
+                placeholder="Describe el perfil, tecnología o requisito que quieres atender..."
                 disabled={sending}
                 onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
               />
