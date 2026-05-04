@@ -1628,6 +1628,49 @@ app.post("/api/racer/ingest", async (req, reply) => {
   }
 });
 
+// ── RACER document management ─────────────────────────────────────────────
+
+app.get("/api/racer/documents", async (req, reply) => {
+  requireAuth(req);
+  const resp = await fetch(`${RACER_URL}/documents`);
+  const data = await resp.json();
+  return reply.send({ data, error: null });
+});
+
+app.delete("/api/racer/documents/all", async (req, reply) => {
+  const user = requireAuth(req);
+  if (user.role !== "admin") throw app.httpErrors.forbidden("Solo admins");
+  const { password } = req.body as { password: string };
+  const resp = await fetch(`${RACER_URL}/documents/all/confirm`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
+  });
+  const data = await resp.json() as any;
+  if (!resp.ok) return reply.code(resp.status).send({ data: null, error: { message: data.detail ?? "Error" } });
+  return reply.send({ data, error: null });
+});
+
+app.delete("/api/racer/documents/:id", async (req, reply) => {
+  requireAuth(req);
+  const { id } = req.params as { id: string };
+  const resp = await fetch(`${RACER_URL}/documents/${encodeURIComponent(id)}`, { method: "DELETE" });
+  const data = await resp.json();
+  return reply.send({ data, error: null });
+});
+
+app.delete("/api/racer/documents", async (req, reply) => {
+  requireAuth(req);
+  const { ids } = req.body as { ids: string[] };
+  const resp = await fetch(`${RACER_URL}/documents`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ids }),
+  });
+  const data = await resp.json();
+  return reply.send({ data, error: null });
+});
+
 // ── Dashboard stats ────────────────────────────────────────────────────────
 app.get("/api/stats/dashboard", async (req, reply) => {
   requireAuth(req);
