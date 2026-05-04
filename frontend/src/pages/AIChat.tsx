@@ -32,7 +32,7 @@ type RacerSource = {
 };
 
 export default function AIChat() {
-  const { sessions, messages, activeSessionId, setActiveSessionId, loading, createSession, deleteSession, reloadSessions } = useAIChat();
+  const { sessions, messages, activeSessionId, setActiveSessionId, loading, createSession, deleteSession, reloadSessions, reloadMessages } = useAIChat();
   const { toast } = useToast();
   const { trackAIQuery } = useAnalytics();
   const [question, setQuestion] = useState("");
@@ -99,7 +99,7 @@ export default function AIChat() {
 
       trackAIQuery(Date.now() - queryStartRef.current);
       await reloadSessions();
-      setActiveSessionId(sessionId);
+      await reloadMessages(sessionId);
     } catch (err: any) {
       toast({ variant: "destructive", title: "Error en el chat", description: err.message });
     } finally {
