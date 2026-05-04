@@ -6,10 +6,10 @@
   "scripts": {
     "dev": "npm --prefix frontend run dev",
     "dev:backend": "npm --prefix backend run dev",
-    "dev:racer": "cd racer && uvicorn server:app --port 8000 --reload",
-    "dev:all": "concurrently -k -n FE,BE,RACER -c cyan,yellow,magenta \"npm --prefix frontend run dev\" \"npm --prefix backend run dev\" \"cd racer && uvicorn server:app --port 8000 --reload\"",
+    "dev:racer": "cd racer && venv/bin/uvicorn server:app --port 8000 --reload",
+    "dev:all": "concurrently -k -n FE,BE,RACER -c cyan,yellow,magenta \"npm --prefix frontend run dev\" \"npm --prefix backend run dev\" \"cd racer && venv/bin/uvicorn server:app --port 8000 --reload\"",
     "docker:mysql": "docker compose up -d mysql",
-    "setup": "npm install && npm --prefix frontend install && npm --prefix backend install && cd racer && pip install -r requirements.txt",
+    "setup": "npm install && npm --prefix frontend install && npm --prefix backend install && cd racer && python3 -m venv venv && venv/bin/pip install -r requirements.txt",
     "db:init": "npm --prefix backend run db:init",
     "db:setup": "npm --prefix backend run db:setup",
     "build": "npm --prefix frontend run build",
