@@ -1746,4 +1746,143 @@ app.post("/api/admin/seed-racer", async (req, reply) => {
 
   return reply.send({ data: { created, skipped, total: lines.length }, error: null });
 });
+
+// ── Analytics ──────────────────────────────────────────────────────────────
+app.post("/api/analytics/events", async (req) => {
+  const user = requireAuth(req);
+  const events = req.body as Array<{
+    eventType: string;
+    page?: string;
+    metadata?: unknown;
+    durationMs?: number;
+    createdAt?: string;
+  }>;
+  if (!Array.isArray(events) || events.length === 0) return { ok: true };
+
+  await prisma.analyticsEvent.createMany({
+    data: events.map((e) => ({
+      userId: user.id,
+      eventType: String(e.eventType),
+      page: e.page ? String(e.page) : null,
+      metadata: (e.metadata as any) ?? undefined,
+      durationMs: typeof e.durationMs === "number" ? Math.round(e.durationMs) : null,
+      createdAt: e.createdAt ? new Date(e.createdAt) : new Date(),
+    })),
+  });
+
+  return { ok: true };
+});
+
+app.get("/api/analytics/summary", async (req) => {
+  const user = requireAuth(req);
+  if (user.role !== "admin") throw app.httpErrors.forbidden("Admin only");
+
+  const [events, profiles] = await Promise.all([
+    prisma.analyticsEvent.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 50000,
+    }),
+    prisma.profile.findMany({
+      select: { userId: true, fullName: true },
+    }),
+  ]);
+
+  const users = await prisma.user.findMany({ select: { id: true, email: true } });
+  const profileMap = new Map(profiles.map((p) => [p.userId, p.fullName]));
+  const emailMap = new Map(users.map((u) => [u.id, u.email]));
+
+  // per-user aggregation
+  const byUser = new Map<string, {
+    userId: string; name: string; email: string;
+    pageVisits: number; totalTimeSec: number;
+    aiQueries: number; totalAiMs: number;
+    uploads: number; totalUploadMs: number;
+    tabClicks: number; sessions: number;
+  }>();
+
+  for (const e of events) {
+    if (!byUser.has(e.userId)) {
+      byUser.set(e.userId, {
+        userId: e.userId,
+        name: profileMap.get(e.userId) || "Sin nombre",
+        email: emailMap.get(e.userId) || "",
+        pageVisits: 0, totalTimeSec: 0,
+        aiQueries: 0, totalAiMs: 0,
+        uploads: 0, totalUploadMs: 0,
+        tabClicks: 0, sessions: 0,
+      });
+    }
+    const u = byUser.get(e.userId)!;
+    if (e.eventType === "page_visit" && e.durationMs) {
+      u.pageVisits++;
+      u.totalTimeSec += e.durationMs / 1000;
+    }
+    if (e.eventType === "session_start") u.sessions++;
+    if (e.eventType === "ai_query") {
+      u.aiQueries++;
+      if (e.durationMs) u.totalAiMs += e.durationMs;
+    }
+    if (e.eventType === "file_upload") {
+      u.uploads++;
+      if (e.durationMs) u.totalUploadMs += e.durationMs;
+    }
+    if (e.eventType === "tab_click") u.tabClicks++;
+  }
+
+  // top pages
+  const pageCount = new Map<string, { visits: number; totalMs: number }>();
+  for (const e of events) {
+    if (e.eventType === "page_visit" && e.page) {
+      const p = pageCount.get(e.page) ?? { visits: 0, totalMs: 0 };
+      p.visits++;
+      if (e.durationMs) p.totalMs += e.durationMs;
+      pageCount.set(e.page, p);
+    }
+  }
+  const topPages = [...pageCount.entries()]
+    .map(([page, { visits, totalMs }]) => ({
+      page,
+      visits,
+      avgTimeSec: visits > 0 ? Math.round(totalMs / visits / 1000) : 0,
+    }))
+    .sort((a, b) => b.visits - a.visits)
+    .slice(0, 10);
+
+  // hourly activity (last 7 days)
+  const hourly = new Array(24).fill(0);
+  const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  for (const e of events) {
+    if (e.createdAt.getTime() > cutoff) hourly[e.createdAt.getHours()]++;
+  }
+
+  // tab click breakdown
+  const tabCount = new Map<string, number>();
+  for (const e of events) {
+    if (e.eventType === "tab_click" && e.metadata) {
+      const tab = (e.metadata as any).tab as string;
+      if (tab) tabCount.set(tab, (tabCount.get(tab) ?? 0) + 1);
+    }
+  }
+  const topTabs = [...tabCount.entries()]
+    .map(([tab, count]) => ({ tab, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+
+  return {
+    data: {
+      users: [...byUser.values()].map((u) => ({
+        ...u,
+        avgTimeSec: u.pageVisits > 0 ? Math.round(u.totalTimeSec / u.pageVisits) : 0,
+        avgAiMs: u.aiQueries > 0 ? Math.round(u.totalAiMs / u.aiQueries) : 0,
+        avgUploadMs: u.uploads > 0 ? Math.round(u.totalUploadMs / u.uploads) : 0,
+      })),
+      topPages,
+      topTabs,
+      hourlyActivity: hourly,
+      totalEvents: events.length,
+    },
+    error: null,
+  };
+});
+
 app.listen({ port: env.port, host: env.host });

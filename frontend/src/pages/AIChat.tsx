@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useAIChat } from "@/hooks/useAI";
 import { apiFetch } from "@/lib/api-client";
+import { useAnalytics } from "@/hooks/useAnalytics";
 import { Bot, MessageSquarePlus, Send, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
@@ -33,8 +34,10 @@ type RacerSource = {
 export default function AIChat() {
   const { sessions, messages, activeSessionId, setActiveSessionId, loading, createSession, deleteSession, reloadSessions } = useAIChat();
   const { toast } = useToast();
+  const { trackAIQuery } = useAnalytics();
   const [question, setQuestion] = useState("");
   const [sending, setSending] = useState(false);
+  const queryStartRef = useRef<number>(0);
 
   const racerSources = useMemo<RacerSource[]>(() => {
     const lastAssistant = [...messages].reverse().find(m => m.role === "assistant" && Array.isArray(m.sourcesJson));
@@ -56,6 +59,7 @@ export default function AIChat() {
     if (!prompt || sending) return;
     setQuestion("");
     setSending(true);
+    queryStartRef.current = Date.now();
 
     try {
       let sessionId = activeSessionId;
@@ -93,6 +97,7 @@ export default function AIChat() {
         },
       });
 
+      trackAIQuery(Date.now() - queryStartRef.current);
       await reloadSessions();
       setActiveSessionId(sessionId);
     } catch (err: any) {

@@ -417,3 +417,18 @@ model AiChatMessage {
   @@index([sessionId, createdAt])
   @@map("ai_chat_messages")
 }
+
+model AnalyticsEvent {
+  id         String   @id @default(uuid()) @db.Char(36)
+  userId     String   @map("user_id") @db.Char(36)
+  eventType  String   @map("event_type") @db.VarChar(64)
+  page       String?  @db.VarChar(255)
+  metadata   Json?
+  durationMs Int?     @map("duration_ms")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([eventType])
+  @@index([createdAt])
+  @@map("analytics_events")
+}

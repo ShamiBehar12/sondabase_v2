@@ -28,7 +28,15 @@ import AIAdmin from "./pages/AIAdmin";
 import AIChat from "./pages/AIChat";
 import SmartCitiesChat from "./pages/SmartCitiesChat";
 import SmartCitiesIngest from "./pages/SmartCitiesIngest";
+import Analytics from "./pages/Analytics";
+import { useAnalytics } from "./hooks/useAnalytics";
+
 const queryClient = new QueryClient();
+
+function AnalyticsTracker() {
+  useAnalytics();
+  return null;
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -37,6 +45,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <AnalyticsTracker />
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route path="/*" element={
@@ -82,6 +91,11 @@ const App = () => (
                           <Route path="/cleanup-certificates" element={
                             <ProtectedRoute requireRole="admin">
                               <CleanupCertificates />
+                            </ProtectedRoute>
+                          } />
+                          <Route path="/analytics" element={
+                            <ProtectedRoute requireRole="admin">
+                              <Analytics />
                             </ProtectedRoute>
                           } />
                           <Route path="/settings" element={<Settings />} />
