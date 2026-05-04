@@ -1,11 +1,19 @@
 {
   "navigation": {
     "dashboard": "Dashboard",
-    "certificates": "Certificates",
+    "main": "Main",
+    "certificates": "Documents",
     "professionalCertificates": "Professional Certificates",
     "successStories": "Success Stories",
     "users": "Users",
-    "settings": "Settings"
+    "settings": "Settings",
+    "aiAssistant": "AI Assistant",
+    "certificateApproval": "Document Approval",
+    "administration": "Administration",
+    "myCertificates": "My Documents",
+    "newConversation": "New conversation",
+    "documentExplorer": "Document Explorer",
+    "adminConversations": "Chat Audit"
   },
   "common": {
     "search": "Search",
@@ -184,7 +192,14 @@
     "activeUsers": "Active Users",
     "newUsersThisMonth": "new users this month",
     "views": "Views",
-    "averageReviewTime": "Average Review Time"
+    "averageReviewTime": "Average Review Time",
+    "activity": {
+      "added_certificate": "added a certificate",
+      "submitted_certificate": "submitted certificate for review",
+      "published_story": "published a story",
+      "submitted_story": "submitted story for review"
+    },
+    "recentDocumentsCount": "{{count}} recent documents"
   },
   "notifications": "Notifications",
   "profile": "My Profile",
