@@ -19,7 +19,7 @@ async function flush() {
   if (queue.length === 0) return;
   const batch = queue.splice(0, queue.length);
   try {
-    await apiFetch('/api/analytics/events', {
+    await apiFetch('/api/usage/events', {
       method: 'POST',
       body: JSON.stringify(batch),
     });

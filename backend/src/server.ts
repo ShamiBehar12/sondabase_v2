@@ -1792,7 +1792,7 @@ app.post("/api/admin/seed-racer", async (req, reply) => {
 });
 
 // ── Analytics ──────────────────────────────────────────────────────────────
-app.post("/api/analytics/events", async (req) => {
+app.post("/api/usage/events", async (req) => {
   const user = requireAuth(req);
   const events = req.body as Array<{
     eventType: string;
@@ -1817,7 +1817,7 @@ app.post("/api/analytics/events", async (req) => {
   return { ok: true };
 });
 
-app.get("/api/analytics/summary", async (req) => {
+app.get("/api/usage/summary", async (req) => {
   const user = requireAuth(req);
   if (user.role !== "admin") throw app.httpErrors.forbidden("Admin only");
 
