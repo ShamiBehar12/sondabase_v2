@@ -18,12 +18,19 @@ DPI_OCR = 300
 IDIOMA_OCR = "spa"
 
 def _tesseract_path() -> str | None:
-    """Resuelve la ruta a tesseract.exe dinámicamente desde LOCALAPPDATA."""
+    """Resuelve la ruta a tesseract multiplataforma."""
+    import shutil
+    # Linux/Mac: usar el que esté en PATH
+    found = shutil.which("tesseract")
+    if found:
+        return found
+    # Windows: buscar en LOCALAPPDATA
     local_app = os.environ.get("LOCALAPPDATA")
-    if not local_app:
-        return None
-    candidate = os.path.join(local_app, "Programs", "Tesseract-OCR", "tesseract.exe")
-    return candidate if os.path.isfile(candidate) else None
+    if local_app:
+        candidate = os.path.join(local_app, "Programs", "Tesseract-OCR", "tesseract.exe")
+        if os.path.isfile(candidate):
+            return candidate
+    return None
 
 
 def _ocr_available() -> bool:
