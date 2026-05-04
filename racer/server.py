@@ -391,7 +391,7 @@ def list_documents():
     """Lista todos los documentos indexados desde SQLite."""
     with get_db() as conn:
         rows = conn.execute(
-            "SELECT document_id, original_filename, doc_type, client, country, year, "
+            "SELECT document_id, source_file AS original_filename, doc_type, client, country, year, "
             "is_apostilled, summary_one_line, ingested_at FROM documents ORDER BY ingested_at DESC"
         ).fetchall()
     return [dict(r) for r in rows]
