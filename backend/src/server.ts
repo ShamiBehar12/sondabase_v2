@@ -45,10 +45,7 @@ declare module "fastify" {
 }
 
 const app = Fastify({
-  logger: {
-    level: "warn",
-    transport: { target: "pino-pretty", options: { colorize: true } },
-  },
+  logger: { level: "warn" },
   disableRequestLogging: true,
   bodyLimit: 50 * 1024 * 1024,
 });
