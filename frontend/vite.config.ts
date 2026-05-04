@@ -9,10 +9,8 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
     proxy: {
-      '/api': {
-        target: 'http://localhost:4000',
-        changeOrigin: true,
-      },
+      '/api': { target: 'http://localhost:4000', changeOrigin: true },
+      '/auth': { target: 'http://localhost:4000', changeOrigin: true },
     },
   },
   plugins: [
