@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { AIChatProvider } from "@/contexts/AIChatContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
@@ -26,6 +27,8 @@ import NotFound from "./pages/NotFound";
 import { CleanupCertificates } from "./pages/CleanupCertificates";
 import AIAdmin from "./pages/AIAdmin";
 import AIChat from "./pages/AIChat";
+import DocumentExplorer from "./pages/DocumentExplorer";
+import AdminConversations from "./pages/AdminConversations";
 import SmartCitiesChat from "./pages/SmartCitiesChat";
 import SmartCitiesIngest from "./pages/SmartCitiesIngest";
 import Analytics from "./pages/Analytics";
@@ -50,6 +53,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/*" element={
               <ProtectedRoute>
+                <AIChatProvider>
                 <SidebarProvider>
                   <div className="min-h-screen flex w-full">
                     <AppSidebar />
@@ -76,6 +80,12 @@ const App = () => (
         <Route path="/my-certificates" element={<MyCertificates />} />
         <Route path="/my-success-stories" element={<MySuccessStories />} />
                           <Route path="/ai-chat" element={<AIChat />} />
+                          <Route path="/documents" element={<DocumentExplorer />} />
+                          <Route path="/admin/conversations" element={
+                            <ProtectedRoute requireRole="admin">
+                              <AdminConversations />
+                            </ProtectedRoute>
+                          } />
                           <Route path="/smart-cities" element={<SmartCitiesChat />} />
                           <Route path="/smart-cities/ingest" element={<SmartCitiesIngest />} />
                           <Route path="/users" element={
@@ -106,6 +116,7 @@ const App = () => (
                     </div>
                   </div>
                 </SidebarProvider>
+                </AIChatProvider>
               </ProtectedRoute>
             } />
           </Routes>
