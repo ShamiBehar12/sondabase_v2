@@ -1747,226 +1747,142 @@ app.post("/api/admin/seed-racer", async (req, reply) => {
   return reply.send({ data: { created, skipped, total: lines.length }, error: null });
 });
 
-// ── Admin: audit all chat sessions with user info ─────────────────────────
-app.get("/api/admin/chat/sessions", async (request, reply) => {
-  requireAdmin(request);
-  const sessions = await prisma.aiChatSession.findMany({
-    orderBy: { updatedAt: "desc" },
-    take: 200,
-    include: {
-      user: {
-        select: {
-          id: true,
-          email: true,
-          profile: { select: { fullName: true } },
-        },
-      },
-    },
+// ── Analytics ──────────────────────────────────────────────────────────────
+app.post("/api/analytics/events", async (req) => {
+  const user = requireAuth(req);
+  const events = req.body as Array<{
+    eventType: string;
+    page?: string;
+    metadata?: unknown;
+    durationMs?: number;
+    createdAt?: string;
+  }>;
+  if (!Array.isArray(events) || events.length === 0) return { ok: true };
+
+  await prisma.analyticsEvent.createMany({
+    data: events.map((e) => ({
+      userId: user.id,
+      eventType: String(e.eventType),
+      page: e.page ? String(e.page) : null,
+      metadata: (e.metadata as any) ?? undefined,
+      durationMs: typeof e.durationMs === "number" ? Math.round(e.durationMs) : null,
+      createdAt: e.createdAt ? new Date(e.createdAt) : new Date(),
+    })),
   });
 
-  const result = sessions.map((s: any) => ({
-    id: s.id,
-    title: s.title,
-    createdAt: s.createdAt,
-    updatedAt: s.updatedAt,
-    userId: s.userId,
-    user: {
-      id: s.user?.id,
-      email: s.user?.email,
-      fullName: s.user?.profile?.fullName ?? null,
-    },
-  }));
-
-  return reply.send({ data: result, error: null });
+  return { ok: true };
 });
 
-// ── Document Explorer: combined certificates + stories with filters ────────
-app.get("/api/documents", async (request, reply) => {
-  const user = requireAuth(request);
-  const query = request.query as Record<string, string>;
-  const { type, country, organization, year, tags, search } = query;
+app.get("/api/analytics/summary", async (req) => {
+  const user = requireAuth(req);
+  if (user.role !== "admin") throw app.httpErrors.forbidden("Admin only");
 
-  const tagList = tags ? tags.split(",").filter(Boolean) : [];
-  const yearNum = year ? parseInt(year, 10) : undefined;
-
-  // Apply user access policy (admin/reviewer see everything)
-  let accessPolicy: Record<string, any> | null = null;
-  if (user.role === "user" || user.role === "moderator") {
-    const profile = await prisma.profile.findUnique({
-      where: { userId: user.id },
-      select: { accessFilters: true },
-    });
-    accessPolicy = (profile?.accessFilters as Record<string, any>) ?? null;
-  }
-
-  const applyPolicyToWhere = (base: Record<string, any>) => {
-    if (!accessPolicy) return base;
-    const result = { ...base };
-    if (accessPolicy.countries?.length) {
-      result.country = { in: accessPolicy.countries };
-    }
-    if (accessPolicy.tags?.length) {
-      result.tags = { hasSome: accessPolicy.tags };
-    }
-    if (accessPolicy.years?.length) {
-      const yearDates = accessPolicy.years.flatMap((y: number) => [
-        { issuedDate: { gte: new Date(`${y}-01-01`), lt: new Date(`${y + 1}-01-01`) } },
-      ]);
-      result.OR = yearDates;
-    }
-    return result;
-  };
-
-  const results: any[] = [];
-
-  if (!type || type === "certificate") {
-    const where: any = applyPolicyToWhere({ isVerified: true });
-    if (country) where.country = country;
-    if (organization) where.issuingOrganization = { contains: organization };
-    if (yearNum) where.issuedDate = { gte: new Date(`${yearNum}-01-01`), lt: new Date(`${yearNum + 1}-01-01`) };
-    if (tagList.length) where.tags = { hasSome: tagList };
-    if (search) where.OR = [{ title: { contains: search } }, { issuingOrganization: { contains: search } }];
-
-    const certs = await prisma.certificate.findMany({
-      where,
-      select: {
-        id: true,
-        title: true,
-        issuingOrganization: true,
-        country: true,
-        tags: true,
-        issuedDate: true,
-        isVerified: true,
-        createdAt: true,
-      },
-      take: 100,
+  const [events, profiles] = await Promise.all([
+    prisma.analyticsEvent.findMany({
       orderBy: { createdAt: "desc" },
-    });
-
-    for (const c of certs) {
-      results.push({
-        id: c.id,
-        type: "certificate",
-        title: c.title,
-        organization: c.issuingOrganization ?? undefined,
-        country: c.country ?? undefined,
-        tags: (c.tags as string[]) ?? [],
-        year: c.issuedDate ? new Date(c.issuedDate).getFullYear() : undefined,
-        isVerified: c.isVerified,
-        createdAt: c.createdAt.toISOString(),
-      });
-    }
-  }
-
-  if (!type || type === "story") {
-    const where: any = applyPolicyToWhere({ isVerified: true });
-    if (country) where.countryEn = { contains: country };
-    if (organization) where.clientEn = { contains: organization };
-    if (search) {
-      where.OR = [
-        { titleEn: { contains: search } },
-        { titlePt: { contains: search } },
-        { clientEn: { contains: search } },
-      ];
-    }
-
-    const stories = await prisma.successStory.findMany({
-      where,
-      select: {
-        id: true,
-        titleEn: true,
-        titlePt: true,
-        titleEs: true,
-        clientEn: true,
-        countryEn: true,
-        closureYear: true,
-        isVerified: true,
-        createdAt: true,
-      },
-      take: 100,
-      orderBy: { createdAt: "desc" },
-    });
-
-    for (const s of stories) {
-      results.push({
-        id: s.id,
-        type: "story",
-        title: s.titleEn || s.titlePt || s.titleEs || "Untitled",
-        organization: s.clientEn ?? undefined,
-        country: s.countryEn ?? undefined,
-        tags: [],
-        year: s.closureYear ?? undefined,
-        isVerified: s.isVerified,
-        createdAt: s.createdAt.toISOString(),
-      });
-    }
-  }
-
-  results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-  return reply.send({ data: results, error: null });
-});
-
-// ── Document Explorer: filter options ────────────────────────────────────
-app.get("/api/documents/filters", async (request, reply) => {
-  requireAuth(request);
-
-  const [certs, stories] = await Promise.all([
-    prisma.certificate.findMany({
-      where: { isVerified: true },
-      select: { country: true, issuingOrganization: true, tags: true, issuedDate: true },
+      take: 50000,
     }),
-    prisma.successStory.findMany({
-      where: { isVerified: true },
-      select: { countryEn: true, clientEn: true, closureYear: true },
+    prisma.profile.findMany({
+      select: { userId: true, fullName: true },
     }),
   ]);
 
-  const countries = [...new Set([
-    ...certs.map((c: any) => c.country).filter(Boolean),
-    ...stories.map((s: any) => s.countryEn).filter(Boolean),
-  ])].sort();
+  const users = await prisma.user.findMany({ select: { id: true, email: true } });
+  const profileMap = new Map(profiles.map((p) => [p.userId, p.fullName]));
+  const emailMap = new Map(users.map((u) => [u.id, u.email]));
 
-  const organizations = [...new Set([
-    ...certs.map((c: any) => c.issuingOrganization).filter(Boolean),
-    ...stories.map((s: any) => s.clientEn).filter(Boolean),
-  ])].sort();
+  // per-user aggregation
+  const byUser = new Map<string, {
+    userId: string; name: string; email: string;
+    pageVisits: number; totalTimeSec: number;
+    aiQueries: number; totalAiMs: number;
+    uploads: number; totalUploadMs: number;
+    tabClicks: number; sessions: number;
+  }>();
 
-  const years = [...new Set([
-    ...certs.map((c: any) => c.issuedDate ? new Date(c.issuedDate).getFullYear() : null).filter(Boolean),
-    ...stories.map((s: any) => s.closureYear).filter(Boolean),
-  ])].sort((a, b) => (b as number) - (a as number));
+  for (const e of events) {
+    if (!byUser.has(e.userId)) {
+      byUser.set(e.userId, {
+        userId: e.userId,
+        name: profileMap.get(e.userId) || "Sin nombre",
+        email: emailMap.get(e.userId) || "",
+        pageVisits: 0, totalTimeSec: 0,
+        aiQueries: 0, totalAiMs: 0,
+        uploads: 0, totalUploadMs: 0,
+        tabClicks: 0, sessions: 0,
+      });
+    }
+    const u = byUser.get(e.userId)!;
+    if (e.eventType === "page_visit" && e.durationMs) {
+      u.pageVisits++;
+      u.totalTimeSec += e.durationMs / 1000;
+    }
+    if (e.eventType === "session_start") u.sessions++;
+    if (e.eventType === "ai_query") {
+      u.aiQueries++;
+      if (e.durationMs) u.totalAiMs += e.durationMs;
+    }
+    if (e.eventType === "file_upload") {
+      u.uploads++;
+      if (e.durationMs) u.totalUploadMs += e.durationMs;
+    }
+    if (e.eventType === "tab_click") u.tabClicks++;
+  }
 
-  const tags = [...new Set(
-    certs.flatMap((c: any) => Array.isArray(c.tags) ? c.tags : []).filter(Boolean)
-  )].sort();
+  // top pages
+  const pageCount = new Map<string, { visits: number; totalMs: number }>();
+  for (const e of events) {
+    if (e.eventType === "page_visit" && e.page) {
+      const p = pageCount.get(e.page) ?? { visits: 0, totalMs: 0 };
+      p.visits++;
+      if (e.durationMs) p.totalMs += e.durationMs;
+      pageCount.set(e.page, p);
+    }
+  }
+  const topPages = [...pageCount.entries()]
+    .map(([page, { visits, totalMs }]) => ({
+      page,
+      visits,
+      avgTimeSec: visits > 0 ? Math.round(totalMs / visits / 1000) : 0,
+    }))
+    .sort((a, b) => b.visits - a.visits)
+    .slice(0, 10);
 
-  return reply.send({ data: { countries, organizations, years, tags }, error: null });
-});
+  // hourly activity (last 7 days)
+  const hourly = new Array(24).fill(0);
+  const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  for (const e of events) {
+    if (e.createdAt.getTime() > cutoff) hourly[e.createdAt.getHours()]++;
+  }
 
-// ── User document access policy ───────────────────────────────────────────
-app.get("/api/users/:userId/document-policy", async (request, reply) => {
-  requireAdmin(request);
-  const userId = pathParam(request, "userId");
-  const profile = await prisma.profile.findUnique({
-    where: { userId },
-    select: { accessFilters: true },
-  });
-  return reply.send({ data: { accessFilters: profile?.accessFilters ?? null }, error: null });
-});
+  // tab click breakdown
+  const tabCount = new Map<string, number>();
+  for (const e of events) {
+    if (e.eventType === "tab_click" && e.metadata) {
+      const tab = (e.metadata as any).tab as string;
+      if (tab) tabCount.set(tab, (tabCount.get(tab) ?? 0) + 1);
+    }
+  }
+  const topTabs = [...tabCount.entries()]
+    .map(([tab, count]) => ({ tab, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
 
-app.put("/api/users/:userId/document-policy", async (request, reply) => {
-  requireAdmin(request);
-  const userId = pathParam(request, "userId");
-  const body = request.body as { accessFilters: Record<string, any> | null };
-
-  await prisma.profile.upsert({
-    where: { userId },
-    create: { userId, accessFilters: body.accessFilters ?? undefined },
-    update: { accessFilters: body.accessFilters ?? null },
-  });
-
-  return reply.send({ data: { ok: true }, error: null });
+  return {
+    data: {
+      users: [...byUser.values()].map((u) => ({
+        ...u,
+        avgTimeSec: u.pageVisits > 0 ? Math.round(u.totalTimeSec / u.pageVisits) : 0,
+        avgAiMs: u.aiQueries > 0 ? Math.round(u.totalAiMs / u.aiQueries) : 0,
+        avgUploadMs: u.uploads > 0 ? Math.round(u.totalUploadMs / u.uploads) : 0,
+      })),
+      topPages,
+      topTabs,
+      hourlyActivity: hourly,
+      totalEvents: events.length,
+    },
+    error: null,
+  };
 });
 
 app.listen({ port: env.port, host: env.host });

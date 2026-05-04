@@ -3,11 +3,9 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 
-type Role = 'admin' | 'moderator' | 'user' | 'reviewer';
-
 interface ProtectedRouteProps {
   children: ReactNode;
-  requireRole?: Role | Role[];
+  requireRole?: 'admin' | 'moderator' | 'user' | 'reviewer';
 }
 
 export function ProtectedRoute({ children, requireRole }: ProtectedRouteProps) {
@@ -25,21 +23,19 @@ export function ProtectedRoute({ children, requireRole }: ProtectedRouteProps) {
     return <Navigate to="/auth" replace />;
   }
 
-  const effectiveRole = (userRole || 'user') as Role;
-
-  if (requireRole) {
-    const allowed = Array.isArray(requireRole) ? requireRole : [requireRole];
-    const hasAccess = effectiveRole === 'admin' || allowed.includes(effectiveRole);
-    if (!hasAccess) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-secondary">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-foreground mb-2">Acesso Negado</h1>
-            <p className="text-foreground-muted">No tienes permiso para acceder a esta página.</p>
-          </div>
+  // Permitir acesso se no há role obrigatório o se o userRole é válido
+  // Fallback para 'user' se userRole for null
+  const effectiveRole = userRole || 'user';
+  
+  if (requireRole && effectiveRole !== requireRole && effectiveRole !== 'admin') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-secondary">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-foreground mb-2">Acesso Negado</h1>
+          <p className="text-foreground-muted">No tienes permiso para acessar esta página.</p>
         </div>
-      );
-    }
+      </div>
+    );
   }
 
   return <>{children}</>;

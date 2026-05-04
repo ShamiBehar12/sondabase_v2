@@ -14,6 +14,7 @@ import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { apiFetch } from '@/lib/api-client';
 import { useToast } from '@/hooks/use-toast';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 type FileStatus = "pending" | "uploading" | "ingesting" | "done" | "duplicate" | "error" | "empty";
 
@@ -51,6 +52,7 @@ export default function Certificates() {
   const { t } = useTranslation();
   const location = useLocation();
   const { toast } = useToast();
+  const { trackUpload, trackTabClick } = useAnalytics();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showUploadForm, setShowUploadForm] = useState(false);
@@ -121,6 +123,7 @@ export default function Certificates() {
     const pending = bulkFiles.filter(f => f.status === "pending");
     if (!pending.length) return;
     setBulkRunning(true);
+    const uploadStart = Date.now();
 
     for (const entry of pending) {
       updateBulkFile(entry.id, { status: "uploading" });
@@ -158,6 +161,7 @@ export default function Certificates() {
     }
 
     setBulkRunning(false);
+    trackUpload(Date.now() - uploadStart, pending.length);
     toast({ title: "Carga masiva completada" });
   };
 
@@ -177,7 +181,7 @@ export default function Certificates() {
         </div>
       </div>
 
-      <Tabs defaultValue="list" className="space-y-6" value={showUploadForm ? "upload" : "list"} onValueChange={(value) => { setShowUploadForm(value === "upload"); if (value === "list") setUploadMode('individual'); }}>
+      <Tabs defaultValue="list" className="space-y-6" value={showUploadForm ? "upload" : "list"} onValueChange={(value) => { setShowUploadForm(value === "upload"); if (value === "list") setUploadMode('individual'); trackTabClick(value); }}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="list" className="flex items-center gap-2">
             <Search className="h-4 w-4" />
