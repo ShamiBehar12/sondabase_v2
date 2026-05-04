@@ -52,7 +52,7 @@ export default function SmartCitiesIngest() {
     const entries: FileEntry[] = Array.from(newFiles)
       .filter(f => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"))
       .map(f => ({
-        id:     crypto.randomUUID(),
+        id:     (crypto.randomUUID?.() ?? Math.random().toString(36).slice(2) + Date.now().toString(36)),
         file:   f,
         status: "pending",
       }));

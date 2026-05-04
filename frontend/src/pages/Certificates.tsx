@@ -102,7 +102,7 @@ export default function Certificates() {
     if (!newFiles) return;
     const entries: FileEntry[] = Array.from(newFiles)
       .filter(f => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"))
-      .map(f => ({ id: crypto.randomUUID(), file: f, status: "pending" }));
+      .map(f => ({ id: (crypto.randomUUID?.() ?? Math.random().toString(36).slice(2) + Date.now().toString(36)), file: f, status: "pending" }));
     if (!entries.length) {
       toast({ variant: "destructive", title: "Solo se aceptan archivos PDF" });
       return;
