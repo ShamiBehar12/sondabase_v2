@@ -185,10 +185,14 @@ def ingest_document(
     if not chunks:
         return {"document_id": doc_id, "chunks_added": 0, "metadata": metadata}
 
-    # 3 — ChromaDB: colección chunks (evitar duplicados)
-    ids_todos = [c["chunk_id"] for c in chunks]
-    existentes = set(col_chunks.get(ids=ids_todos)["ids"])
-    nuevos = [c for c in chunks if c["chunk_id"] not in existentes]
+    # 3 — ChromaDB: eliminar chunks viejos del mismo documento y agregar los nuevos
+    try:
+        old = col_chunks.get(where={"document_id": doc_id})
+        if old["ids"]:
+            col_chunks.delete(ids=old["ids"])
+    except Exception:
+        pass
+    nuevos = chunks
 
     def _chunk_meta(c: dict) -> dict:
         return {
