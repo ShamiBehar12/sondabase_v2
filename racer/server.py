@@ -8,7 +8,8 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, File, HTTPException, BackgroundTasks, UploadFile
+from fastapi import FastAPI, File, HTTPException, BackgroundTasks, UploadFile, Body
+from typing import List
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from openai import OpenAI
@@ -384,6 +385,62 @@ def ingest_stats():
         "chunks": col_chunks.count(),
         "docs":   col_docs.count(),
     }
+
+@app.get("/documents")
+def list_documents():
+    """Lista todos los documentos indexados desde SQLite."""
+    with get_db() as conn:
+        rows = conn.execute(
+            "SELECT document_id, original_filename, doc_type, client, country, year, "
+            "is_apostilled, summary_one_line, ingested_at FROM documents ORDER BY ingested_at DESC"
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def _delete_document(doc_id: str):
+    """Elimina un documento de ChromaDB (chunks + doc) y SQLite."""
+    try:
+        old_chunks = col_chunks.get(where={"document_id": doc_id})
+        if old_chunks["ids"]:
+            col_chunks.delete(ids=old_chunks["ids"])
+    except Exception:
+        pass
+    try:
+        if col_docs.get(ids=[doc_id])["ids"]:
+            col_docs.delete(ids=[doc_id])
+    except Exception:
+        pass
+    with get_db() as conn:
+        conn.execute("DELETE FROM documents WHERE document_id = ?", (doc_id,))
+        conn.commit()
+
+
+@app.delete("/documents/{doc_id}")
+def delete_document(doc_id: str):
+    """Elimina un documento por ID."""
+    _delete_document(doc_id)
+    return {"ok": True, "deleted": doc_id}
+
+
+@app.delete("/documents")
+def delete_documents(ids: List[str] = Body(..., embed=True)):
+    """Elimina múltiples documentos por lista de IDs."""
+    for doc_id in ids:
+        _delete_document(doc_id)
+    return {"ok": True, "deleted": len(ids)}
+
+
+@app.delete("/documents/all/confirm")
+def delete_all_documents(password: str = Body(..., embed=True)):
+    """Elimina TODOS los documentos. Requiere contraseña 'borrar todo'."""
+    if password != "borrar todo":
+        raise HTTPException(403, "Contraseña incorrecta")
+    with get_db() as conn:
+        doc_ids = [r[0] for r in conn.execute("SELECT document_id FROM documents").fetchall()]
+    for doc_id in doc_ids:
+        _delete_document(doc_id)
+    return {"ok": True, "deleted": len(doc_ids)}
+
 
 @app.post("/reingest/metadata")
 def reingest_metadata(req: ReMetadataRequest):
