@@ -53,7 +53,7 @@ def _safe_meta(val, default=""):
     return val
 
 
-# ── Chunking ──────────────────────────────────────────────────────────────
+# ── Chunking ────────────────────────────────────────────────────────────────────────────
 
 def chunk_text(text: str, document_id: str, source_file: str) -> list[dict]:
     text = re.sub(r"\r\n?", "\n", text)
@@ -83,7 +83,7 @@ def chunk_text(text: str, document_id: str, source_file: str) -> list[dict]:
     return chunks
 
 
-# ── Extracción de metadata via LLM ───────────────────────────────────────
+# ── Extracción de metadata via LLM ──────────────────────────────────────────────────────
 
 _PROMPT_SISTEMA = """Eres experto en análisis de documentos corporativos de tecnología.
 Extraes metadatos de contratos, certificados, cartas de referencia y licitaciones.
@@ -144,7 +144,7 @@ def extract_metadata(text: str, filename: str, llm: OpenAI, modelo: str) -> dict
         }
 
 
-# ── Pipeline principal ────────────────────────────────────────────────────
+# ── Pipeline principal ────────────────────────────────────────────────────────────────────────────
 
 def ingest_document(
     *,
@@ -185,10 +185,14 @@ def ingest_document(
     if not chunks:
         return {"document_id": doc_id, "chunks_added": 0, "metadata": metadata}
 
-    # 3 — ChromaDB: colección chunks (evitar duplicados)
-    ids_todos = [c["chunk_id"] for c in chunks]
-    existentes = set(col_chunks.get(ids=ids_todos)["ids"])
-    nuevos = [c for c in chunks if c["chunk_id"] not in existentes]
+    # 3 — ChromaDB: eliminar chunks viejos del mismo documento y agregar los nuevos
+    try:
+        old = col_chunks.get(where={"document_id": doc_id})
+        if old["ids"]:
+            col_chunks.delete(ids=old["ids"])
+    except Exception:
+        pass
+    nuevos = chunks
 
     def _chunk_meta(c: dict) -> dict:
         return {

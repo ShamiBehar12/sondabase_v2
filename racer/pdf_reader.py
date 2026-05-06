@@ -11,19 +11,26 @@ import fitz  # PyMuPDF
 
 logger = logging.getLogger(__name__)
 
-# ── Configuración OCR ─────────────────────────────────────────────────────
+# ── Configuración OCR ─────────────────────────────────────────────────────────────────────────────
 
 UMBRAL_TEXTO_PAGINA = 30    # chars mínimos para considerar que una página tiene texto
 DPI_OCR = 300
 IDIOMA_OCR = "spa"
 
 def _tesseract_path() -> str | None:
-    """Resuelve la ruta a tesseract.exe dinámicamente desde LOCALAPPDATA."""
+    """Resuelve la ruta a tesseract multiplataforma."""
+    import shutil
+    # Linux/Mac: usar el que esté en PATH
+    found = shutil.which("tesseract")
+    if found:
+        return found
+    # Windows: buscar en LOCALAPPDATA
     local_app = os.environ.get("LOCALAPPDATA")
-    if not local_app:
-        return None
-    candidate = os.path.join(local_app, "Programs", "Tesseract-OCR", "tesseract.exe")
-    return candidate if os.path.isfile(candidate) else None
+    if local_app:
+        candidate = os.path.join(local_app, "Programs", "Tesseract-OCR", "tesseract.exe")
+        if os.path.isfile(candidate):
+            return candidate
+    return None
 
 
 def _ocr_available() -> bool:
@@ -56,7 +63,7 @@ def _ensure_ocr():
     return _OCR_READY
 
 
-# ── Funciones auxiliares ──────────────────────────────────────────────────
+# ── Funciones auxiliares ───────────────────────────────────────────────────────────────────────────
 
 def _limpiar_texto(texto: str) -> str:
     if not texto:
@@ -94,7 +101,7 @@ def _pagina_necesita_ocr(pagina, texto_extraido: str) -> bool:
     return True
 
 
-# ── API pública ───────────────────────────────────────────────────────────
+# ── API pública ───────────────────────────────────────────────────────────────────────────────────
 
 def extract_text_from_pdf(file_bytes: bytes, filename: str = "document.pdf") -> str:
     """
