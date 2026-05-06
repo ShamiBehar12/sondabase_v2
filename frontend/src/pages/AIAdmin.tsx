@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -38,6 +39,7 @@ type RacerDoc = {
 type SeedResult = { created: number; skipped: number; total: number };
 
 export default function AIAdmin() {
+  const { t } = useTranslation();
   const { settings, providers, indexStatus, loading, saveSettings, testProvider, reindexAll } = useAIAdmin();
   const { toast } = useToast();
 
@@ -200,10 +202,10 @@ export default function AIAdmin() {
       <div>
         <h1 className="text-3xl font-bold text-gradient flex items-center gap-3">
           <Bot className="w-8 h-8" />
-          Administração de IA
+          {t('navigation.aiAdministration')}
         </h1>
         <p className="text-foreground-muted mt-2">
-          Configura provider, modelo ativo, estado del índice y gestão del RACER Smart Cities.
+          {t('navigation.aiAdministrationSubtitle')}
         </p>
       </div>
 
