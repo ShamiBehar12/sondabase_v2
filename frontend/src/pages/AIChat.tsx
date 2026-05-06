@@ -5,21 +5,18 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { useAIChatContext } from "@/contexts/AIChatContext";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useAIChat } from "@/hooks/useAI";
 import { apiFetch } from "@/lib/api-client";
 import { useAnalytics } from "@/hooks/useAnalytics";
-import { Bot, MessageSquarePlus, Send, Trash2 } from "lucide-react";
+import { Bot, Send, FileText, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -32,12 +29,18 @@ type RacerSource = {
 };
 
 export default function AIChat() {
-  const { sessions, messages, activeSessionId, setActiveSessionId, loading, createSession, deleteSession, reloadSessions, reloadMessages } = useAIChatContext();
+  const { t } = useTranslation();
+  const { messages, activeSessionId, setActiveSessionId, loading, createSession, reloadSessions, reloadMessages } = useAIChat();
   const { toast } = useToast();
   const { trackAIQuery } = useAnalytics();
   const [question, setQuestion] = useState("");
   const [sending, setSending] = useState(false);
   const queryStartRef = useRef<number>(0);
+
+  const [selectedSource, setSelectedSource] = useState<RacerSource | null>(null);
+  const [sourceViewMode, setSourceViewMode] = useState<'pdf' | 'txt'>('pdf');
+  const [sourcePdfUrl, setSourcePdfUrl] = useState<string | null>(null);
+  const [sourceLoading, setSourceLoading] = useState(false);
 
   const racerSources = useMemo<RacerSource[]>(() => {
     const lastAssistant = [...messages].reverse().find(m => m.role === "assistant" && Array.isArray(m.sourcesJson));
@@ -46,13 +49,6 @@ export default function AIChat() {
     if (!sources.length || !(sources[0] as any)?.archivo) return [];
     return sources as RacerSource[];
   }, [messages]);
-
-  const handleNewSession = async () => {
-    const { error } = await createSession("Nova conversación");
-    if (error) {
-      toast({ variant: "destructive", title: "Error ao crear conversación", description: error.message });
-    }
-  };
 
   const handleSubmit = async () => {
     const prompt = question.trim();
@@ -66,7 +62,7 @@ export default function AIChat() {
       if (!sessionId) {
         const created = await createSession(prompt.slice(0, 60));
         sessionId = created.data?.id ?? null;
-        if (!sessionId) throw new Error("No se pudo crear la sesión");
+        if (!sessionId) throw new Error(t('aiChat.newSessionError'));
       }
 
       const { data, error } = await apiFetch<{
@@ -80,7 +76,7 @@ export default function AIChat() {
       });
 
       if (error || !data) {
-        throw new Error(error?.message ?? "Error al consultar el asistente");
+        throw new Error(error?.message ?? t('aiChat.chatError'));
       }
 
       await apiFetch(`/api/ai/chat/sessions/${sessionId}/messages`, {
@@ -102,19 +98,23 @@ export default function AIChat() {
       setActiveSessionId(sessionId);
       await reloadMessages(sessionId);
     } catch (err: any) {
-      toast({ variant: "destructive", title: "Error en el chat", description: err.message });
+      toast({ variant: "destructive", title: t('aiChat.chatError'), description: err.message });
     } finally {
       setSending(false);
     }
   };
 
-  const handleDeleteSession = async (sessionId: string) => {
-    const { error } = await deleteSession(sessionId);
-    if (error) {
-      toast({ variant: "destructive", title: "Error al eliminar conversación", description: error.message });
-      return;
-    }
-    toast({ title: "Conversación eliminada", description: "La sesión fue eliminada con éxito." });
+  const handleSourceClick = async (src: RacerSource) => {
+    setSelectedSource(src);
+    setSourceViewMode('pdf');
+    setSourceLoading(true);
+    setSourcePdfUrl(null);
+
+    const { data } = await apiFetch<{ filePath: string; fileUrl: string }>(
+      `/api/racer/source-file?name=${encodeURIComponent(src.archivo)}`
+    );
+    if (data?.fileUrl) setSourcePdfUrl(data.fileUrl);
+    setSourceLoading(false);
   };
 
   return (
@@ -122,105 +122,33 @@ export default function AIChat() {
       <div>
         <h1 className="text-3xl font-bold text-gradient flex items-center gap-3">
           <Bot className="w-8 h-8" />
-          Assistente de Certificados
+          {t('aiChat.title')}
         </h1>
         <p className="text-foreground-muted mt-2">
-          Consulta en lenguaje natural y recibe los documentos más relevantes con fuentes y contexto.
+          {t('aiChat.subtitle')}
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[320px_1fr_360px]">
-        {/* Sessions panel */}
-        <Card className="premium-card">
-          <CardHeader>
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <CardTitle>Conversaciones</CardTitle>
-                <CardDescription>Sesiones recientes del asistente.</CardDescription>
-              </div>
-              <Button size="icon" variant="outline" onClick={handleNewSession}>
-                <MessageSquarePlus className="w-4 h-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[460px] pr-3">
-              <div className="space-y-2">
-                {sessions.map((session) => (
-                  <div
-                    key={session.id}
-                    className={`group flex items-start gap-2 rounded-lg border px-3 py-2 transition ${
-                      activeSessionId === session.id ? "border-primary bg-primary/10" : "border-border"
-                    }`}
-                  >
-                    <button
-                      className="min-w-0 flex-1 overflow-hidden pr-2 text-left"
-                      onClick={() => setActiveSessionId(session.id)}
-                    >
-                      <div className="break-words text-sm font-medium leading-snug">
-                        {session.title || "Sin título"}
-                      </div>
-                      <div className="text-xs text-foreground-muted mt-1">
-                        {new Date(session.updatedAt).toLocaleString("pt-BR")}
-                      </div>
-                    </button>
-
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          type="button"
-                          size="icon"
-                          variant="ghost"
-                          className="h-8 w-8 shrink-0 text-foreground-muted opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100 focus-visible:opacity-100"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-surface border-border">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle className="text-foreground">Excluir conversación</AlertDialogTitle>
-                          <AlertDialogDescription className="text-foreground-muted">
-                            ¿Estás seguro de que deseas eliminar la conversación "{session.title || "Sin título"}"? Esta acción no se puede deshacer.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                          <AlertDialogAction
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            onClick={() => handleDeleteSession(session.id)}
-                          >
-                            Excluir
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </CardContent>
-        </Card>
-
+      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         {/* Chat panel */}
         <Card className="premium-card">
           <CardHeader>
-            <CardTitle>Chat</CardTitle>
-            <CardDescription>Consulta orientada aos certificados aprovados y indexados.</CardDescription>
+            <CardTitle>{t('aiChat.chat')}</CardTitle>
+            <CardDescription>{t('aiChat.chatDesc')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <ScrollArea className="h-[460px] rounded-lg border border-border p-4">
+            <ScrollArea className="h-[520px] rounded-lg border border-border p-4">
               <div className="space-y-4">
-                {loading && <div className="text-sm text-foreground-muted">Cargando conversaciones...</div>}
+                {loading && <div className="text-sm text-foreground-muted">{t('aiChat.loading')}</div>}
                 {!loading && messages.length === 0 && (
                   <div className="text-sm text-foreground-muted">
-                    Aún no hay mensajes. Ejemplo: "¿Qué contratos tenemos apostillados en Chile?"
+                    {t('aiChat.noMessages')}
                   </div>
                 )}
                 {messages.map((message) => (
                   <div key={message.id} className={`rounded-xl p-4 ${message.role === "user" ? "bg-primary/10" : "bg-surface"}`}>
                     <div className="text-xs uppercase tracking-wide text-foreground-muted mb-2">
-                      {message.role === "user" ? "Pregunta" : "Asistente"}
+                      {message.role === "user" ? t('aiChat.question') : t('aiChat.assistant')}
                     </div>
                     <div className="text-sm prose prose-invert prose-sm max-w-none
                       [&_table]:w-full [&_table]:border-collapse [&_table]:text-xs
@@ -234,7 +162,7 @@ export default function AIChat() {
                 ))}
                 {sending && (
                   <div className="rounded-xl p-4 bg-surface text-sm text-foreground-muted animate-pulse">
-                    Consultando documentos...
+                    {t('aiChat.querying')}
                   </div>
                 )}
               </div>
@@ -244,13 +172,13 @@ export default function AIChat() {
               <Input
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Describe el perfil, tecnología o requisito que quieres atender..."
+                placeholder={t('aiChat.inputPlaceholder')}
                 disabled={sending}
                 onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
               />
               <Button onClick={handleSubmit} disabled={sending} className="bg-gradient-primary hover:opacity-90">
                 <Send className="w-4 h-4 mr-2" />
-                Enviar
+                {t('aiChat.send')}
               </Button>
             </div>
           </CardContent>
@@ -259,19 +187,23 @@ export default function AIChat() {
         {/* Sources panel */}
         <Card className="premium-card">
           <CardHeader>
-            <CardTitle>Fuentes</CardTitle>
-            <CardDescription>Documentos encontrados en la última respuesta.</CardDescription>
+            <CardTitle>{t('aiChat.sources')}</CardTitle>
+            <CardDescription>{t('aiChat.sourcesDesc')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[460px] pr-2">
+            <ScrollArea className="h-[520px] pr-2">
               {racerSources.length === 0 ? (
                 <div className="text-sm text-foreground-muted">
-                  Las fuentes aparecerán aquí tras la primera consulta.
+                  {t('aiChat.sourcesEmpty')}
                 </div>
               ) : (
                 <div className="space-y-3">
                   {racerSources.map((src, i) => (
-                    <div key={i} className="rounded-lg border border-border p-3 space-y-1">
+                    <div
+                      key={i}
+                      className="rounded-lg border border-border p-3 space-y-1 cursor-pointer hover:border-cyan-400/30 hover:bg-surface-hover transition-colors"
+                      onClick={() => handleSourceClick(src)}
+                    >
                       <p className="text-sm font-medium break-all">{src.archivo}</p>
                       <div className="flex flex-wrap gap-1 text-xs">
                         {src.pais && <Badge variant="secondary">{src.pais}</Badge>}
@@ -287,6 +219,93 @@ export default function AIChat() {
           </CardContent>
         </Card>
       </div>
+
+      {/* PDF/Text document viewer */}
+      <Dialog open={!!selectedSource} onOpenChange={(open) => !open && setSelectedSource(null)}>
+        <DialogContent className="max-w-4xl h-[85vh] flex flex-col bg-surface border-border p-0">
+          <DialogHeader className="px-6 pt-6 pb-3 border-b border-border">
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <FileText className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{selectedSource?.archivo}</span>
+            </DialogTitle>
+            <DialogDescription asChild>
+              <div className="flex flex-wrap gap-1 mt-1">
+                {selectedSource?.pais && <Badge variant="secondary">{selectedSource.pais}</Badge>}
+                {selectedSource?.ano && <Badge variant="outline">{selectedSource.ano}</Badge>}
+                {selectedSource?.apostillado && <Badge className="bg-green-600 text-white">Apostillado</Badge>}
+                <span className="text-xs text-foreground-muted self-center ml-1">dist: {selectedSource?.distancia}</span>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex gap-2 px-6 py-3 border-b border-border">
+            <Button
+              size="sm"
+              variant={sourceViewMode === 'pdf' ? 'default' : 'outline'}
+              onClick={() => setSourceViewMode('pdf')}
+              className="h-7 text-xs"
+            >
+              {t('aiChat.viewPdf')}
+            </Button>
+            <Button
+              size="sm"
+              variant={sourceViewMode === 'txt' ? 'default' : 'outline'}
+              onClick={() => setSourceViewMode('txt')}
+              className="h-7 text-xs"
+            >
+              {t('aiChat.viewText')}
+            </Button>
+          </div>
+
+          <div className="flex-1 overflow-hidden">
+            {sourceViewMode === 'pdf' ? (
+              sourceLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <Loader2 className="w-6 h-6 animate-spin text-foreground-muted" />
+                </div>
+              ) : sourcePdfUrl ? (
+                <iframe
+                  src={`${sourcePdfUrl}#toolbar=1&navpanes=0`}
+                  className="w-full h-full border-0"
+                  title={selectedSource?.archivo}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-foreground-muted text-sm px-6 text-center">
+                  {t('aiChat.pdfUnavailable')}
+                </div>
+              )
+            ) : (
+              <div className="p-6 space-y-4 text-sm overflow-auto h-full">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-xs text-foreground-muted uppercase tracking-wide mb-1">Archivo</p>
+                    <p className="font-medium break-all">{selectedSource?.archivo}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-foreground-muted uppercase tracking-wide mb-1">País</p>
+                    <p className="font-medium">{selectedSource?.pais || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-foreground-muted uppercase tracking-wide mb-1">Año</p>
+                    <p className="font-medium">{selectedSource?.ano || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-foreground-muted uppercase tracking-wide mb-1">Apostillado</p>
+                    <p className="font-medium">{selectedSource?.apostillado ? 'Sí' : 'No'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-foreground-muted uppercase tracking-wide mb-1">Distancia</p>
+                    <p className="font-medium">{selectedSource?.distancia}</p>
+                  </div>
+                </div>
+                <p className="text-foreground-muted text-xs mt-4 pt-4 border-t border-border">
+                  {t('aiChat.textViewInfo')}
+                </p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
