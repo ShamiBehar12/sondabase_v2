@@ -27,6 +27,9 @@ import NotFound from "./pages/NotFound";
 import { CleanupCertificates } from "./pages/CleanupCertificates";
 import AIAdmin from "./pages/AIAdmin";
 import AIChat from "./pages/AIChat";
+import DocumentExplorer from "./pages/DocumentExplorer";
+import AdminConversations from "./pages/AdminConversations";
+import Biblioteca from "./pages/Biblioteca";
 import SmartCitiesChat from "./pages/SmartCitiesChat";
 import SmartCitiesIngest from "./pages/SmartCitiesIngest";
 import Analytics from "./pages/Analytics";
@@ -84,6 +87,12 @@ const App = () => (
         <Route path="/my-certificates" element={<MyCertificates />} />
         <Route path="/my-success-stories" element={<MySuccessStories />} />
                           <Route path="/ai-chat" element={<AIChat />} />
+                          <Route path="/documents" element={<DocumentExplorer />} />
+                          <Route path="/admin/conversations" element={
+                            <ProtectedRoute requireRole="admin">
+                              <AdminConversations />
+                            </ProtectedRoute>
+                          } />
                           <Route path="/smart-cities" element={<SmartCitiesChat />} />
                           <Route path="/smart-cities/ingest" element={<SmartCitiesIngest />} />
                           <Route path="/users" element={
@@ -104,6 +113,11 @@ const App = () => (
                           <Route path="/analytics" element={
                             <ProtectedRoute requireRole="admin">
                               <Analytics />
+                            </ProtectedRoute>
+                          } />
+                          <Route path="/biblioteca" element={
+                            <ProtectedRoute requireRole="admin">
+                              <Biblioteca />
                             </ProtectedRoute>
                           } />
                           <Route path="/settings" element={<Settings />} />

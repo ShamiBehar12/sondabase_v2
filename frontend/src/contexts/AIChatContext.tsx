@@ -12,6 +12,7 @@ type AIChatContextValue = {
   deleteSession: (id: string) => Promise<any>;
   sendMessage: (message: string) => Promise<any>;
   reloadSessions: () => Promise<void>;
+  reloadMessages: (sessionId: string) => Promise<void>;
 };
 
 const AIChatContext = createContext<AIChatContextValue | null>(null);
