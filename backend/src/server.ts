@@ -45,7 +45,8 @@ declare module "fastify" {
 }
 
 const app = Fastify({
-  logger: true,
+  logger: { level: "warn" },
+  disableRequestLogging: true,
   bodyLimit: 50 * 1024 * 1024,
 });
 
@@ -1446,7 +1447,7 @@ app.setErrorHandler((error: any, _request, reply) => {
     },
   });
 });
-// ── RACER Smart Cities RAG proxy ──────────────────────────────────────────
+// ── RACER Smart Cities RAG proxy ──────────────────────────────────────────────────────────────────────────────
 const RACER_URL = process.env.RACER_URL ?? "http://localhost:8000";
 
 async function sendPdfToRacer(absolutePath: string, fileName: string, documentId?: string) {
@@ -1627,7 +1628,66 @@ app.post("/api/racer/ingest", async (req, reply) => {
   }
 });
 
-// ── Dashboard stats ────────────────────────────────────────────────────────
+// ── RACER document management ──────────────────────────────────────────────────────────────────────────────
+
+app.get("/api/racer/documents", async (req, reply) => {
+  requireAuth(req);
+  const resp = await fetch(`${RACER_URL}/documents`);
+  const data = await resp.json();
+  return reply.send({ data, error: null });
+});
+
+app.delete("/api/racer/documents/all", async (req, reply) => {
+  const user = requireAuth(req);
+  if (user.role !== "admin") throw app.httpErrors.forbidden("Solo admins");
+  const { password } = req.body as { password: string };
+  const resp = await fetch(`${RACER_URL}/documents/all/confirm`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
+  });
+  const data = await resp.json() as any;
+  if (!resp.ok) return reply.code(resp.status).send({ data: null, error: { message: data.detail ?? "Error" } });
+  return reply.send({ data, error: null });
+});
+
+app.delete("/api/racer/documents/:id", async (req, reply) => {
+  requireAuth(req);
+  const { id } = req.params as { id: string };
+  const resp = await fetch(`${RACER_URL}/documents/${encodeURIComponent(id)}`, { method: "DELETE" });
+  const data = await resp.json();
+  return reply.send({ data, error: null });
+});
+
+app.delete("/api/racer/documents", async (req, reply) => {
+  requireAuth(req);
+  const { ids } = req.body as { ids: string[] };
+  const resp = await fetch(`${RACER_URL}/documents`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ids }),
+  });
+  const data = await resp.json();
+  return reply.send({ data, error: null });
+});
+
+app.get("/api/racer/source-file", async (request) => {
+  requireAuth(request);
+  const name = (request.query as { name?: string }).name;
+  if (!name) throw app.httpErrors.badRequest("name is required");
+
+  const cert = await prisma.certificate.findFirst({
+    where: { fileName: { endsWith: name } },
+    select: { filePath: true, fileName: true },
+  });
+
+  if (!cert) return { data: null, error: { message: "Document not found" } };
+
+  const fileUrl = `/api/storage/certificates/file?path=${encodeURIComponent(cert.filePath)}`;
+  return { data: { filePath: cert.filePath, fileUrl }, error: null };
+});
+
+// ── Dashboard stats ──────────────────────────────────────────────────────────────────────────────
 app.get("/api/stats/dashboard", async (req, reply) => {
   requireAuth(req);
   const [
@@ -1701,7 +1761,7 @@ app.get("/api/stats/dashboard", async (req, reply) => {
   });
 });
 
-// ── Seed RACER documents as certificates ──────────────────────────────────
+// ── Seed RACER documents as certificates ──────────────────────────────────────────────────────────────────────────────────
 app.post("/api/admin/seed-racer", async (req, reply) => {
   const user = requireAdmin(req);
   const metadataPath = path.join(process.cwd(), "../racer/data/metadata.jsonl");
@@ -1747,8 +1807,8 @@ app.post("/api/admin/seed-racer", async (req, reply) => {
   return reply.send({ data: { created, skipped, total: lines.length }, error: null });
 });
 
-// ── Analytics ──────────────────────────────────────────────────────────────
-app.post("/api/analytics/events", async (req) => {
+// ── Analytics ──────────────────────────────────────────────────────────────────────────────────────
+app.post("/api/usage/events", async (req) => {
   const user = requireAuth(req);
   const events = req.body as Array<{
     eventType: string;
@@ -1773,7 +1833,7 @@ app.post("/api/analytics/events", async (req) => {
   return { ok: true };
 });
 
-app.get("/api/analytics/summary", async (req) => {
+app.get("/api/usage/summary", async (req) => {
   const user = requireAuth(req);
   if (user.role !== "admin") throw app.httpErrors.forbidden("Admin only");
 
