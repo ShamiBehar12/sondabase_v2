@@ -1447,7 +1447,7 @@ app.setErrorHandler((error: any, _request, reply) => {
     },
   });
 });
-// ── RACER Smart Cities RAG proxy ──────────────────────────────────────────
+// ── RACER Smart Cities RAG proxy ────────────────────────────────────────────────
 const RACER_URL = process.env.RACER_URL ?? "http://localhost:8000";
 
 async function sendPdfToRacer(absolutePath: string, fileName: string, documentId?: string) {
@@ -1628,7 +1628,7 @@ app.post("/api/racer/ingest", async (req, reply) => {
   }
 });
 
-// ── RACER document management ─────────────────────────────────────────────
+// ── RACER document management ───────────────────────────────────────────────────
 
 app.get("/api/racer/documents", async (req, reply) => {
   requireAuth(req);
@@ -1671,7 +1671,23 @@ app.delete("/api/racer/documents", async (req, reply) => {
   return reply.send({ data, error: null });
 });
 
-// ── Dashboard stats ────────────────────────────────────────────────────────
+app.get("/api/racer/source-file", async (request) => {
+  requireAuth(request);
+  const name = (request.query as { name?: string }).name;
+  if (!name) throw app.httpErrors.badRequest("name is required");
+
+  const cert = await prisma.certificate.findFirst({
+    where: { fileName: { endsWith: name } },
+    select: { filePath: true, fileName: true },
+  });
+
+  if (!cert) return { data: null, error: { message: "Document not found" } };
+
+  const fileUrl = `/api/storage/certificates/file?path=${encodeURIComponent(cert.filePath)}`;
+  return { data: { filePath: cert.filePath, fileUrl }, error: null };
+});
+
+// ── Dashboard stats ──────────────────────────────────────────────────────────
 app.get("/api/stats/dashboard", async (req, reply) => {
   requireAuth(req);
   const [
@@ -1745,7 +1761,7 @@ app.get("/api/stats/dashboard", async (req, reply) => {
   });
 });
 
-// ── Seed RACER documents as certificates ──────────────────────────────────
+// ── Seed RACER documents as certificates ────────────────────────────────────────────
 app.post("/api/admin/seed-racer", async (req, reply) => {
   const user = requireAdmin(req);
   const metadataPath = path.join(process.cwd(), "../racer/data/metadata.jsonl");
@@ -1791,7 +1807,7 @@ app.post("/api/admin/seed-racer", async (req, reply) => {
   return reply.send({ data: { created, skipped, total: lines.length }, error: null });
 });
 
-// ── Analytics ──────────────────────────────────────────────────────────────
+// ── Analytics ──────────────────────────────────────────────────────────────────
 app.post("/api/usage/events", async (req) => {
   const user = requireAuth(req);
   const events = req.body as Array<{

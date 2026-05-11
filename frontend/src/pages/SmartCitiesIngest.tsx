@@ -1,10 +1,10 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { apiFetch } from "@/lib/api-client";
-import { Upload, FolderOpen, CheckCircle, AlertCircle, Copy, Loader2, X } from "lucide-react";
+import { Upload, FolderOpen, CheckCircle, AlertCircle, Copy, Loader2, X, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type FileStatus = "pending" | "uploading" | "ingesting" | "done" | "duplicate" | "error" | "empty";
@@ -34,7 +34,7 @@ const STATUS_LABEL: Record<FileStatus, string> = {
   uploading: "Subiendo",
   ingesting: "Procesando",
   done:      "Listo",
-  duplicate: "Duplicado",
+  duplicate: "Ya existe",
   error:     "Error",
   empty:     "Sin texto",
 };
@@ -46,6 +46,14 @@ export default function SmartCitiesIngest() {
   const [files,   setFiles]   = useState<FileEntry[]>([]);
   const [running, setRunning] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  // Filenames already indexed in RACER (loaded once on mount)
+  const [indexedNames, setIndexedNames] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    apiFetch<Array<{ source_file: string }>>("/api/racer/documents").then(({ data }) => {
+      if (data) setIndexedNames(new Set(data.map(d => d.source_file)));
+    });
+  }, []);
 
   const addFiles = (newFiles: FileList | null) => {
     if (!newFiles) return;
@@ -54,11 +62,17 @@ export default function SmartCitiesIngest() {
       .map(f => ({
         id:     (crypto.randomUUID?.() ?? Math.random().toString(36).slice(2) + Date.now().toString(36)),
         file:   f,
-        status: "pending",
+        // Pre-mark as duplicate if already indexed, so we skip upload entirely
+        status: indexedNames.has(f.name) ? "duplicate" : "pending",
+        duplicateOf: indexedNames.has(f.name) ? f.name : undefined,
       }));
     if (!entries.length) {
       toast({ variant: "destructive", title: "Solo se aceptan archivos PDF" });
       return;
+    }
+    const skipped = entries.filter(e => e.status === "duplicate").length;
+    if (skipped > 0) {
+      toast({ title: `${skipped} archivo(s) ya indexado(s), se omitirán` });
     }
     setFiles(prev => [...prev, ...entries]);
   };
@@ -71,6 +85,10 @@ export default function SmartCitiesIngest() {
 
   const updateFile = (id: string, patch: Partial<FileEntry>) =>
     setFiles(prev => prev.map(f => f.id === id ? { ...f, ...patch } : f));
+
+  const retryErrors = () => {
+    setFiles(prev => prev.map(f => f.status === "error" ? { ...f, status: "pending", error: undefined } : f));
+  };
 
   const processAll = async () => {
     const pending = files.filter(f => f.status === "pending");
@@ -177,6 +195,11 @@ export default function SmartCitiesIngest() {
               ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Procesando...</>
               : <><Upload className="w-4 h-4 mr-2" />Ingestar {files.filter(f => f.status === "pending").length} archivo(s)</>}
           </Button>
+          {files.some(f => f.status === "error") && (
+            <Button variant="outline" size="sm" onClick={retryErrors} disabled={running}>
+              <RefreshCw className="w-4 h-4 mr-1" />Reintentar errores
+            </Button>
+          )}
           <Button variant="outline" size="sm" onClick={clear} disabled={running}>
             <X className="w-4 h-4 mr-1" />Limpiar
           </Button>

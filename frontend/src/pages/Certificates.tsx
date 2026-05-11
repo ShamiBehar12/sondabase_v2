@@ -1,15 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Plus, Grid3x3, LayoutList, Upload, FolderOpen, CheckCircle, AlertCircle, Copy, Loader2, X, FileText as FileTextIcon, RefreshCw } from 'lucide-react';
-import { CertificateUploadForm } from '@/components/certificates/CertificateUploadForm';
-import { CertificateList } from '@/components/certificates/CertificateList';
-import { useCertificates } from '@/hooks/useCertificates';
-import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { Upload, CheckCircle, AlertCircle, Copy, Loader2, X, RefreshCw } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { apiFetch } from '@/lib/api-client';
@@ -52,15 +46,7 @@ export default function Certificates() {
   const { t } = useTranslation();
   const location = useLocation();
   const { toast } = useToast();
-  const { trackUpload, trackTabClick } = useAnalytics();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [showUploadForm, setShowUploadForm] = useState(false);
-  const [uploadMode, setUploadMode] = useState<'individual' | 'bulk'>('individual');
-  const [openCertificateId, setOpenCertificateId] = useState<string | null>(null);
-  const { certificates } = useCertificates();
-  const { preferences, loading: preferencesLoading } = useUserPreferences();
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const { trackUpload } = useAnalytics();
 
   // Bulk upload state
   const inputRef = useRef<HTMLInputElement>(null);
@@ -68,34 +54,6 @@ export default function Certificates() {
   const [bulkFiles, setBulkFiles] = useState<FileEntry[]>([]);
   const [bulkRunning, setBulkRunning] = useState(false);
   const [dragOver, setDragOver] = useState(false);
-
-  useEffect(() => {
-    if (!preferencesLoading && preferences.certificates_view_mode) {
-      setViewMode(preferences.certificates_view_mode);
-    }
-  }, [preferences.certificates_view_mode, preferencesLoading]);
-
-  useEffect(() => {
-    if (location.state?.openCertificateId) {
-      setOpenCertificateId(location.state.openCertificateId);
-      window.history.replaceState({}, document.title);
-    }
-  }, [location.state]);
-
-  const allTags = Array.from(
-    new Set(certificates.flatMap(cert => cert.tags || []))
-  ).sort();
-
-  const toggleTag = (tag: string) => {
-    setSelectedTags(prev =>
-      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
-    );
-  };
-
-  const clearFilters = () => {
-    setSearchTerm('');
-    setSelectedTags([]);
-  };
 
   // Bulk upload helpers
   const addBulkFiles = (newFiles: FileList | null) => {
@@ -183,240 +141,113 @@ export default function Certificates() {
         </div>
       </div>
 
-      <Tabs defaultValue="list" className="space-y-6" value={showUploadForm ? "upload" : "list"} onValueChange={(value) => { setShowUploadForm(value === "upload"); if (value === "list") setUploadMode('individual'); trackTabClick(value); }}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="list" className="flex items-center gap-2">
-            <Search className="h-4 w-4" />
-            {t('certificates.listTab')}
-          </TabsTrigger>
-          <TabsTrigger value="upload" className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            {t('certificates.addTab')}
-          </TabsTrigger>
-        </TabsList>
+      <div className="space-y-4">
+        {/* Drop zone */}
+        <Card
+          className={`premium-card border-2 border-dashed transition-colors cursor-pointer ${dragOver ? "border-primary bg-primary/5" : "border-border"}`}
+          onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={onDrop}
+          onClick={() => inputRef.current?.click()}
+        >
+          <CardContent className="flex flex-col items-center justify-center py-12 gap-3">
+            <Upload className="w-10 h-10 text-muted-foreground" />
+            <p className="text-sm text-foreground-muted">
+              Arrastra PDFs aquí o haz clic para seleccionar
+            </p>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={e => { e.stopPropagation(); inputRef.current?.click(); }}>
+                Seleccionar archivos
+              </Button>
+              <Button variant="outline" size="sm" onClick={e => { e.stopPropagation(); folderRef.current?.click(); }}>
+                Seleccionar carpeta
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-        <TabsContent value="upload" className="space-y-6">
-          {/* Mode toggle */}
-          <div className="flex gap-2">
-            <Button
-              variant={uploadMode === 'individual' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setUploadMode('individual')}
-            >
-              <FileTextIcon className="h-4 w-4 mr-2" />
-              Certificado individual
+        <input ref={inputRef} type="file" multiple accept=".pdf" className="hidden"
+          onChange={e => addBulkFiles(e.target.files)} />
+        <input ref={folderRef} type="file" className="hidden"
+          {...{ webkitdirectory: "", multiple: true } as any}
+          onChange={e => addBulkFiles(e.target.files)} />
+
+        {bulkFiles.length > 0 && (
+          <div className="flex items-center gap-3">
+            <Button onClick={processAll} disabled={bulkRunning || !bulkFiles.some(f => f.status === "pending")}
+              className="bg-gradient-primary hover:opacity-90">
+              {bulkRunning
+                ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Procesando...</>
+                : <><Upload className="w-4 h-4 mr-2" />Ingestar {bulkFiles.filter(f => f.status === "pending").length} archivo(s)</>}
             </Button>
-            <Button
-              variant={uploadMode === 'bulk' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setUploadMode('bulk')}
-            >
-              <FolderOpen className="h-4 w-4 mr-2" />
-              Carga masiva
-            </Button>
-          </div>
-
-          {uploadMode === 'individual' && (
-            <CertificateUploadForm onSuccess={() => setShowUploadForm(false)} />
-          )}
-
-          {uploadMode === 'bulk' && (
-            <div className="space-y-4">
-              {/* Drop zone */}
-              <Card
-                className={`premium-card border-2 border-dashed transition-colors cursor-pointer ${dragOver ? "border-primary bg-primary/5" : "border-border"}`}
-                onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={onDrop}
-                onClick={() => inputRef.current?.click()}
-              >
-                <CardContent className="flex flex-col items-center justify-center py-12 gap-3">
-                  <Upload className="w-10 h-10 text-muted-foreground" />
-                  <p className="text-sm text-foreground-muted">
-                    Arrastra PDFs aquí o haz clic para seleccionar
-                  </p>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={e => { e.stopPropagation(); inputRef.current?.click(); }}>
-                      Seleccionar archivos
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={e => { e.stopPropagation(); folderRef.current?.click(); }}>
-                      Seleccionar carpeta
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <input ref={inputRef} type="file" multiple accept=".pdf" className="hidden"
-                onChange={e => addBulkFiles(e.target.files)} />
-              <input ref={folderRef} type="file" className="hidden"
-                {...{ webkitdirectory: "", multiple: true } as any}
-                onChange={e => addBulkFiles(e.target.files)} />
-
-              {bulkFiles.length > 0 && (
-                <div className="flex items-center gap-3">
-                  <Button onClick={processAll} disabled={bulkRunning || !bulkFiles.some(f => f.status === "pending")}
-                    className="bg-gradient-primary hover:opacity-90">
-                    {bulkRunning
-                      ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Procesando...</>
-                      : <><Upload className="w-4 h-4 mr-2" />Ingestar {bulkFiles.filter(f => f.status === "pending").length} archivo(s)</>}
-                  </Button>
-                  {bulkFiles.some(f => f.status === "error") && (
-                    <Button variant="outline" size="sm" onClick={retryErrors} disabled={bulkRunning}>
-                      <RefreshCw className="w-4 h-4 mr-1" />Reintentar errores ({bulkFiles.filter(f => f.status === "error").length})
-                    </Button>
-                  )}
-                  <Button variant="outline" size="sm" onClick={clearBulk} disabled={bulkRunning}>
-                    <X className="w-4 h-4 mr-1" />Limpiar
-                  </Button>
-                  <span className="text-sm text-foreground-muted ml-auto">
-                    {bulkDone}/{bulkTotal} completados
-                  </span>
-                </div>
-              )}
-
-              {bulkRunning && <Progress value={bulkProgress} className="h-2" />}
-
-              {bulkFiles.length > 0 && (
-                <Card className="premium-card">
-                  <CardHeader>
-                    <CardTitle>Archivos</CardTitle>
-                    <CardDescription>{bulkTotal} archivo(s) en cola</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {bulkFiles.map(entry => (
-                        <div key={entry.id} className="flex items-center gap-3 rounded-lg border border-border px-4 py-2">
-                          {STATUS_ICON[entry.status]}
-                          <span className="flex-1 text-sm truncate">{entry.file.name}</span>
-                          <span className="text-xs text-foreground-muted">
-                            {(entry.file.size / 1024).toFixed(0)} KB
-                          </span>
-                          <Badge variant={
-                            entry.status === "done"      ? "default"     :
-                            entry.status === "duplicate" ? "secondary"   :
-                            entry.status === "error"     ? "destructive" : "outline"
-                          } className="text-xs">
-                            {STATUS_LABEL[entry.status]}
-                          </Badge>
-                          {entry.status === "done" && entry.chunks !== undefined && (
-                            <span className="text-xs text-green-500">{entry.chunks} chunks</span>
-                          )}
-                          {entry.status === "duplicate" && entry.duplicateOf && (
-                            <span className="text-xs text-orange-400 truncate max-w-[120px]" title={entry.duplicateOf}>
-                              = {entry.duplicateOf}
-                            </span>
-                          )}
-                          {entry.status === "error" && (
-                            <>
-                              <span className="text-xs text-red-400 truncate max-w-[140px]" title={entry.error}>
-                                {entry.error}
-                              </span>
-                              <button
-                                onClick={() => retryOne(entry.id)}
-                                disabled={bulkRunning}
-                                className="text-foreground-muted hover:text-foreground transition-colors disabled:opacity-50"
-                                title="Reintentar"
-                              >
-                                <RefreshCw className="w-3.5 h-3.5" />
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="list" className="space-y-6">
-          {/* View Mode Controls */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-foreground-muted">{t('common.view')}:</span>
-              <div className="flex border rounded-lg overflow-hidden">
-                <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                  className="rounded-none border-none"
-                >
-                  <Grid3x3 className="h-4 w-4 mr-1" />
-                  {t('certificates.gridView')}
-                </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                  className="rounded-none border-none"
-                >
-                  <LayoutList className="h-4 w-4 mr-1" />
-                  {t('certificates.listView')}
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Search and Filters */}
-          <div className="space-y-4">
-            <div className="flex gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder={t('certificates.searchPlaceholder')}
-                  value={searchTerm}
-                  onChange={(y) => setSearchTerm(y.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              {(searchTerm || selectedTags.length > 0) && (
-                <Button variant="outline" onClick={clearFilters}>
-                  {t('common.clear')}
-                </Button>
-              )}
-            </div>
-
-            {allTags.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-sm font-medium">{t('common.filter')} {t('common.tags')}:</p>
-                <div className="flex flex-wrap gap-2">
-                  {allTags.map(tag => (
-                    <Badge
-                      key={tag}
-                      variant={selectedTags.includes(tag) ? "default" : "outline"}
-                      className="cursor-pointer"
-                      onClick={() => toggleTag(tag)}
-                    >
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+            {bulkFiles.some(f => f.status === "error") && (
+              <Button variant="outline" size="sm" onClick={retryErrors} disabled={bulkRunning}>
+                <RefreshCw className="w-4 h-4 mr-1" />Reintentar errores ({bulkFiles.filter(f => f.status === "error").length})
+              </Button>
             )}
+            <Button variant="outline" size="sm" onClick={clearBulk} disabled={bulkRunning}>
+              <X className="w-4 h-4 mr-1" />Limpiar
+            </Button>
+            <span className="text-sm text-foreground-muted ml-auto">
+              {bulkDone}/{bulkTotal} completados
+            </span>
+          </div>
+        )}
 
-            {selectedTags.length > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">{t('common.tags')}:</span>
-                {selectedTags.map(tag => (
-                  <Badge key={tag} variant="secondary" className="cursor-pointer" onClick={() => toggleTag(tag)}>
-                    {tag} ×
-                  </Badge>
+        {bulkRunning && <Progress value={bulkProgress} className="h-2" />}
+
+        {bulkFiles.length > 0 && (
+          <Card className="premium-card">
+            <CardHeader>
+              <CardTitle>Archivos</CardTitle>
+              <CardDescription>{bulkTotal} archivo(s) en cola</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {bulkFiles.map(entry => (
+                  <div key={entry.id} className="flex items-center gap-3 rounded-lg border border-border px-4 py-2">
+                    {STATUS_ICON[entry.status]}
+                    <span className="flex-1 text-sm truncate">{entry.file.name}</span>
+                    <span className="text-xs text-foreground-muted">
+                      {(entry.file.size / 1024).toFixed(0)} KB
+                    </span>
+                    <Badge variant={
+                      entry.status === "done"      ? "default"     :
+                      entry.status === "duplicate" ? "secondary"   :
+                      entry.status === "error"     ? "destructive" : "outline"
+                    } className="text-xs">
+                      {STATUS_LABEL[entry.status]}
+                    </Badge>
+                    {entry.status === "done" && entry.chunks !== undefined && (
+                      <span className="text-xs text-green-500">{entry.chunks} chunks</span>
+                    )}
+                    {entry.status === "duplicate" && entry.duplicateOf && (
+                      <span className="text-xs text-orange-400 truncate max-w-[120px]" title={entry.duplicateOf}>
+                        = {entry.duplicateOf}
+                      </span>
+                    )}
+                    {entry.status === "error" && (
+                      <>
+                        <span className="text-xs text-red-400 truncate max-w-[140px]" title={entry.error}>
+                          {entry.error}
+                        </span>
+                        <button
+                          onClick={() => retryOne(entry.id)}
+                          disabled={bulkRunning}
+                          className="text-foreground-muted hover:text-foreground transition-colors disabled:opacity-50"
+                          title="Reintentar"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5" />
+                        </button>
+                      </>
+                    )}
+                  </div>
                 ))}
               </div>
-            )}
-          </div>
-
-          <CertificateList
-            searchTerm={searchTerm}
-            selectedTags={selectedTags}
-            viewMode={viewMode}
-            openCertificateId={openCertificateId}
-            onCertificateOpened={() => setOpenCertificateId(null)}
-          />
-        </TabsContent>
-      </Tabs>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }
