@@ -3,10 +3,15 @@ RACER Smart Cities API
 Ejecutar desde la carpeta racer/:
     uvicorn server:app --host 0.0.0.0 --port 8000 --reload
 """
+import sys
 import json, re, sqlite3, time, logging
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
+
+# Force UTF-8 output so Unicode chars (✓ ✗ —) work on Windows cp1252 consoles
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 
 from fastapi import FastAPI, File, HTTPException, BackgroundTasks, UploadFile, Body
 from typing import List
