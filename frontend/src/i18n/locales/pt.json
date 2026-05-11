@@ -389,5 +389,25 @@
     "createUserError": "Não foi possível criar o usuário",
     "allFieldsRequired": "Todos os campos são obrigatórios",
     "resetPasswordTitle": "Enviar link de redefinição de senha"
+  },
+  "aiChat": {
+    "title": "Assistente IA",
+    "subtitle": "Consulte os documentos indexados usando inteligência artificial",
+    "chat": "Chat",
+    "chatDesc": "Faça perguntas sobre os documentos disponíveis",
+    "loading": "Carregando mensagens...",
+    "noMessages": "Sem mensagens. Faça sua primeira pergunta!",
+    "question": "Você",
+    "assistant": "Assistente",
+    "querying": "Consultando...",
+    "inputPlaceholder": "Digite sua consulta...",
+    "send": "Enviar",
+    "sources": "Fontes",
+    "sourcesDesc": "Documentos recuperados pelo assistente",
+    "sourcesFor": "Fontes da mensagem selecionada",
+    "sourcesEmpty": "As fontes aparecerão aqui após sua consulta",
+    "newSessionError": "Não foi possível criar a sessão",
+    "chatError": "Erro ao enviar a mensagem",
+    "newChat": "Nova conversa"
   }
 }
