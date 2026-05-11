@@ -65,6 +65,10 @@ export default function AIChat() {
         if (!sessionId) throw new Error(t('aiChat.newSessionError'));
       }
 
+      // Include last 6 messages as conversation history so the RAG can
+      // resolve follow-up questions that lack explicit context (e.g. "¿cuáles son apostillados?")
+      const history = messages.slice(-6).map(m => ({ role: m.role, content: m.content }));
+
       const { data, error } = await apiFetch<{
         answer: string;
         sources: RacerSource[];
@@ -72,7 +76,7 @@ export default function AIChat() {
         filtros: Record<string, unknown>;
       }>("/api/racer/query", {
         method: "POST",
-        body: { question: prompt },
+        body: { question: prompt, history },
       });
 
       if (error || !data) {

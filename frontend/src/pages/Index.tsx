@@ -174,13 +174,13 @@ const Index = () => {
           </div>
 
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-4" style={{ color: 'rgba(255,255,255,0.95)' }}>
-            Sonda
+            Smart
             <span style={{
               background: 'linear-gradient(135deg, #60a5fa 0%, #818cf8 50%, #c084fc 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
-            }}>base</span>
+            }}>Match</span>
           </h1>
 
           <p
@@ -282,7 +282,7 @@ const Index = () => {
 
         {/* Footer */}
         <p className="mt-14 text-xs" style={{ color: 'rgba(255,255,255,0.15)' }}>
-          Sondabase &copy; {new Date().getFullYear()}
+          SmartMatch &copy; {new Date().getFullYear()}
         </p>
       </div>
     </div>

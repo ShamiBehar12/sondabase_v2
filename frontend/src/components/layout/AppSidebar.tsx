@@ -37,7 +37,7 @@ export function AppSidebar() {
   const { t } = useTranslation();
   const { state, toggleSidebar } = useSidebar();
   const { userRole } = useAuth();
-  const { sessions, activeSessionId, setActiveSessionId } = useAIChatContext();
+  const { sessions, activeSessionId, setActiveSessionId, createSession } = useAIChatContext();
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
@@ -80,6 +80,14 @@ export function AppSidebar() {
     navigate('/ai-chat');
   };
 
+  const handleNewChat = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await createSession();
+    setActiveSessionId(null);
+    navigate('/ai-chat');
+  };
+
   return (
     <Sidebar collapsible="icon" className={collapsed ? "w-16" : "w-64"}>
       <SidebarContent className="bg-sidebar border-r border-sidebar-border">
@@ -91,7 +99,7 @@ export function AppSidebar() {
                 <Award className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="font-bold text-lg text-blue-400">StoryCert</h2>
+                <h2 className="font-bold text-lg text-blue-400">SmartMatch</h2>
                 <p className="text-xs text-foreground-muted">Enterprise Platform</p>
               </div>
               <button
@@ -154,13 +162,24 @@ export function AppSidebar() {
                       <Bot className="w-5 h-5 flex-shrink-0" />
                       {!collapsed && <span className="truncate">{t('navigation.aiAssistant')}</span>}
                     </NavLink>
-                    {!collapsed && sessions.length > 0 && (
-                      <button
-                        onClick={(e) => { e.preventDefault(); setSessionsOpen(s => !s); }}
-                        className="ml-auto flex-shrink-0 w-5 h-5 flex items-center justify-center rounded text-current/70 hover:text-current transition-transform"
-                      >
-                        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${sessionsOpen ? 'rotate-180' : ''}`} />
-                      </button>
+                    {!collapsed && (
+                      <div className="ml-auto flex items-center gap-1 flex-shrink-0">
+                        <button
+                          onClick={handleNewChat}
+                          title={t('aiChat.newChat')}
+                          className="w-5 h-5 flex items-center justify-center rounded text-current/70 hover:text-current transition-colors"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                        {sessions.length > 0 && (
+                          <button
+                            onClick={(e) => { e.preventDefault(); setSessionsOpen(s => !s); }}
+                            className="w-5 h-5 flex items-center justify-center rounded text-current/70 hover:text-current transition-transform"
+                          >
+                            <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${sessionsOpen ? 'rotate-180' : ''}`} />
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
 

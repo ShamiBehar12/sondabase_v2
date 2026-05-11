@@ -193,12 +193,17 @@ REGLAS CRÍTICAS
 - Ante preguntas ambiguas, clarifica antes de responder.
 - Los datos son de uso interno de SONDA exclusivamente."""
 
+class ConversationMessage(BaseModel):
+    role:    str  # "user" or "assistant"
+    content: str
+
 class QueryRequest(BaseModel):
     question:          str
     pais:              Optional[str] = None
     solo_apostillados: bool          = False
     ano_desde:         Optional[int] = None
     conversation_id:   Optional[str] = None
+    history:           list[ConversationMessage] = []
 
 class RFPRequest(BaseModel):
     rfp_text: str
@@ -252,20 +257,37 @@ def health():
 def query(req: QueryRequest):
     if not req.question.strip():
         raise HTTPException(400, "Pregunta vacía")
+
+    # Build a context-enriched query string using recent conversation history.
+    # This lets filter extraction and vector search resolve follow-up questions
+    # that lack explicit context (e.g. "¿cuáles son apostillados?" after asking about Guatemala).
+    if req.history:
+        history_text = "\n".join(
+            f"{'Usuario' if m.role == 'user' else 'Asistente'}: {m.content[:300]}"
+            for m in req.history[-4:]
+        )
+        enriched_q = f"{history_text}\nUsuario: {req.question}"
+    else:
+        enriched_q = req.question
+
     tipo    = detectar_tipo(req.question)
-    filtros = extraer_filtros(req.question, req.pais, req.solo_apostillados)
-    items   = buscar(req.question, tipo, filtros, n=8)
+    filtros = extraer_filtros(enriched_q, req.pais, req.solo_apostillados)
+    items   = buscar(enriched_q, tipo, filtros, n=8)
     if req.ano_desde:
         items = [x for x in items if (x["meta"].get("year") or 0) >= req.ano_desde]
     if not items:
         return QueryResponse(answer="No encontré documentos que coincidan.",
                              sources=[], tipo=tipo, filtros=filtros)
     contexto = construir_contexto(items)
-    r = llm.chat.completions.create(
-        model=MODELO, temperature=0,
-        messages=[{"role":"system","content":SYSTEM_PROMPT},
-                  {"role":"user","content":f"Pregunta: {req.question}\n\nContexto:\n{contexto}"}]
-    )
+
+    # Include conversation history in the LLM call so the assistant can give
+    # coherent follow-up answers without losing thread.
+    messages: list[dict] = [{"role": "system", "content": SYSTEM_PROMPT}]
+    for m in req.history[-6:]:
+        messages.append({"role": m.role, "content": m.content})
+    messages.append({"role": "user", "content": f"Pregunta: {req.question}\n\nContexto documental:\n{contexto}"})
+
+    r = llm.chat.completions.create(model=MODELO, temperature=0, messages=messages)
     sources = [Source(
         archivo=x["meta"].get("source_file",""),
         pais=x["meta"].get("country",""),
