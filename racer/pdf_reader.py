@@ -11,7 +11,7 @@ import fitz  # PyMuPDF
 
 logger = logging.getLogger(__name__)
 
-# ── Configuración OCR ─────────────────────────────────────────────────────
+# ── Configuración OCR ─────────────────────────────────────────────────────────────────────────────
 
 UMBRAL_TEXTO_PAGINA = 30    # chars mínimos para considerar que una página tiene texto
 DPI_OCR = 300
@@ -63,7 +63,7 @@ def _ensure_ocr():
     return _OCR_READY
 
 
-# ── Funciones auxiliares ──────────────────────────────────────────────────
+# ── Funciones auxiliares ───────────────────────────────────────────────────────────────────────────
 
 def _limpiar_texto(texto: str) -> str:
     if not texto:
@@ -101,7 +101,7 @@ def _pagina_necesita_ocr(pagina, texto_extraido: str) -> bool:
     return True
 
 
-# ── API pública ───────────────────────────────────────────────────────────
+# ── API pública ───────────────────────────────────────────────────────────────────────────────────
 
 def extract_text_from_pdf(file_bytes: bytes, filename: str = "document.pdf") -> str:
     """

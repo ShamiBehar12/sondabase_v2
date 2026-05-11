@@ -53,7 +53,7 @@ def _safe_meta(val, default=""):
     return val
 
 
-# ── Chunking ──────────────────────────────────────────────────────────────
+# ── Chunking ────────────────────────────────────────────────────────────────────────────
 
 def chunk_text(text: str, document_id: str, source_file: str) -> list[dict]:
     text = re.sub(r"\r\n?", "\n", text)
@@ -83,7 +83,7 @@ def chunk_text(text: str, document_id: str, source_file: str) -> list[dict]:
     return chunks
 
 
-# ── Extracción de metadata via LLM ───────────────────────────────────────
+# ── Extracción de metadata via LLM ──────────────────────────────────────────────────────
 
 _PROMPT_SISTEMA = """Eres experto en análisis de documentos corporativos de tecnología.
 Extraes metadatos de contratos, certificados, cartas de referencia y licitaciones.
@@ -144,7 +144,7 @@ def extract_metadata(text: str, filename: str, llm: OpenAI, modelo: str) -> dict
         }
 
 
-# ── Pipeline principal ────────────────────────────────────────────────────
+# ── Pipeline principal ────────────────────────────────────────────────────────────────────────────
 
 def ingest_document(
     *,
