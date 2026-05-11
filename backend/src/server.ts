@@ -12,6 +12,7 @@ import {
   buildFallbackAnswer,
   buildDocumentHash,
   buildSearchText,
+  classifyQueryIntent,
   defaultAiSettings,
   estimateTokenCount,
   isStrongMatch,
@@ -795,6 +796,21 @@ app.post("/api/ai/chat/query", async (request) => {
     throw app.httpErrors.forbidden("Operation not allowed");
   }
 
+  const previousMessages = await prisma.aiChatMessage.findMany({
+    where: { sessionId: session.id },
+    orderBy: { createdAt: "asc" },
+    take: 10,
+  });
+
+  const historyForAI = previousMessages
+    .filter((m) => m.role === "user" || m.role === "assistant")
+    .map((m) => ({
+      role: m.role as "user" | "assistant",
+      content: m.role === "assistant" ? m.content.slice(0, 600) : m.content,
+    }));
+
+  const intent = classifyQueryIntent(message, historyForAI);
+
   const topK = Math.max(1, Math.min(body.topK ?? settings.topK, 10));
 
   const indexedDocuments = await prisma.aiDocumentIndex.findMany({
@@ -859,9 +875,15 @@ app.post("/api/ai/chat/query", async (request) => {
 
   let answer = buildFallbackAnswer(finalMatches);
 
-  if (shouldUseOpenAI && finalMatches.length > 0) {
+  if (shouldUseOpenAI && (finalMatches.length > 0 || intent === "clarification")) {
     try {
-      const generated = await generateOpenAIAnswer(settings.activeChatModel, message, providerContext);
+      const generated = await generateOpenAIAnswer(
+        settings.activeChatModel,
+        message,
+        providerContext,
+        historyForAI,
+        intent,
+      );
       if (generated) {
         answer = generated;
       }
@@ -894,6 +916,7 @@ app.post("/api/ai/chat/query", async (request) => {
       providerUsed: settings.activeProvider,
       modelUsed: settings.activeChatModel,
       ragMode: settings.ragMode,
+      intent,
       answer,
       matches: finalMatches,
     },

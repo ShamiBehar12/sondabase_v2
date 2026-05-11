@@ -54,20 +54,43 @@ export async function generateOpenAIEmbedding(input: string, model: string) {
   }
 }
 
-export async function generateOpenAIAnswer(model: string, question: string, context: string) {
+export type ChatMessage = { role: "user" | "assistant"; content: string };
+export type QueryIntent = "rag" | "clarification";
+
+export async function generateOpenAIAnswer(
+  model: string,
+  question: string,
+  context: string,
+  history: ChatMessage[] = [],
+  intent: QueryIntent = "rag",
+) {
   assertAvailable();
   const openai = getOpenAIClient();
   if (!openai) return null;
 
+  const systemPrompt =
+    intent === "clarification"
+      ? "Eres un asistente experto en certificados y documentos de proyectos de ciudades inteligentes. El usuario pide aclaración o contexto adicional sobre algo mencionado en la conversación. Usa el historial de la conversación como fuente principal. Si hay documentos recuperados, úsalos como referencia de apoyo. No inventes información ausente. Responde en el mismo idioma que el usuario."
+      : "Eres un asistente experto en certificados y documentos de proyectos de ciudades inteligentes. Usa los documentos recuperados en el contexto para responder la consulta. Resume cuáles certificados son más relevantes, explica por qué y no inventes información ausente. Si el historial de conversación aporta contexto relevante, tenlo en cuenta. Responde en el mismo idioma que el usuario.";
+
+  const userContent = context
+    ? `${question}\n\nDocumentos recuperados:\n${context}`
+    : question;
+
+  const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+    { role: "system", content: systemPrompt },
+    ...history,
+    { role: "user", content: userContent },
+  ];
+
   try {
-    const response = await openai.responses.create({
+    const response = await openai.chat.completions.create({
       model,
-      instructions:
-        "Responde em português claro. Usa apenas os certificados fornecidos no contexto. Resume quais certificados atendem melhor ao pedido, explica por quê e não inventes informação ausente.",
-      input: `Pedido do utilizador:\n${question}\n\nContexto recuperado:\n${context}`,
+      messages,
+      temperature: 0.2,
     });
 
-    return response.output_text?.trim() || null;
+    return response.choices[0]?.message?.content?.trim() || null;
   } catch (error) {
     handleOpenAIError(error);
     return null;

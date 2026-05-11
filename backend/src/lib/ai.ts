@@ -434,3 +434,39 @@ export function buildFallbackAnswer(matches: Array<{
 
   return [firstSentence, secondSentence, thirdSentence].filter(Boolean).join(" ");
 }
+
+export function classifyQueryIntent(
+  message: string,
+  history: Array<{ role: string; content: string }>,
+): "rag" | "clarification" {
+  if (history.length < 2) return "rag";
+
+  const lower = message
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "");
+
+  const clarificationPatterns = [
+    /\b(ese|eso|este|esto|esa|esta|aquel|aquello)\b/,
+    /\b(that|this|those|these)\b/,
+    /\b(el|la|los|las) (certificado|documento|resultado|primero|segundo|tercero|ultimo|anterior|mencionado)\b/,
+    /^(y |e |pero |ademas |tambien |and |but |also )/,
+    /\b(explica|explicame|detalla|amplia|elabora|cuentame mas|dime mas)\b/,
+    /\b(explain|elaborate|tell me more|give me more details)\b/,
+    /^(por que|porque|why|how come)\b/,
+    /\b(que significa|que quiere decir|what does|what is|what are)\b/,
+    /\b(mismo|misma|el de|la de)\b/,
+  ];
+
+  const tokens = meaningfulTokens(message);
+  const matchesClarification = clarificationPatterns.some((p) => p.test(lower));
+  const isShortWithoutSearchTerms =
+    tokens.length <= 3 &&
+    !/\b(busca|buscar|encuentra|muestra|show|find|search|necesito|quiero|dame|lista|listar)\b/.test(lower);
+
+  if (matchesClarification || isShortWithoutSearchTerms) {
+    return "clarification";
+  }
+
+  return "rag";
+}
