@@ -1,4 +1,21 @@
 {
+  "home": {
+    "subtitle": "Gestiona documentos, certificados e historias de éxito desde un solo lugar",
+    "goToDashboard": "Ir al Dashboard",
+    "quickAccess": "Acceso Rápido",
+    "featureDashboard": "Dashboard",
+    "featureDashboardDesc": "Vista general de métricas y actividad reciente",
+    "featureDocuments": "Documentos",
+    "featureDocumentsDesc": "Gestiona y busca certificados y expedientes",
+    "featureStories": "Historias de Éxito",
+    "featureStoriesDesc": "Comparte y revisa casos de éxito empresarial",
+    "featureAI": "Asistente IA",
+    "featureAIDesc": "Consulta inteligente sobre tu base de conocimiento",
+    "featureCertificates": "Mis Certificados",
+    "featureCertificatesDesc": "Tus certificados y los pendientes de aprobación",
+    "featureSettings": "Configuración",
+    "featureSettingsDesc": "Personaliza tu perfil e idioma preferido"
+  },
   "navigation": {
     "dashboard": "Dashboard",
     "main": "Principal",
@@ -10,6 +27,8 @@
     "aiAssistant": "Asistente IA",
     "certificateApproval": "Aprobación de Documentos",
     "administration": "Administración",
+    "aiAdministration": "Administración de IA",
+    "aiAdministrationSubtitle": "Configura el provider, modelo activo, estado del índice y gestión del RACER",
     "myCertificates": "Mis Documentos",
     "newConversation": "Nueva conversación",
     "documentExplorer": "Explorador de Documentos",
@@ -77,8 +96,6 @@
     "tableActions": "Acciones",
     "emittedOn": "Emitido en",
     "contract": "Contrato",
-    "contractStart": "Inicio contrato",
-    "contractEnd": "Fin contrato",
     "size": "Tamaño",
     "actions": "Acciones",
     "noCertificatesFound": "No se encontraron certificados",
@@ -180,6 +197,7 @@
     "alertsExpiringMessage": "certificados expiran pronto",
     "alertsPending": "Aprobaciones Pendientes",
     "alertsPendingMessage": "documentos esperando aprobación",
+    "registered": "registrados",
     "alertsGoal": "Meta Alcanzada",
     "alertsGoalMessage": "de la meta de calidad alcanzada",
     "noOrganization": "Sin organización",
@@ -319,7 +337,6 @@
     "insufficientPermissions": "Permisos insuficientes",
     "insufficientPermissionsMessage": "No tienes permiso para esta acción"
   },
-  "profile": "Perfil",
   "users": {
     "title": "Usuarios",
     "subtitle": "Gestionar usuarios del sistema",

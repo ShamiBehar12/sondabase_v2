@@ -237,5 +237,6 @@ export function useAIChat() {
     deleteSession,
     sendMessage,
     reloadSessions: loadSessions,
+    reloadMessages: loadMessages,
   };
 }
