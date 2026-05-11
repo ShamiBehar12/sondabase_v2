@@ -9,7 +9,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
 
-# Force UTF-8 output so Unicode chars (✓ ✗ —) work on Windows cp1252 consoles
+# Force UTF-8 output so Unicode chars work on Windows cp1252 consoles
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
 
@@ -39,7 +39,6 @@ class OpenAIEmbeddingFunction(EmbeddingFunction):
 
 load_dotenv()
 
-# Verificar OCR al arrancar
 _ocr_ok = _ensure_ocr()
 print(f"[RACER] OCR Tesseract: {'✓ disponible' if _ocr_ok else '✗ NO disponible — PDFs escaneados darán 0 chunks'}", flush=True)
 
@@ -58,7 +57,6 @@ chroma = chromadb.PersistentClient(path=RUTA_CHROMA)
 col_chunks = chroma.get_or_create_collection("chunks", embedding_function=ef)
 col_docs   = chroma.get_or_create_collection("docs",   embedding_function=ef)
 
-# Ensure data directory and SQLite schema exist
 Path("data").mkdir(exist_ok=True)
 _init_conn = sqlite3.connect(RUTA_DB)
 _init_conn.execute("""
@@ -90,7 +88,6 @@ _init_conn.close()
 @contextmanager
 def get_db():
     conn = sqlite3.connect(RUTA_DB)
-
     conn.row_factory = sqlite3.Row
     try:
         yield conn
@@ -181,21 +178,17 @@ REPOSITORIO — tipos de documentos:
 - Contratos y adendas: evidencian la relación contractual formal con montos y plazos.
 
 COMPORTAMIENTO
-- Responde siempre en español. Si un documento está en portugués, traduce o resume.
+- Responde siempre en español.
 - Sé directo. Los usuarios necesitan respuestas rápidas y accionables.
-- Siempre cita la fuente. Ejemplo: \"Según el Certificado Metro Panamá (apostillado), SONDA implementó el sistema de recaudo desde 2011.\"
+- Siempre cita la fuente.
 - Si no tienes la información, responde: \"No encontré esa información en los documentos disponibles.\"
 - Cuando haya múltiples resultados, usa tabla Markdown con columnas: Cliente | País | Documento | Apostillado | Año
-- Distingue apostillados de no apostillados. Para licitaciones internacionales, prioriza los apostillados.
+- Distingue apostillados de no apostillados.
 - Si un documento tiene más de 3 años, indica \"(revisar vigencia)\".
-- Si existen múltiples versiones de un documento (v1, v2), menciona ambas y sugiere la más reciente.
-- Sé proactivo: si detectas información relacionada útil, ofrécela.
 
 REGLAS CRÍTICAS
-- NUNCA inventes experiencias, montos, fechas o clientes. Información falsa puede descalificar a SONDA en licitaciones.
+- NUNCA inventes experiencias, montos, fechas o clientes.
 - Responde SOLO con información del contexto proporcionado.
-- Prioriza documentos apostillados para licitaciones internacionales.
-- Ante preguntas ambiguas, clarifica antes de responder.
 - Los datos son de uso interno de SONDA exclusivamente."""
 
 class QueryRequest(BaseModel):
@@ -300,7 +293,6 @@ Licitación:
         requisitos = json.loads(r.choices[0].message.content).get("requisitos", [])
     except Exception:
         raise HTTPException(500, "No se pudieron parsear los requisitos")
-
     resultados = []
     for req_item in requisitos:
         items    = buscar(req_item["texto"], tipo="chunk", filtros={}, n=5)
@@ -324,12 +316,10 @@ Contexto documental:
             evidencia = ev_data.get("evidencia", "")[:100]
         except Exception:
             estado, evidencia = "NO_CUMPLE", "Error al evaluar"
-
         resultados.append(RFPRow(id=req_item.get("id","R?"),
                                   requisito=req_item["texto"][:80],
                                   estado=estado, evidencia=evidencia))
         time.sleep(0.2)
-
     return RFPResponse(total=len(resultados), requisitos=resultados)
 
 @app.post("/ingest", response_model=IngestResponse)
@@ -338,13 +328,8 @@ def ingest(req: IngestRequest):
         raise HTTPException(400, "Texto vacío")
     try:
         result = ingest_document(
-            text=req.text,
-            filename=req.filename,
-            col_chunks=col_chunks,
-            col_docs=col_docs,
-            db_path=RUTA_DB,
-            llm=llm,
-            modelo=MODELO,
+            text=req.text, filename=req.filename, col_chunks=col_chunks, col_docs=col_docs,
+            db_path=RUTA_DB, llm=llm, modelo=MODELO,
             ruta_chunks_jsonl=Path("data/chunks.jsonl"),
             ruta_metadata_jsonl=Path("data/metadata.jsonl"),
             document_id=req.document_id,
@@ -355,27 +340,19 @@ def ingest(req: IngestRequest):
 
 @app.post("/ingest/pdf")
 async def ingest_pdf(file: UploadFile = File(...), document_id: str | None = None):
-    """Acepta un PDF via multipart, extrae texto con PyMuPDF + OCR, e ingesta."""
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(400, "Se requiere un archivo PDF")
     file_bytes = await file.read()
     if not file_bytes:
         raise HTTPException(400, "Archivo vacío")
-
     text = extract_text_from_pdf(file_bytes, file.filename)
     if not text.strip():
-        return {"status": "empty", "document_id": document_id or "",
-                "chunks_added": 0, "metadata": {},
+        return {"status": "empty", "document_id": document_id or "", "chunks_added": 0, "metadata": {},
                 "message": "No se pudo extraer texto del PDF"}
     try:
         result = ingest_document(
-            text=text,
-            filename=file.filename,
-            col_chunks=col_chunks,
-            col_docs=col_docs,
-            db_path=RUTA_DB,
-            llm=llm,
-            modelo=MODELO,
+            text=text, filename=file.filename, col_chunks=col_chunks, col_docs=col_docs,
+            db_path=RUTA_DB, llm=llm, modelo=MODELO,
             ruta_chunks_jsonl=Path("data/chunks.jsonl"),
             ruta_metadata_jsonl=Path("data/metadata.jsonl"),
             document_id=document_id,
@@ -386,142 +363,96 @@ async def ingest_pdf(file: UploadFile = File(...), document_id: str | None = Non
 
 @app.get("/ingest/stats")
 def ingest_stats():
-    return {
-        "chunks": col_chunks.count(),
-        "docs":   col_docs.count(),
-    }
+    return {"chunks": col_chunks.count(), "docs": col_docs.count()}
 
 @app.get("/documents")
 def list_documents():
-    """Lista todos los documentos indexados desde SQLite."""
     with get_db() as conn:
         rows = conn.execute(
             "SELECT document_id, source_file AS original_filename, doc_type, client, country, year, "
-            "is_apostilled, summary_one_line, ingested_at FROM documents ORDER BY ingested_at DESC"
+            "is_apostilled, summary_one_line, ingested_at, content_hash FROM documents ORDER BY ingested_at DESC"
         ).fetchall()
     return [dict(r) for r in rows]
 
-
 def _delete_document(doc_id: str):
-    """Elimina un documento de ChromaDB (chunks + doc) y SQLite."""
     try:
         old_chunks = col_chunks.get(where={"document_id": doc_id})
-        if old_chunks["ids"]:
-            col_chunks.delete(ids=old_chunks["ids"])
-    except Exception:
-        pass
+        if old_chunks["ids"]: col_chunks.delete(ids=old_chunks["ids"])
+    except Exception: pass
     try:
-        if col_docs.get(ids=[doc_id])["ids"]:
-            col_docs.delete(ids=[doc_id])
-    except Exception:
-        pass
+        if col_docs.get(ids=[doc_id])["ids"]: col_docs.delete(ids=[doc_id])
+    except Exception: pass
     with get_db() as conn:
         conn.execute("DELETE FROM documents WHERE document_id = ?", (doc_id,))
         conn.commit()
 
-
 @app.delete("/documents/{doc_id}")
 def delete_document(doc_id: str):
-    """Elimina un documento por ID."""
     _delete_document(doc_id)
     return {"ok": True, "deleted": doc_id}
 
-
 @app.delete("/documents")
 def delete_documents(ids: List[str] = Body(..., embed=True)):
-    """Elimina múltiples documentos por lista de IDs."""
-    for doc_id in ids:
-        _delete_document(doc_id)
+    for doc_id in ids: _delete_document(doc_id)
     return {"ok": True, "deleted": len(ids)}
-
 
 @app.delete("/documents/all/confirm")
 def delete_all_documents(password: str = Body(..., embed=True)):
-    """Elimina TODOS los documentos. Requiere contraseña 'borrar todo'."""
     if password != "borrar todo":
         raise HTTPException(403, "Contraseña incorrecta")
     with get_db() as conn:
         doc_ids = [r[0] for r in conn.execute("SELECT document_id FROM documents").fetchall()]
-    for doc_id in doc_ids:
-        _delete_document(doc_id)
+    for doc_id in doc_ids: _delete_document(doc_id)
     return {"ok": True, "deleted": len(doc_ids)}
-
 
 @app.post("/reingest/metadata")
 def reingest_metadata(req: ReMetadataRequest):
-    """Re-extract metadata for a document that failed during initial ingestion.
-    Reconstructs the original text from existing ChromaDB chunks and re-runs the LLM."""
     from ingest import extract_metadata, _safe_meta
-
-    # 1 — Leer chunks existentes de ChromaDB
-    results = col_chunks.get(
-        where={"document_id": req.document_id},
-        include=["documents", "metadatas"],
-    )
+    results = col_chunks.get(where={"document_id": req.document_id}, include=["documents", "metadatas"])
     if not results["ids"]:
         raise HTTPException(404, f"No se encontraron chunks para '{req.document_id}'")
-
-    # 2 — Reconstruir texto ordenando por chunk_index
-    pairs = sorted(
-        zip(results["documents"], results["metadatas"]),
-        key=lambda x: x[1].get("chunk_index", 0),
-    )
+    pairs = sorted(zip(results["documents"], results["metadatas"]), key=lambda x: x[1].get("chunk_index", 0))
     full_text   = "\n".join(doc for doc, _ in pairs)
     source_file = results["metadatas"][0].get("source_file", req.document_id)
-
-    # 3 — Re-extraer metadata con el LLM
     meta = extract_metadata(full_text, source_file, llm, MODELO)
     summary = meta.get("summary_one_line", "")
     if summary.startswith("No se pudo procesar") or summary.startswith("Error al procesar"):
         raise HTTPException(500, f"La extracción de metadata falló de nuevo: {summary}")
-
-    # 4 — Actualizar colección docs en ChromaDB (upsert)
     texto_doc = "\n".join(filter(None, [
-        f"ARCHIVO: {source_file}",
-        f"TIPO: {meta.get('doc_type','')}",
-        f"CLIENTE: {meta.get('client','')}",
-        f"PAIS: {meta.get('country','')}",
+        f"ARCHIVO: {source_file}", f"TIPO: {meta.get('doc_type','')}",
+        f"CLIENTE: {meta.get('client','')}", f"PAIS: {meta.get('country','')}",
         f"APOSTILLADO: {'Sí' if meta.get('is_apostilled') else 'No'}",
         f"AÑO: {meta.get('year','')}",
         f"DOMINIOS: {', '.join(meta.get('project_domain') or [])}",
         f"RESUMEN: {meta.get('summary_one_line','')}",
     ]))
     new_doc_meta = {
-        "document_id":     req.document_id,
-        "source_file":     _safe_meta(source_file),
-        "doc_type":        _safe_meta(meta.get("doc_type")),
-        "client":          _safe_meta(meta.get("client")),
-        "country":         _safe_meta(meta.get("country")),
-        "is_apostilled":   1 if meta.get("is_apostilled") is True else (-1 if meta.get("is_apostilled") is None else 0),
-        "year":            meta.get("year") or 0,
-        "project_domain":  _safe_meta(meta.get("project_domain")),
-        "validity_alert":  1 if meta.get("validity_alert") else 0,
+        "document_id": req.document_id, "source_file": _safe_meta(source_file),
+        "doc_type": _safe_meta(meta.get("doc_type")), "client": _safe_meta(meta.get("client")),
+        "country": _safe_meta(meta.get("country")),
+        "is_apostilled": 1 if meta.get("is_apostilled") is True else (-1 if meta.get("is_apostilled") is None else 0),
+        "year": meta.get("year") or 0, "project_domain": _safe_meta(meta.get("project_domain")),
+        "validity_alert": 1 if meta.get("validity_alert") else 0,
         "summary_one_line": _safe_meta(meta.get("summary_one_line")),
-        "language":        _safe_meta(meta.get("language")),
+        "language": _safe_meta(meta.get("language")),
     }
     if col_docs.get(ids=[req.document_id])["ids"]:
         col_docs.update(ids=[req.document_id], documents=[texto_doc], metadatas=[new_doc_meta])
     else:
         col_docs.add(ids=[req.document_id], documents=[texto_doc], metadatas=[new_doc_meta])
-
-    # 5 — Actualizar metadata de chunks en ChromaDB
     chunk_update_metas = []
     for m in results["metadatas"]:
         um = dict(m)
         um.update({
-            "doc_type":        _safe_meta(meta.get("doc_type")),
-            "client":          _safe_meta(meta.get("client")),
-            "country":         _safe_meta(meta.get("country")),
-            "is_apostilled":   1 if meta.get("is_apostilled") is True else (-1 if meta.get("is_apostilled") is None else 0),
-            "year":            meta.get("year") or 0,
-            "project_domain":  _safe_meta(meta.get("project_domain")),
-            "validity_alert":  1 if meta.get("validity_alert") else 0,
+            "doc_type": _safe_meta(meta.get("doc_type")), "client": _safe_meta(meta.get("client")),
+            "country": _safe_meta(meta.get("country")),
+            "is_apostilled": 1 if meta.get("is_apostilled") is True else (-1 if meta.get("is_apostilled") is None else 0),
+            "year": meta.get("year") or 0, "project_domain": _safe_meta(meta.get("project_domain")),
+            "validity_alert": 1 if meta.get("validity_alert") else 0,
             "summary_one_line": _safe_meta(meta.get("summary_one_line")),
         })
         chunk_update_metas.append(um)
     col_chunks.update(ids=results["ids"], metadatas=chunk_update_metas)
-
-    # 6 — Actualizar SQLite
     def _b(v): return 1 if v is True else (0 if v is False else None)
     def _i(v):
         try: return int(v)
@@ -529,41 +460,31 @@ def reingest_metadata(req: ReMetadataRequest):
     def _f(v):
         try: return float(v)
         except: return None
-
     with get_db() as conn:
         conn.execute("""
-            UPDATE documents SET
-                doc_type=?, client=?, country=?, is_apostilled=?, year=?,
+            UPDATE documents SET doc_type=?, client=?, country=?, is_apostilled=?, year=?,
                 contract_value_usd=?, contract_duration_years=?, units_deployed=?,
                 summary_one_line=?, language=?, validity_alert=?,
                 project_domain_json=?, technologies_json=?
             WHERE document_id=?
         """, (
-            str(meta.get("doc_type", "") or ""),
-            str(meta.get("client", "") or "") or None,
-            str(meta.get("country", "") or "") or None,
-            _b(meta.get("is_apostilled")),
-            _i(meta.get("year")),
-            _f(meta.get("contract_value_usd")),
-            _f(meta.get("contract_duration_years")),
-            _i(meta.get("units_deployed")),
-            str(meta.get("summary_one_line", "") or ""),
-            str(meta.get("language", "") or ""),
+            str(meta.get("doc_type", "") or ""), str(meta.get("client", "") or "") or None,
+            str(meta.get("country", "") or "") or None, _b(meta.get("is_apostilled")),
+            _i(meta.get("year")), _f(meta.get("contract_value_usd")),
+            _f(meta.get("contract_duration_years")), _i(meta.get("units_deployed")),
+            str(meta.get("summary_one_line", "") or ""), str(meta.get("language", "") or ""),
             _b(meta.get("validity_alert", False)),
             json.dumps(meta.get("project_domain") or [], ensure_ascii=False),
             json.dumps(meta.get("technologies") or [], ensure_ascii=False),
             req.document_id,
         ))
-
-    # 7 — Reemplazar línea en metadata.jsonl
     ruta_meta = Path("data/metadata.jsonl")
     if ruta_meta.exists():
         nuevo_reg = {"document_id": req.document_id, "source_file": source_file, **meta}
         lines = ruta_meta.read_text(encoding="utf-8").splitlines()
         new_lines, updated = [], False
         for line in lines:
-            if not line.strip():
-                continue
+            if not line.strip(): continue
             try:
                 obj = json.loads(line)
                 if obj.get("document_id") == req.document_id:
@@ -576,5 +497,4 @@ def reingest_metadata(req: ReMetadataRequest):
         if not updated:
             new_lines.append(json.dumps(nuevo_reg, ensure_ascii=False))
         ruta_meta.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
-
     return {"status": "ok", "document_id": req.document_id, "metadata": meta}
