@@ -54,20 +54,45 @@ export async function generateOpenAIEmbedding(input: string, model: string) {
   }
 }
 
-export async function generateOpenAIAnswer(model: string, question: string, context: string) {
+export type ChatMessage = { role: "user" | "assistant"; content: string };
+export type QueryIntent = "rag" | "clarification";
+
+export async function generateOpenAIAnswer(
+  model: string,
+  question: string,
+  context: string,
+  history: ChatMessage[] = [],
+  intent: QueryIntent = "rag",
+) {
   assertAvailable();
   const openai = getOpenAIClient();
   if (!openai) return null;
 
+  const systemPrompt =
+    intent === "clarification"
+      ? "Eres un asistente especializado en documentos y certificados. El usuario está pidiendo una aclaración o contexto adicional sobre algo mencionado anteriormente en la conversación. Responde de manera clara y directa, referenciando el historial de la conversación cuando sea relevante. Usa el mismo idioma que el usuario."
+      : "Eres un asistente especializado en documentos y certificados. Responde usando únicamente los certificados proporcionados en el contexto. Resume cuáles certificados atienden mejor la solicitud, explica por qué y no inventes información ausente. Usa el mismo idioma que el usuario.";
+
+  const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+    { role: "system", content: systemPrompt },
+    ...history,
+    {
+      role: "user",
+      content:
+        intent === "clarification"
+          ? question
+          : `Consulta del usuario:\n${question}\n\nContexto recuperado:\n${context}`,
+    },
+  ];
+
   try {
-    const response = await openai.responses.create({
+    const response = await openai.chat.completions.create({
       model,
-      instructions:
-        "Responde em português claro. Usa apenas os certificados fornecidos no contexto. Resume quais certificados atendem melhor ao pedido, explica por quê e não inventes informação ausente.",
-      input: `Pedido do utilizador:\n${question}\n\nContexto recuperado:\n${context}`,
+      messages,
+      temperature: 0.2,
     });
 
-    return response.output_text?.trim() || null;
+    return response.choices[0]?.message?.content?.trim() || null;
   } catch (error) {
     handleOpenAIError(error);
     return null;
