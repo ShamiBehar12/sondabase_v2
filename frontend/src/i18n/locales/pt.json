@@ -418,5 +418,29 @@
     "savedDescription": "Configurações salvas com sucesso",
     "saveError": "Erro ao salvar configurações"
   },
-  "notifications": "Notificações"
+  "notifications": "Notificações",
+  "aiChat": {
+    "title": "Assistente IA",
+    "subtitle": "Consultas inteligentes sobre sua base de conhecimento",
+    "chat": "Conversa",
+    "chatDesc": "Faça perguntas sobre os documentos indexados",
+    "loading": "Carregando mensagens...",
+    "noMessages": "Inicie uma conversa fazendo uma pergunta.",
+    "question": "Pergunta",
+    "assistant": "Assistente",
+    "querying": "Consultando a base de conhecimento...",
+    "inputPlaceholder": "Digite sua pergunta aqui...",
+    "send": "Enviar",
+    "sources": "Fontes",
+    "sourcesDesc": "Documentos relevantes encontrados",
+    "sourcesEmpty": "As fontes aparecerão aqui após sua primeira consulta.",
+    "viewPdf": "Ver PDF",
+    "viewText": "Ver Texto",
+    "pdfUnavailable": "O PDF não está disponível para visualização.",
+    "textViewInfo": "Visualização de metadados do documento fonte.",
+    "noTitle": "Sem título",
+    "newSessionError": "Não foi possível criar a sessão",
+    "chatError": "Erro ao processar a consulta",
+    "newChat": "Nova conversa"
+  }
 }

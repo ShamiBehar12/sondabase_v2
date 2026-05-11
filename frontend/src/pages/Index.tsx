@@ -282,7 +282,7 @@ const Index = () => {
 
         {/* Footer */}
         <p className="mt-14 text-xs" style={{ color: 'rgba(255,255,255,0.15)' }}>
-          Sondabase &copy; {new Date().getFullYear()}
+          SmartMatch &copy; {new Date().getFullYear()}
         </p>
       </div>
     </div>

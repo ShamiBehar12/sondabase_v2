@@ -37,7 +37,7 @@ export function AppSidebar() {
   const { t } = useTranslation();
   const { state, toggleSidebar } = useSidebar();
   const { userRole } = useAuth();
-  const { sessions, activeSessionId, setActiveSessionId } = useAIChatContext();
+  const { sessions, activeSessionId, setActiveSessionId, createSession } = useAIChatContext();
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
@@ -77,6 +77,13 @@ export function AppSidebar() {
 
   const handleSessionClick = (sessionId: string) => {
     setActiveSessionId(sessionId);
+    navigate('/ai-chat');
+  };
+
+  const handleNewChat = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setActiveSessionId(null);
     navigate('/ai-chat');
   };
 
@@ -154,13 +161,24 @@ export function AppSidebar() {
                       <Bot className="w-5 h-5 flex-shrink-0" />
                       {!collapsed && <span className="truncate">{t('navigation.aiAssistant')}</span>}
                     </NavLink>
-                    {!collapsed && sessions.length > 0 && (
-                      <button
-                        onClick={(e) => { e.preventDefault(); setSessionsOpen(s => !s); }}
-                        className="ml-auto flex-shrink-0 w-5 h-5 flex items-center justify-center rounded text-current/70 hover:text-current transition-transform"
-                      >
-                        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${sessionsOpen ? 'rotate-180' : ''}`} />
-                      </button>
+                    {!collapsed && (
+                      <div className="ml-auto flex items-center gap-0.5 flex-shrink-0">
+                        <button
+                          onClick={handleNewChat}
+                          className="w-5 h-5 flex items-center justify-center rounded text-current/70 hover:text-current transition-colors"
+                          title={t('aiChat.newChat')}
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                        {sessions.length > 0 && (
+                          <button
+                            onClick={(e) => { e.preventDefault(); setSessionsOpen(s => !s); }}
+                            className="w-5 h-5 flex items-center justify-center rounded text-current/70 hover:text-current transition-transform"
+                          >
+                            <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${sessionsOpen ? 'rotate-180' : ''}`} />
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
 
