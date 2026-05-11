@@ -12,6 +12,7 @@ import {
   buildFallbackAnswer,
   buildDocumentHash,
   buildSearchText,
+  classifyQueryIntent,
   defaultAiSettings,
   estimateTokenCount,
   isStrongMatch,
@@ -19,7 +20,7 @@ import {
   type MatchStats,
 } from "./lib/ai.js";
 import { extractPdfTextDirect, extractPdfTextWithOcrFallback } from "./lib/pdf.js";
-import { generateOpenAIAnswer, generateOpenAIEmbedding, testOpenAIConnection } from "./lib/openai.js";
+import { generateOpenAIAnswer, generateOpenAIEmbedding, testOpenAIConnection, type ChatMessage } from "./lib/openai.js";
 import { prisma } from "./lib/prisma.js";
 import {
   hashPassword,
@@ -795,6 +796,21 @@ app.post("/api/ai/chat/query", async (request) => {
     throw app.httpErrors.forbidden("Operation not allowed");
   }
 
+  const previousMessages = await prisma.aiChatMessage.findMany({
+    where: { sessionId: session.id },
+    orderBy: { createdAt: "asc" },
+    take: 10,
+  });
+
+  const historyForAI: ChatMessage[] = previousMessages
+    .filter((m) => m.role === "user" || m.role === "assistant")
+    .map((m) => ({
+      role: m.role as "user" | "assistant",
+      content: m.role === "assistant" ? m.content.slice(0, 3000) : m.content,
+    }));
+
+  const intent = classifyQueryIntent(message, historyForAI);
+
   const topK = Math.max(1, Math.min(body.topK ?? settings.topK, 10));
 
   const indexedDocuments = await prisma.aiDocumentIndex.findMany({
@@ -859,9 +875,15 @@ app.post("/api/ai/chat/query", async (request) => {
 
   let answer = buildFallbackAnswer(finalMatches);
 
-  if (shouldUseOpenAI && finalMatches.length > 0) {
+  if (shouldUseOpenAI && (finalMatches.length > 0 || intent === "clarification")) {
     try {
-      const generated = await generateOpenAIAnswer(settings.activeChatModel, message, providerContext);
+      const generated = await generateOpenAIAnswer(
+        settings.activeChatModel,
+        message,
+        providerContext,
+        historyForAI,
+        intent,
+      );
       if (generated) {
         answer = generated;
       }
@@ -888,6 +910,11 @@ app.post("/api/ai/chat/query", async (request) => {
     ],
   });
 
+  await prisma.aiChatSession.update({
+    where: { id: session.id },
+    data: { updatedAt: new Date() },
+  });
+
   return {
     data: {
       sessionId: session.id,
@@ -896,6 +923,7 @@ app.post("/api/ai/chat/query", async (request) => {
       ragMode: settings.ragMode,
       answer,
       matches: finalMatches,
+      intent,
     },
     error: null,
   };
@@ -1671,7 +1699,7 @@ app.delete("/api/racer/documents", async (req, reply) => {
   return reply.send({ data, error: null });
 });
 
-// ── Dashboard stats ────────────────────────────────────────────────────────
+// ── Dashboard stats ──────────────────────────────────────────────────────────────
 app.get("/api/stats/dashboard", async (req, reply) => {
   requireAuth(req);
   const [
@@ -1706,7 +1734,7 @@ app.get("/api/stats/dashboard", async (req, reply) => {
   const activities: ActivityItem[] = [];
 
   for (const cert of recentCerts) {
-    const userName = (cert as any).user?.profile?.fullName || (cert as any).user?.email || "Usuario";
+    const userName = (cert as any).user?.profile?.fullName || (cert as any).user?.email || "Usuário";
     activities.push({
       id: cert.id,
       action: cert.isVerified ? "added_certificate" : "submitted_certificate",
@@ -1717,7 +1745,7 @@ app.get("/api/stats/dashboard", async (req, reply) => {
     });
   }
   for (const story of recentStories) {
-    const userName = (story as any).user?.profile?.fullName || (story as any).user?.email || "Usuario";
+    const userName = (story as any).user?.profile?.fullName || (story as any).user?.email || "Usuário";
     activities.push({
       id: story.id,
       action: story.isVerified ? "published_story" : "submitted_story",
@@ -1745,7 +1773,7 @@ app.get("/api/stats/dashboard", async (req, reply) => {
   });
 });
 
-// ── Seed RACER documents as certificates ──────────────────────────────────
+// ── Seed RACER documents as certificates ──────────────────────────────────────────────
 app.post("/api/admin/seed-racer", async (req, reply) => {
   const user = requireAdmin(req);
   const metadataPath = path.join(process.cwd(), "../racer/data/metadata.jsonl");
@@ -1791,7 +1819,7 @@ app.post("/api/admin/seed-racer", async (req, reply) => {
   return reply.send({ data: { created, skipped, total: lines.length }, error: null });
 });
 
-// ── Analytics ──────────────────────────────────────────────────────────────
+// ── Analytics ──────────────────────────────────────────────────────────────────
 app.post("/api/usage/events", async (req) => {
   const user = requireAuth(req);
   const events = req.body as Array<{
@@ -1835,7 +1863,6 @@ app.get("/api/usage/summary", async (req) => {
   const profileMap = new Map(profiles.map((p) => [p.userId, p.fullName]));
   const emailMap = new Map(users.map((u) => [u.id, u.email]));
 
-  // per-user aggregation
   const byUser = new Map<string, {
     userId: string; name: string; email: string;
     pageVisits: number; totalTimeSec: number;
@@ -1873,7 +1900,6 @@ app.get("/api/usage/summary", async (req) => {
     if (e.eventType === "tab_click") u.tabClicks++;
   }
 
-  // top pages
   const pageCount = new Map<string, { visits: number; totalMs: number }>();
   for (const e of events) {
     if (e.eventType === "page_visit" && e.page) {
@@ -1892,14 +1918,12 @@ app.get("/api/usage/summary", async (req) => {
     .sort((a, b) => b.visits - a.visits)
     .slice(0, 10);
 
-  // hourly activity (last 7 days)
   const hourly = new Array(24).fill(0);
   const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
   for (const e of events) {
     if (e.createdAt.getTime() > cutoff) hourly[e.createdAt.getHours()]++;
   }
 
-  // tab click breakdown
   const tabCount = new Map<string, number>();
   for (const e of events) {
     if (e.eventType === "tab_click" && e.metadata) {
