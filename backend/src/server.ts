@@ -1016,6 +1016,25 @@ app.post("/auth/reset-password", async (request) => {
   return { ok: true };
 });
 
+
+app.put("/api/users/me/password", async (request) => {
+  const authUser = requireAuth(request);
+  const body = request.body as { currentPassword: string; newPassword: string };
+  if (!body.currentPassword || !body.newPassword)
+    throw app.httpErrors.badRequest("currentPassword y newPassword son requeridos");
+  if (body.newPassword.length < 8)
+    throw app.httpErrors.badRequest("La nueva contraseña debe tener al menos 8 caracteres");
+  const user = await prisma.user.findUnique({ where: { id: authUser.id } });
+  if (!user) throw app.httpErrors.notFound("User not found");
+  if (!(await verifyPassword(body.currentPassword, user.passwordHash)))
+    throw app.httpErrors.badRequest("Contraseña actual incorrecta");
+  await prisma.user.update({
+    where: { id: authUser.id },
+    data: { passwordHash: await hashPassword(body.newPassword) },
+  });
+  return { data: { ok: true }, error: null };
+});
+
 app.post("/api/query/:table", async (request) => {
   const table = pathParam(request, "table") as TableName;
   if (!(table in tableMap)) throw app.httpErrors.notFound("Unknown table");
@@ -1614,7 +1633,7 @@ app.post("/api/racer/ingest", async (req, reply) => {
               issuingOrganization: meta.client ?? null,
               country: meta.country ?? null,
               description: meta.summary_one_line ?? null,
-              tags: meta.project_domain ? meta.project_domain : undefined,
+              tags: Array.isArray(meta.project_domain) ? meta.project_domain : undefined,
             },
           });
         }
