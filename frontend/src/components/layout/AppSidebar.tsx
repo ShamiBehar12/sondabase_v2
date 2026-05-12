@@ -38,7 +38,7 @@ export function AppSidebar() {
   const [sessionsOpen, setSessionsOpen] = useState(true);
 
   const navigationItems = [
-    { title: t('navigation.dashboard'), url: "/dashboard", icon: Home },
+    ...(userRole === 'admin' || userRole === 'reviewer' ? [{ title: t('navigation.dashboard'), url: "/dashboard", icon: Home }] : []),
     { title: t('navigation.certificates'), url: "/certificates", icon: Award },
   ];
 
