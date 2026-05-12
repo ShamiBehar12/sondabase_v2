@@ -11,10 +11,12 @@ import {
   Users,
   ChevronLeft,
   ChevronRight,
+  Plus,
 } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAIChatContext } from '@/contexts/AIChatContext';
 
 import {
   Sidebar,
@@ -32,6 +34,8 @@ export function AppSidebar() {
   const { t } = useTranslation();
   const { state, toggleSidebar } = useSidebar();
   const { userRole } = useAuth();
+  const { createSession } = useAIChatContext();
+  const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
   const collapsed = state === "collapsed";
@@ -43,7 +47,7 @@ export function AppSidebar() {
     // { title: t('navigation.professionalCertificates'), url: "/professional-certificates", icon: GraduationCap },
     { title: t('myCertificates.title'), url: "/my-certificates", icon: ClipboardList },
     // { title: "Minhas Historias", url: "/my-success-stories", icon: FileText },
-    { title: "Asistente IA", url: "/ai-chat", icon: Bot },
+    { title: t('navigation.aiAssistant'), url: "/ai-chat", icon: Bot },
     // { title: "Smart Cities RAG", url: "/smart-cities", icon: MapPin },
     // { title: "Carga Masiva RAG", url: "/smart-cities/ingest", icon: Upload },
   ];
@@ -68,6 +72,11 @@ export function AppSidebar() {
     return `${baseClass} text-foreground-secondary hover:text-foreground hover:bg-surface-hover`;
   };
 
+  const handleNewAIChat = async () => {
+    await createSession();
+    navigate("/ai-chat");
+  };
+
   return (
     <Sidebar className={collapsed ? "w-16" : "w-64"}>
       <SidebarContent className="bg-sidebar border-r border-sidebar-border">
@@ -79,7 +88,7 @@ export function AppSidebar() {
                 <Award className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="font-bold text-lg text-blue-400">StoryCert</h2>
+                <h2 className="font-bold text-lg text-blue-400">SmartMatch</h2>
                 <p className="text-xs text-foreground-muted">Enterprise Platform</p>
               </div>
               <button
@@ -111,20 +120,34 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navigationItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      className={getNavClass(item.url)}
-                      title={collapsed ? item.title : undefined}
-                    >
-                      <item.icon className="w-5 h-5 flex-shrink-0" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {navigationItems.map((item) => {
+                const isAIChat = item.url === "/ai-chat";
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <div className={isAIChat && !collapsed ? "flex items-center" : undefined}>
+                      <SidebarMenuButton asChild className={isAIChat && !collapsed ? "flex-1" : undefined}>
+                        <NavLink
+                          to={item.url}
+                          className={getNavClass(item.url)}
+                          title={collapsed ? item.title : undefined}
+                        >
+                          <item.icon className="w-5 h-5 flex-shrink-0" />
+                          {!collapsed && <span>{item.title}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                      {isAIChat && !collapsed && (
+                        <button
+                          onClick={handleNewAIChat}
+                          title={t('navigation.newConversation')}
+                          className="w-7 h-7 flex items-center justify-center rounded-md text-foreground-muted hover:text-foreground hover:bg-white/10 transition-colors flex-shrink-0 mx-1"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
