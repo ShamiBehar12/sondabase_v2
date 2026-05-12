@@ -70,17 +70,19 @@ export async function generateOpenAIAnswer(
 
   const systemPrompt =
     intent === "clarification"
-      ? "Eres un asistente experto en certificados y documentos de proyectos de ciudades inteligentes. El usuario pide aclaración o contexto adicional sobre algo mencionado en la conversación. Usa el historial de la conversación como fuente principal. Si hay documentos recuperados, úsalos como referencia de apoyo. No inventes información ausente. Responde en el mismo idioma que el usuario."
-      : "Eres un asistente experto en certificados y documentos de proyectos de ciudades inteligentes. Usa los documentos recuperados en el contexto para responder la consulta. Resume cuáles certificados son más relevantes, explica por qué y no inventes información ausente. Si el historial de conversación aporta contexto relevante, tenlo en cuenta. Responde en el mismo idioma que el usuario.";
-
-  const userContent = context
-    ? `${question}\n\nDocumentos recuperados:\n${context}`
-    : question;
+      ? "Eres un asistente especializado en documentos y certificados. El usuario está pidiendo una aclaración o contexto adicional sobre algo mencionado anteriormente en la conversación. Responde de manera clara y directa, referenciando el historial de la conversación cuando sea relevante. Usa el mismo idioma que el usuario."
+      : "Eres un asistente especializado en documentos y certificados. Responde usando únicamente los certificados proporcionados en el contexto. Resume cuáles certificados atienden mejor la solicitud, explica por qué y no inventes información ausente. Usa el mismo idioma que el usuario.";
 
   const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
     { role: "system", content: systemPrompt },
     ...history,
-    { role: "user", content: userContent },
+    {
+      role: "user",
+      content:
+        intent === "clarification"
+          ? question
+          : `Consulta del usuario:\n${question}\n\nContexto recuperado:\n${context}`,
+    },
   ];
 
   try {
