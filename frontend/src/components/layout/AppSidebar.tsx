@@ -1,13 +1,7 @@
 import {
   Award,
   Home,
-  GraduationCap,
-  CheckCircle,
-  ClipboardList,
   Bot,
-  MapPin,
-  Upload,
-  FileText,
   Users,
   ChevronLeft,
   ChevronRight,
@@ -43,12 +37,10 @@ export function AppSidebar() {
   const navigationItems = [
     { title: t('navigation.dashboard'), url: "/dashboard", icon: Home },
     { title: t('navigation.certificates'), url: "/certificates", icon: Award },
-    { title: t('myCertificates.title'), url: "/my-certificates", icon: ClipboardList },
     { title: t('navigation.aiAssistant'), url: "/ai-chat", icon: Bot },
   ];
 
   const adminItems = [
-    { title: "Aprobación de Certificados", url: "/certificate-approval", icon: CheckCircle },
     { title: t('navigation.users'), url: "/users", icon: Users },
   ];
 

@@ -9,7 +9,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { BookOpen, Trash2, RefreshCw, Search, AlertTriangle, Copy } from "lucide-react";
+import { BookOpen, Trash2, RefreshCw, Search, AlertTriangle, Copy, WifiOff } from "lucide-react";
 
 interface RacerDocument {
   document_id: string;
@@ -29,10 +29,20 @@ function formatDate(iso: string | null) {
   return new Date(iso).toLocaleDateString("es-CL", { day: "2-digit", month: "short", year: "numeric" });
 }
 
+function normalizeDocsResponse(data: unknown): RacerDocument[] {
+  if (!data) return [];
+  if (Array.isArray(data)) return data as RacerDocument[];
+  const obj = data as Record<string, unknown>;
+  if (Array.isArray(obj.documents)) return obj.documents as RacerDocument[];
+  if (Array.isArray(obj.data)) return obj.data as RacerDocument[];
+  return [];
+}
+
 export default function Biblioteca() {
   const { toast } = useToast();
   const [docs, setDocs] = useState<RacerDocument[]>([]);
   const [loading, setLoading] = useState(true);
+  const [racerDown, setRacerDown] = useState(false);
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [deleteAllPassword, setDeleteAllPassword] = useState("");
@@ -41,8 +51,14 @@ export default function Biblioteca() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data } = await apiFetch<RacerDocument[]>("/api/racer/documents");
-    if (data) setDocs(data);
+    setRacerDown(false);
+    const { data, error } = await apiFetch<unknown>("/api/racer/documents");
+    if (error) {
+      setRacerDown(true);
+      setDocs([]);
+    } else {
+      setDocs(normalizeDocsResponse(data));
+    }
     setLoading(false);
   }, []);
 
@@ -84,7 +100,7 @@ export default function Biblioteca() {
     setDeleting(true);
     const { error, data } = await apiFetch<{ deleted: number }>("/api/racer/documents/all", { method: "DELETE", body: { password: deleteAllPassword } });
     if (error) toast({ variant: "destructive", title: "Error", description: (error as any).message });
-    else { toast({ title: `Índice limpiado — ${data?.deleted ?? 0} documentos eliminados` }); setSelected(new Set()); setDeleteAllPassword(""); await load(); }
+    else { toast({ title: `Índice limpiado — ${(data as any)?.deleted ?? 0} documentos eliminados` }); setSelected(new Set()); setDeleteAllPassword(""); await load(); }
     setDeleting(false);
   };
 
@@ -96,7 +112,7 @@ export default function Biblioteca() {
             <BookOpen className="w-6 h-6 text-primary" />Biblioteca de Conocimiento
           </h1>
           <p className="text-foreground-muted text-sm mt-1">
-            {loading ? "Cargando…" : `${docs.length} documento${docs.length !== 1 ? "s" : ""} indexado${docs.length !== 1 ? "s" : ""} en el asistente IA`}
+            {loading ? "Cargando…" : racerDown ? "RACER no disponible" : `${docs.length} documento${docs.length !== 1 ? "s" : ""} indexado${docs.length !== 1 ? "s" : ""} en el asistente IA`}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -112,6 +128,16 @@ export default function Biblioteca() {
           </Button>
         </div>
       </div>
+
+      {racerDown && (
+        <div className="flex items-start gap-3 p-4 rounded-lg border border-red-500/30 bg-red-500/10">
+          <WifiOff className="w-5 h-5 text-red-400 mt-0.5 shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-red-300">Servicio RACER no disponible</p>
+            <p className="text-xs text-red-400/70 mt-0.5">No se pudo conectar al servidor de documentos. Verifica que RACER esté corriendo.</p>
+          </div>
+        </div>
+      )}
 
       {showDuplicates && duplicateCount > 0 && (
         <div className="flex items-start gap-3 p-4 rounded-lg border border-amber-500/30 bg-amber-500/10">
@@ -169,7 +195,8 @@ export default function Biblioteca() {
             </thead>
             <tbody className="divide-y divide-white/5">
               {loading && <tr><td colSpan={9} className="py-12 text-center text-foreground-muted"><RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2" />Cargando documentos…</td></tr>}
-              {!loading && filtered.length === 0 && <tr><td colSpan={9} className="py-12 text-center text-foreground-muted">{showDuplicates ? "No se encontraron duplicados." : search ? "Sin resultados." : "No hay documentos indexados aún."}</td></tr>}
+              {!loading && racerDown && <tr><td colSpan={9} className="py-12 text-center text-red-400"><WifiOff className="w-5 h-5 mx-auto mb-2" />RACER no disponible — inicia el servidor e intenta de nuevo.</td></tr>}
+              {!loading && !racerDown && filtered.length === 0 && <tr><td colSpan={9} className="py-12 text-center text-foreground-muted">{showDuplicates ? "No se encontraron duplicados." : search ? "Sin resultados." : "No hay documentos indexados aún. Usa la carga por lote para ingestar PDFs."}</td></tr>}
               {filtered.map(doc => {
                 const isDup = !!(doc.content_hash && duplicateHashSet.has(doc.content_hash));
                 return (
