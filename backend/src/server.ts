@@ -20,7 +20,7 @@ import {
   type MatchStats,
 } from "./lib/ai.js";
 import { extractPdfTextDirect, extractPdfTextWithOcrFallback } from "./lib/pdf.js";
-import { generateOpenAIAnswer, generateOpenAIEmbedding, testOpenAIConnection } from "./lib/openai.js";
+import { generateOpenAIAnswer, generateOpenAIEmbedding, testOpenAIConnection, type ChatMessage } from "./lib/openai.js";
 import { prisma } from "./lib/prisma.js";
 import {
   hashPassword,
@@ -802,11 +802,11 @@ app.post("/api/ai/chat/query", async (request) => {
     take: 10,
   });
 
-  const historyForAI = previousMessages
+  const historyForAI: ChatMessage[] = previousMessages
     .filter((m) => m.role === "user" || m.role === "assistant")
     .map((m) => ({
       role: m.role as "user" | "assistant",
-      content: m.role === "assistant" ? m.content.slice(0, 600) : m.content,
+      content: m.role === "assistant" ? m.content.slice(0, 3000) : m.content,
     }));
 
   const intent = classifyQueryIntent(message, historyForAI);
@@ -910,15 +910,20 @@ app.post("/api/ai/chat/query", async (request) => {
     ],
   });
 
+  await prisma.aiChatSession.update({
+    where: { id: session.id },
+    data: { updatedAt: new Date() },
+  });
+
   return {
     data: {
       sessionId: session.id,
       providerUsed: settings.activeProvider,
       modelUsed: settings.activeChatModel,
       ragMode: settings.ragMode,
-      intent,
       answer,
       matches: finalMatches,
+      intent,
     },
     error: null,
   };
@@ -1038,7 +1043,6 @@ app.post("/auth/reset-password", async (request) => {
 
   return { ok: true };
 });
-
 
 app.put("/api/users/me/password", async (request) => {
   const authUser = requireAuth(request);
@@ -1489,7 +1493,8 @@ app.setErrorHandler((error: any, _request, reply) => {
     },
   });
 });
-// ── RACER Smart Cities RAG proxy ────────────────────────────────────────────────
+
+// ── RACER Smart Cities RAG proxy ────────────────────────────────────────────
 const RACER_URL = process.env.RACER_URL ?? "http://localhost:8000";
 
 async function sendPdfToRacer(absolutePath: string, fileName: string, documentId?: string) {
@@ -1656,7 +1661,7 @@ app.post("/api/racer/ingest", async (req, reply) => {
               issuingOrganization: meta.client ?? null,
               country: meta.country ?? null,
               description: meta.summary_one_line ?? null,
-              tags: Array.isArray(meta.project_domain) ? meta.project_domain : undefined,
+              tags: meta.project_domain ? meta.project_domain : undefined,
             },
           });
         }
@@ -1670,7 +1675,7 @@ app.post("/api/racer/ingest", async (req, reply) => {
   }
 });
 
-// ── RACER document management ───────────────────────────────────────────────────
+// ── RACER document management ────────────────────────────────────────────────
 
 app.get("/api/racer/documents", async (req, reply) => {
   requireAuth(req);
@@ -1713,23 +1718,7 @@ app.delete("/api/racer/documents", async (req, reply) => {
   return reply.send({ data, error: null });
 });
 
-app.get("/api/racer/source-file", async (request) => {
-  requireAuth(request);
-  const name = (request.query as { name?: string }).name;
-  if (!name) throw app.httpErrors.badRequest("name is required");
-
-  const cert = await prisma.certificate.findFirst({
-    where: { fileName: { endsWith: name } },
-    select: { filePath: true, fileName: true },
-  });
-
-  if (!cert) return { data: null, error: { message: "Document not found" } };
-
-  const fileUrl = `/api/storage/certificates/file?path=${encodeURIComponent(cert.filePath)}`;
-  return { data: { filePath: cert.filePath, fileUrl }, error: null };
-});
-
-// ── Dashboard stats ──────────────────────────────────────────────────────────
+// ── Dashboard stats ────────────────────────────────────────────────────────
 app.get("/api/stats/dashboard", async (req, reply) => {
   requireAuth(req);
   const [
@@ -1764,7 +1753,7 @@ app.get("/api/stats/dashboard", async (req, reply) => {
   const activities: ActivityItem[] = [];
 
   for (const cert of recentCerts) {
-    const userName = (cert as any).user?.profile?.fullName || (cert as any).user?.email || "Usuario";
+    const userName = (cert as any).user?.profile?.fullName || (cert as any).user?.email || "Usuário";
     activities.push({
       id: cert.id,
       action: cert.isVerified ? "added_certificate" : "submitted_certificate",
@@ -1775,7 +1764,7 @@ app.get("/api/stats/dashboard", async (req, reply) => {
     });
   }
   for (const story of recentStories) {
-    const userName = (story as any).user?.profile?.fullName || (story as any).user?.email || "Usuario";
+    const userName = (story as any).user?.profile?.fullName || (story as any).user?.email || "Usuário";
     activities.push({
       id: story.id,
       action: story.isVerified ? "published_story" : "submitted_story",
@@ -1803,7 +1792,7 @@ app.get("/api/stats/dashboard", async (req, reply) => {
   });
 });
 
-// ── Seed RACER documents as certificates ────────────────────────────────────────────
+// ── Seed RACER documents as certificates ──────────────────────────────────────────────────────
 app.post("/api/admin/seed-racer", async (req, reply) => {
   const user = requireAdmin(req);
   const metadataPath = path.join(process.cwd(), "../racer/data/metadata.jsonl");
@@ -1849,7 +1838,7 @@ app.post("/api/admin/seed-racer", async (req, reply) => {
   return reply.send({ data: { created, skipped, total: lines.length }, error: null });
 });
 
-// ── Analytics ──────────────────────────────────────────────────────────────────
+// ── Analytics ──────────────────────────────────────────────────────────────
 app.post("/api/usage/events", async (req) => {
   const user = requireAuth(req);
   const events = req.body as Array<{
@@ -1893,7 +1882,6 @@ app.get("/api/usage/summary", async (req) => {
   const profileMap = new Map(profiles.map((p) => [p.userId, p.fullName]));
   const emailMap = new Map(users.map((u) => [u.id, u.email]));
 
-  // per-user aggregation
   const byUser = new Map<string, {
     userId: string; name: string; email: string;
     pageVisits: number; totalTimeSec: number;
@@ -1931,7 +1919,6 @@ app.get("/api/usage/summary", async (req) => {
     if (e.eventType === "tab_click") u.tabClicks++;
   }
 
-  // top pages
   const pageCount = new Map<string, { visits: number; totalMs: number }>();
   for (const e of events) {
     if (e.eventType === "page_visit" && e.page) {
@@ -1950,14 +1937,12 @@ app.get("/api/usage/summary", async (req) => {
     .sort((a, b) => b.visits - a.visits)
     .slice(0, 10);
 
-  // hourly activity (last 7 days)
   const hourly = new Array(24).fill(0);
   const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
   for (const e of events) {
     if (e.createdAt.getTime() > cutoff) hourly[e.createdAt.getHours()]++;
   }
 
-  // tab click breakdown
   const tabCount = new Map<string, number>();
   for (const e of events) {
     if (e.eventType === "tab_click" && e.metadata) {
