@@ -27,8 +27,6 @@
     "aiAssistant": "Asistente IA",
     "certificateApproval": "Aprobación de Documentos",
     "administration": "Administración",
-    "aiAdministration": "Administración de IA",
-    "aiAdministrationSubtitle": "Configura el provider, modelo activo, estado del índice y gestión del RACER",
     "myCertificates": "Mis Documentos",
     "newConversation": "Nueva conversación",
     "documentExplorer": "Explorador de Documentos",
@@ -197,7 +195,6 @@
     "alertsExpiringMessage": "certificados expiran pronto",
     "alertsPending": "Aprobaciones Pendientes",
     "alertsPendingMessage": "documentos esperando aprobación",
-    "registered": "registrados",
     "alertsGoal": "Meta Alcanzada",
     "alertsGoalMessage": "de la meta de calidad alcanzada",
     "noOrganization": "Sin organización",
@@ -373,5 +370,25 @@
     "createUserError": "No se pudo crear el usuario",
     "allFieldsRequired": "Todos los campos son requeridos",
     "resetPasswordTitle": "Enviar enlace de restablecimiento de contraseña"
+  },
+  "aiChat": {
+    "title": "Asistente IA",
+    "subtitle": "Consulta los documentos indexados usando inteligencia artificial",
+    "chat": "Chat",
+    "chatDesc": "Haz preguntas sobre los documentos disponibles",
+    "loading": "Cargando mensajes...",
+    "noMessages": "Sin mensajes. ¡Haz tu primera pregunta!",
+    "question": "Tú",
+    "assistant": "Asistente",
+    "querying": "Consultando...",
+    "inputPlaceholder": "Escribe tu consulta...",
+    "send": "Enviar",
+    "sources": "Fuentes",
+    "sourcesDesc": "Documentos recuperados por el asistente",
+    "sourcesFor": "Fuentes del mensaje seleccionado",
+    "sourcesEmpty": "Las fuentes aparecerán aquí tras tu consulta",
+    "newSessionError": "No se pudo crear la sesión",
+    "chatError": "Error al enviar el mensaje",
+    "newChat": "Nueva conversación"
   }
 }

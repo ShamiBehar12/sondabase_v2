@@ -27,8 +27,6 @@
     "aiAssistant": "AI Assistant",
     "certificateApproval": "Document Approval",
     "administration": "Administration",
-    "aiAdministration": "AI Administration",
-    "aiAdministrationSubtitle": "Configure provider, active model, index state and RACER management",
     "myCertificates": "My Documents",
     "newConversation": "New conversation",
     "documentExplorer": "Document Explorer",
@@ -197,7 +195,6 @@
     "alertsExpiringMessage": "certificates expire soon",
     "alertsPending": "Pending Approvals",
     "alertsPendingMessage": "documents awaiting approval",
-    "registered": "registered",
     "alertsGoal": "Goal Achieved",
     "alertsGoalMessage": "of quality goal achieved",
     "noOrganization": "No organization",
@@ -373,5 +370,25 @@
     "createUserError": "Could not create user",
     "allFieldsRequired": "All fields are required",
     "resetPasswordTitle": "Send password reset link"
+  },
+  "aiChat": {
+    "title": "AI Assistant",
+    "subtitle": "Query indexed documents using artificial intelligence",
+    "chat": "Chat",
+    "chatDesc": "Ask questions about available documents",
+    "loading": "Loading messages...",
+    "noMessages": "No messages yet. Ask your first question!",
+    "question": "You",
+    "assistant": "Assistant",
+    "querying": "Querying...",
+    "inputPlaceholder": "Type your query...",
+    "send": "Send",
+    "sources": "Sources",
+    "sourcesDesc": "Documents retrieved by the assistant",
+    "sourcesFor": "Sources for selected message",
+    "sourcesEmpty": "Sources will appear here after your query",
+    "newSessionError": "Could not create session",
+    "chatError": "Error sending message",
+    "newChat": "New conversation"
   }
 }

@@ -28,8 +28,6 @@
     "certificateApproval": "Aprovação de Documentos",
     "successStoriesApproval": "Aprovação de Histórias",
     "administration": "Administração",
-    "aiAdministration": "Administração de IA",
-    "aiAdministrationSubtitle": "Configura o provider, modelo ativo, estado do índice e gestão do RACER",
     "myCertificates": "Meus Documentos",
     "newConversation": "Nova conversa",
     "documentExplorer": "Explorador de Documentos",
@@ -102,11 +100,7 @@
     "noCertificatesFound": "Nenhum certificado encontrado",
     "noCertificatesMessage": "Nenhum certificado corresponde aos filtros aplicados.",
     "noCertificatesInitial": "Você ainda não possui certificados. Comece enviando seu primeiro certificado!",
-    "clickToView": "Clique no cartão para visualizar",
-    "verified": "Verificado",
-    "pending": "Pendente",
-    "rejected": "Rejeitado",
-    "approved": "Aprovado"
+    "clickToView": "Clique no cartão para visualizar"
   },
   "successStories": {
     "title": "Histórias de Sucesso",
@@ -161,20 +155,6 @@
     "rejected": "Rejeitada",
     "draft": "Rascunho"
   },
-  "professionalCertificates": {
-    "title": "Certificados Profissionais",
-    "subtitle": "Gerencie certificados profissionais e acadêmicos",
-    "uploadTitle": "Enviar Certificado Profissional",
-    "uploadSubtitle": "Adicione um certificado profissional à sua coleção",
-    "institution": "Instituição",
-    "certificationType": "Tipo de Certificação",
-    "specialization": "Área de Especialização",
-    "courseHours": "Horas do Curso",
-    "validFrom": "Válido a partir de",
-    "validUntil": "Válido até",
-    "professionalCouncil": "Conselho Profissional",
-    "registrationNumber": "Número de Registro"
-  },
   "auth": {
     "signIn": "Entrar",
     "signUp": "Cadastrar",
@@ -216,7 +196,6 @@
     "alertsExpiringMessage": "certificados expiram em breve",
     "alertsPending": "Aprovações Pendentes",
     "alertsPendingMessage": "documentos aguardando aprovação",
-    "registered": "registrados",
     "alertsGoal": "Meta Atingida",
     "alertsGoalMessage": "da meta de qualidade alcançada",
     "noOrganization": "Sem organização",
@@ -393,30 +372,24 @@
     "allFieldsRequired": "Todos os campos são obrigatórios",
     "resetPasswordTitle": "Enviar link de redefinição de senha"
   },
-  "settings": {
-    "title": "Configurações",
-    "description": "Personalize sua conta e preferências",
-    "profile": "Informações Pessoais",
-    "profileDescription": "Gerencie suas informações pessoais e avatar",
-    "fullName": "Nome Completo",
-    "fullNamePlaceholder": "Digite seu nome completo",
-    "email": "Email",
-    "emailNote": "O email não pode ser alterado",
-    "avatarUrl": "Avatar",
-    "language": "Idioma",
-    "languageDescription": "Escolha seu idioma preferido",
-    "preferredLanguage": "Idioma Preferido",
-    "languagePreview": "Visualização",
-    "interfaceLanguage": "Idioma da interface",
-    "dateFormat": "Formato de data",
-    "certificates": "Certificados",
-    "certificatesDescription": "Configure como visualizar certificados",
-    "certificatesViewMode": "Modo de Visualização",
-    "certificatesPreview": "Visualização",
-    "certificatesViewDescription": "Como os certificados serão exibidos",
-    "saved": "Salvo",
-    "savedDescription": "Configurações salvas com sucesso",
-    "saveError": "Erro ao salvar configurações"
-  },
-  "notifications": "Notificações"
+  "aiChat": {
+    "title": "Assistente IA",
+    "subtitle": "Consulte os documentos indexados usando inteligência artificial",
+    "chat": "Chat",
+    "chatDesc": "Faça perguntas sobre os documentos disponíveis",
+    "loading": "Carregando mensagens...",
+    "noMessages": "Sem mensagens. Faça sua primeira pergunta!",
+    "question": "Você",
+    "assistant": "Assistente",
+    "querying": "Consultando...",
+    "inputPlaceholder": "Digite sua consulta...",
+    "send": "Enviar",
+    "sources": "Fontes",
+    "sourcesDesc": "Documentos recuperados pelo assistente",
+    "sourcesFor": "Fontes da mensagem selecionada",
+    "sourcesEmpty": "As fontes aparecerão aqui após sua consulta",
+    "newSessionError": "Não foi possível criar a sessão",
+    "chatError": "Erro ao enviar a mensagem",
+    "newChat": "Nova conversa"
+  }
 }
