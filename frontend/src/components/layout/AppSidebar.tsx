@@ -1,22 +1,18 @@
 import {
   Award,
   Home,
-  GraduationCap,
-  CheckCircle,
-  ClipboardList,
   Bot,
-  MapPin,
-  Upload,
-  FileText,
   Users,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Plus,
 } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAIChatContext } from '@/contexts/AIChatContext';
+import { useState } from 'react';
 
 import {
   Sidebar,
@@ -34,29 +30,20 @@ export function AppSidebar() {
   const { t } = useTranslation();
   const { state, toggleSidebar } = useSidebar();
   const { userRole } = useAuth();
-  const { createSession } = useAIChatContext();
+  const { sessions, activeSessionId, setActiveSessionId, createSession } = useAIChatContext();
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
   const collapsed = state === "collapsed";
+  const [sessionsOpen, setSessionsOpen] = useState(true);
 
   const navigationItems = [
     { title: t('navigation.dashboard'), url: "/dashboard", icon: Home },
-    // { title: t('navigation.successStories'), url: "/success-stories", icon: FileText },
     { title: t('navigation.certificates'), url: "/certificates", icon: Award },
-    // { title: t('navigation.professionalCertificates'), url: "/professional-certificates", icon: GraduationCap },
-    { title: t('myCertificates.title'), url: "/my-certificates", icon: ClipboardList },
-    // { title: "Minhas Historias", url: "/my-success-stories", icon: FileText },
-    { title: t('navigation.aiAssistant'), url: "/ai-chat", icon: Bot },
-    // { title: "Smart Cities RAG", url: "/smart-cities", icon: MapPin },
-    // { title: "Carga Masiva RAG", url: "/smart-cities/ingest", icon: Upload },
   ];
 
   const adminItems = [
-    { title: "Aprobación de Certificados", url: "/certificate-approval", icon: CheckCircle },
-    // { title: "Aprobación de Historias", url: "/success-story-approval", icon: FileText },
     { title: t('navigation.users'), url: "/users", icon: Users },
-    // { title: "Administración IA", url: "/ai-admin", icon: Bot },
   ];
 
   const isActive = (path: string) => {
@@ -74,6 +61,11 @@ export function AppSidebar() {
 
   const handleNewAIChat = async () => {
     await createSession();
+    navigate("/ai-chat");
+  };
+
+  const handleSessionClick = (sessionId: string) => {
+    setActiveSessionId(sessionId);
     navigate("/ai-chat");
   };
 
@@ -120,43 +112,89 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navigationItems.map((item) => {
-                const isAIChat = item.url === "/ai-chat";
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <div className={isAIChat && !collapsed ? "flex items-center" : undefined}>
-                      <SidebarMenuButton asChild className={isAIChat && !collapsed ? "flex-1" : undefined}>
-                        <NavLink
-                          to={item.url}
-                          className={getNavClass(item.url)}
-                          title={collapsed ? item.title : undefined}
-                        >
-                          <item.icon className="w-5 h-5 flex-shrink-0" />
-                          {!collapsed && <span>{item.title}</span>}
-                        </NavLink>
-                      </SidebarMenuButton>
-                      {isAIChat && !collapsed && (
+              {navigationItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={item.url}
+                      className={getNavClass(item.url)}
+                      title={collapsed ? item.title : undefined}
+                    >
+                      <item.icon className="w-5 h-5 flex-shrink-0" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+
+              {/* AI Assistant with collapsible sessions */}
+              <SidebarMenuItem>
+                <div>
+                  <div
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 font-medium ${
+                      isActive('/ai-chat')
+                        ? 'bg-gradient-primary text-white shadow-primary'
+                        : 'text-foreground-secondary hover:text-foreground hover:bg-surface-hover'
+                    }`}
+                  >
+                    <NavLink
+                      to="/ai-chat"
+                      className="flex items-center gap-3 flex-1 min-w-0"
+                      title={collapsed ? t('navigation.aiAssistant') : undefined}
+                    >
+                      <Bot className="w-5 h-5 flex-shrink-0" />
+                      {!collapsed && <span className="truncate">{t('navigation.aiAssistant')}</span>}
+                    </NavLink>
+                    {!collapsed && (
+                      <div className="flex items-center gap-0.5 flex-shrink-0">
                         <button
-                          onClick={handleNewAIChat}
+                          onClick={(e) => { e.preventDefault(); handleNewAIChat(); }}
                           title={t('navigation.newConversation')}
-                          className="w-7 h-7 flex items-center justify-center rounded-md text-foreground-muted hover:text-foreground hover:bg-white/10 transition-colors flex-shrink-0 mx-1"
+                          className="w-5 h-5 flex items-center justify-center rounded text-current/70 hover:text-current transition-colors"
                         >
                           <Plus className="w-3.5 h-3.5" />
                         </button>
-                      )}
+                        {sessions.length > 0 && (
+                          <button
+                            onClick={(e) => { e.preventDefault(); setSessionsOpen(s => !s); }}
+                            className="w-5 h-5 flex items-center justify-center rounded text-current/70 hover:text-current transition-colors"
+                          >
+                            <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${sessionsOpen ? 'rotate-180' : ''}`} />
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {!collapsed && sessionsOpen && sessions.length > 0 && (
+                    <div className="mt-1 ml-4 border-l border-border/50 pl-3 space-y-0.5 pb-1">
+                      {sessions.slice(0, 8).map(session => (
+                        <button
+                          key={session.id}
+                          onClick={() => handleSessionClick(session.id)}
+                          className={`w-full text-left text-xs px-2 py-1.5 rounded-md transition-colors truncate block ${
+                            activeSessionId === session.id
+                              ? 'text-primary bg-primary/10'
+                              : 'text-foreground-muted hover:text-foreground hover:bg-surface-hover'
+                          }`}
+                          title={session.title || t('aiChat.noTitle')}
+                        >
+                          {session.title || t('aiChat.noTitle')}
+                        </button>
+                      ))}
                     </div>
-                  </SidebarMenuItem>
-                );
-              })}
+                  )}
+                </div>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Admin Section - Only show for admins */}
+        {/* Admin Section */}
         {(userRole === 'admin' || userRole === 'reviewer') && (
           <SidebarGroup>
             <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>
-              Administración
+              {t('navigation.administration')}
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>

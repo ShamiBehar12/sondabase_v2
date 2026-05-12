@@ -408,6 +408,8 @@
     "sourcesEmpty": "As fontes aparecerão aqui após sua consulta",
     "newSessionError": "Não foi possível criar a sessão",
     "chatError": "Erro ao enviar a mensagem",
-    "newChat": "Nova conversa"
+    "newChat": "Nova conversa",
+    "noTitle": "Sem título",
+    "openDoc": "Abrir documento"
   }
 }

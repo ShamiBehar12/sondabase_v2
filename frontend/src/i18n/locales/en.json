@@ -389,6 +389,8 @@
     "sourcesEmpty": "Sources will appear here after your query",
     "newSessionError": "Could not create session",
     "chatError": "Error sending message",
-    "newChat": "New conversation"
+    "newChat": "New conversation",
+    "noTitle": "No title",
+    "openDoc": "Open document"
   }
 }

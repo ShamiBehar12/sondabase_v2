@@ -389,6 +389,8 @@
     "sourcesEmpty": "Las fuentes aparecerán aquí tras tu consulta",
     "newSessionError": "No se pudo crear la sesión",
     "chatError": "Error al enviar el mensaje",
-    "newChat": "Nueva conversación"
+    "newChat": "Nueva conversación",
+    "noTitle": "Sin título",
+    "openDoc": "Abrir documento"
   }
 }
