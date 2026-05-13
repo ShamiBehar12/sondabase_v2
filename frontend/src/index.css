@@ -89,20 +89,94 @@
   }
 }
 
+/* ── Dark mode class block ── ───────────────────────────────────────────────
+   Required for darkMode: ["class"] — mirrors :root values so .dark variants
+   activate AND Tailwind's dark: utilities generate proper rules.
+   ─────────────────────────────────────────────────────────────────────────── */
+@layer base {
+  .dark {
+    color-scheme: dark;
+    --background: 218 16% 11%;
+    --background-secondary: 218 18% 14%;
+    --background-tertiary: 218 20% 17%;
+    --surface: 218 18% 16%;
+    --surface-hover: 218 22% 20%;
+    --foreground: 210 40% 98%;
+    --foreground-secondary: 215 18% 88%;
+    --foreground-muted: 215 16% 72%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 40% 98%;
+    --card: var(--surface);
+    --card-foreground: var(--foreground);
+    --popover: var(--background-secondary);
+    --popover-foreground: var(--foreground);
+    --secondary: var(--background-secondary);
+    --secondary-foreground: var(--foreground);
+    --muted: var(--background-tertiary);
+    --muted-foreground: var(--foreground-muted);
+    --accent: var(--primary);
+    --accent-foreground: var(--primary-foreground);
+    --destructive: 0 78% 58%;
+    --destructive-foreground: var(--foreground);
+    --border: 215 20% 26%;
+    --input: 215 20% 26%;
+    --ring: var(--primary);
+    --sidebar-background: var(--background-secondary);
+    --sidebar-foreground: var(--foreground);
+    --sidebar-border: 215 20% 18%;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
   }
 
   body {
     @apply bg-background text-foreground font-inter;
     background: var(--gradient-secondary);
     min-height: 100vh;
+    color: hsl(var(--foreground));
   }
-  
-  html {
-    scroll-behavior: smooth;
+
+  /* ── Force readable text on all semantic elements ─────────────────────── */
+  h1, h2, h3, h4, h5, h6 {
+    color: hsl(var(--foreground));
   }
+
+  p {
+    color: inherit;
+  }
+
+  label {
+    color: hsl(var(--foreground-secondary));
+  }
+
+  /* Inputs inherit text from body (white), keep placeholder muted */
+  input, textarea, select {
+    color: hsl(var(--foreground));
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: hsl(var(--foreground-muted));
+    opacity: 1;
+  }
+
+  input:focus,
+  textarea:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  /* Ensure table text is visible */
+  th { color: hsl(var(--foreground-muted)); }
+  td { color: hsl(var(--foreground-secondary)); }
 }
 
 @layer components {
