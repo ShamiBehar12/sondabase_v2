@@ -47,87 +47,82 @@ export function AppHeader() {
     }
   };
   return (
-    <header className="bg-background-secondary/75 backdrop-blur-md border-b border-border/40 sticky top-0 z-50">
-      <div className="flex items-center justify-between px-6 py-3">
-        {/* Left Section */}
+    <header className="sticky top-0 z-50" style={{
+      background: 'rgba(22,26,38,0.85)',
+      backdropFilter: 'blur(20px)',
+      borderBottom: '1px solid rgba(255,255,255,0.08)',
+    }}>
+      <div className="flex items-center justify-between px-6 py-2.5">
+        {/* Left */}
         <div className="flex items-center gap-3">
-          <SidebarTrigger />
+          <SidebarTrigger className="text-foreground-muted hover:text-foreground" />
         </div>
 
-        {/* Right Section */}
+        {/* Right */}
         <div className="flex items-center gap-1">
-          {/* Language Selector */}
           <LanguageSelector />
 
-          <div className="w-px h-5 bg-border/60 mx-1" />
+          <div className="w-px h-5 mx-1" style={{ background: 'rgba(255,255,255,0.1)' }} />
 
           {/* Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="relative w-9 h-9 p-0 hover:bg-white/[0.06]">
-                <Bell className="w-4 h-4" />
-                <Badge
-                  variant="destructive"
-                  className="absolute -top-0.5 -right-0.5 w-4 h-4 flex items-center justify-center text-[10px] p-0 font-bold"
-                >
+              <Button variant="ghost" size="sm" className="relative w-9 h-9 p-0 rounded-xl hover:bg-white/[0.06]">
+                <Bell className="w-4 h-4 text-foreground-muted" />
+                <span className="absolute -top-0.5 -right-0.5 w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold text-white"
+                  style={{ background: 'linear-gradient(135deg,#ef4444,#dc2626)' }}>
                   3
-                </Badge>
+                </span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80">
-              <div className="px-3 py-2.5 border-b border-border/50">
-                <h3 className="font-semibold text-sm">{t('notifications')}</h3>
+              <div className="px-3 py-2.5 border-b border-border/40">
+                <h3 className="font-semibold text-sm text-foreground">{t('notifications')}</h3>
               </div>
-              <DropdownMenuItem className="p-3 gap-3 focus:bg-white/[0.04]">
-                <div className="w-1.5 h-1.5 rounded-full bg-info flex-shrink-0 mt-1" />
-                <div>
-                  <p className="font-medium text-sm">Nova exportação concluída</p>
-                  <p className="text-xs text-foreground-muted mt-0.5">Success Story - Cliente ABC</p>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="p-3 gap-3 focus:bg-white/[0.04]">
-                <div className="w-1.5 h-1.5 rounded-full bg-warning flex-shrink-0 mt-1" />
-                <div>
-                  <p className="font-medium text-sm">Certificado expirando</p>
-                  <p className="text-xs text-foreground-muted mt-0.5">ISO 9001 - vence em 30 dias</p>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="p-3 gap-3 focus:bg-white/[0.04]">
-                <div className="w-1.5 h-1.5 rounded-full bg-success flex-shrink-0 mt-1" />
-                <div>
-                  <p className="font-medium text-sm">Story aprovada</p>
-                  <p className="text-xs text-foreground-muted mt-0.5">Case XYZ foi publicado</p>
-                </div>
-              </DropdownMenuItem>
+              {[
+                { color: 'bg-info', title: 'Nova exportação concluída', sub: 'Success Story - Cliente ABC' },
+                { color: 'bg-warning', title: 'Certificado expirando', sub: 'ISO 9001 - vence em 30 dias' },
+                { color: 'bg-success', title: 'Story aprovada', sub: 'Case XYZ foi publicado' },
+              ].map((n, i) => (
+                <DropdownMenuItem key={i} className="p-3 gap-3 focus:bg-white/[0.04] cursor-pointer">
+                  <div className={`w-2 h-2 rounded-full ${n.color} flex-shrink-0 mt-1`} />
+                  <div>
+                    <p className="font-medium text-sm text-foreground">{n.title}</p>
+                    <p className="text-xs text-foreground-muted mt-0.5">{n.sub}</p>
+                  </div>
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div className="w-px h-5 bg-border/60 mx-1" />
+          <div className="w-px h-5 mx-1" style={{ background: 'rgba(255,255,255,0.1)' }} />
 
-          {/* User Menu */}
+          {/* User menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-9 px-2 gap-2.5 hover:bg-white/[0.06]">
+              <Button variant="ghost" className="h-9 px-2 gap-2.5 rounded-xl hover:bg-white/[0.06]">
                 <Avatar className="w-7 h-7">
                   <AvatarImage src={profile.avatar_url || ''} />
-                  <AvatarFallback className="bg-gradient-primary text-white text-xs font-semibold">
+                  <AvatarFallback className="bg-gradient-primary text-white text-xs font-bold">
                     {profile.full_name?.charAt(0) || user?.email?.charAt(0).toUpperCase() || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <div className="hidden sm:block text-left">
-                  <p className="text-sm font-medium leading-tight">{profile.full_name || user?.email}</p>
+                  <p className="text-sm font-semibold text-foreground leading-tight">
+                    {profile.full_name || user?.email}
+                  </p>
                   <p className="text-[11px] text-foreground-muted leading-tight">{t('auth.loggedInUser')}</p>
                 </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem onClick={() => navigate('/settings')}>
-                <User className="w-4 h-4 mr-2" />
+              <DropdownMenuItem onClick={() => navigate('/settings')} className="gap-2 cursor-pointer">
+                <User className="w-4 h-4" />
                 {t('profile')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-error" onClick={signOut}>
-                <LogOut className="w-4 h-4 mr-2" />
+              <DropdownMenuItem className="text-red-400 gap-2 cursor-pointer focus:text-red-400" onClick={signOut}>
+                <LogOut className="w-4 h-4" />
                 {t('auth.signOut')}
               </DropdownMenuItem>
             </DropdownMenuContent>

@@ -220,9 +220,15 @@ export default function AdminDocPermissions() {
         {/* Permissions panel */}
         <div className="premium-card flex flex-col overflow-hidden">
           {!selected || !access ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-foreground-muted gap-2">
-              <Shield className="w-12 h-12 opacity-20" />
-              <p className="text-sm">Selecciona un usuario para configurar sus permisos</p>
+            <div className="flex-1 flex flex-col items-center justify-center gap-3 p-8 text-center">
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.15)' }}>
+                <Shield className="w-7 h-7 text-primary opacity-60" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">Configura permisos documentales</p>
+                <p className="text-xs text-foreground-muted mt-1">Selecciona un usuario de la lista para gestionar su acceso al RAG</p>
+              </div>
             </div>
           ) : (
             <div className="flex flex-col h-full">

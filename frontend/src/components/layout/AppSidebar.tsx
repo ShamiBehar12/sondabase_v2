@@ -34,7 +34,6 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -61,9 +60,9 @@ export function AppSidebar() {
   ];
 
   const adminItems = [
-    { title: t("navigation.users"),             url: "/users",                  icon: Users },
-    { title: t("navigation.adminConversations"), url: "/admin/conversations",    icon: MessageSquareText },
-    { title: t("navigation.docPermissions"),     url: "/admin/doc-permissions",  icon: ShieldCheck },
+    { title: t("navigation.users"),             url: "/users",                 icon: Users },
+    { title: t("navigation.adminConversations"), url: "/admin/conversations",   icon: MessageSquareText },
+    { title: t("navigation.docPermissions"),     url: "/admin/doc-permissions", icon: ShieldCheck },
   ];
 
   const isActive = (path: string) => {
@@ -72,12 +71,12 @@ export function AppSidebar() {
   };
 
   const getNavClass = (path: string) => {
-    const baseClass =
-      "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 font-medium";
+    const base =
+      "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 font-medium text-sm w-full";
     if (isActive(path)) {
-      return `${baseClass} bg-gradient-primary text-white shadow-primary`;
+      return `${base} bg-gradient-primary text-white shadow-primary`;
     }
-    return `${baseClass} text-foreground-secondary hover:text-foreground hover:bg-surface-hover`;
+    return `${base} text-foreground-secondary hover:text-foreground hover:bg-white/[0.07]`;
   };
 
   const handleNewAIChat = async () => {
@@ -97,11 +96,7 @@ export function AppSidebar() {
   const handleDeleteSession = async (sessionId: string) => {
     const { error } = await deleteSession(sessionId);
     if (error) {
-      toast({
-        variant: "destructive",
-        title: t("aiChat.errorDelete"),
-        description: error.message,
-      });
+      toast({ variant: "destructive", title: t("aiChat.errorDelete"), description: error.message });
       return;
     }
     toast({ title: t("aiChat.deletedSuccess") });
@@ -109,33 +104,43 @@ export function AppSidebar() {
 
   return (
     <Sidebar className={collapsed ? "w-16" : "w-64"}>
-      <SidebarContent className="bg-sidebar border-r border-sidebar-border">
-        {/* Logo Area */}
-        <div className="p-4 border-b border-sidebar-border">
+      <SidebarContent className="bg-sidebar border-r border-sidebar-border flex flex-col">
+
+        {/* Logo */}
+        <div className="p-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
           {!collapsed ? (
-            <div className="flex items-center gap-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm px-3 py-2.5 relative">
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20 flex-shrink-0">
+            <div
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5"
+              style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.18)' }}
+            >
+              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/25 flex-shrink-0">
                 <Award className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="font-bold text-lg text-blue-400">SmartMatch</h2>
-                <p className="text-xs text-foreground-muted">Enterprise Platform</p>
+                <h2 className="font-bold text-[15px] text-white leading-tight">SmartMatch</h2>
+                <p className="text-[11px]" style={{ color: 'rgba(147,197,253,0.6)' }}>Enterprise Platform</p>
               </div>
               <button
                 onClick={toggleSidebar}
-                className="w-6 h-6 flex items-center justify-center rounded-md text-foreground-muted hover:text-foreground hover:bg-white/10 transition-colors flex-shrink-0"
+                className="w-6 h-6 flex items-center justify-center rounded-md transition-colors flex-shrink-0"
+                style={{ color: 'rgba(255,255,255,0.35)' }}
+                onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.8)'}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.35)'}
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/25">
                 <Award className="w-5 h-5 text-white" />
               </div>
               <button
                 onClick={toggleSidebar}
-                className="w-6 h-6 flex items-center justify-center rounded-md text-foreground-muted hover:text-foreground hover:bg-white/10 transition-colors"
+                className="w-6 h-6 flex items-center justify-center rounded-md transition-colors"
+                style={{ color: 'rgba(255,255,255,0.35)' }}
+                onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.8)'}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.35)'}
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -143,46 +148,58 @@ export function AppSidebar() {
           )}
         </div>
 
-        {/* Main Navigation */}
-        <SidebarGroup>
-          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>
-            {t("navigation.dashboard")}
-          </SidebarGroupLabel>
+        {/* Main nav */}
+        <SidebarGroup className="pt-3 flex-shrink-0">
+          {!collapsed && (
+            <p className="px-4 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.15em]"
+              style={{ color: 'rgba(255,255,255,0.25)' }}>
+              {t("navigation.dashboard")}
+            </p>
+          )}
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="px-2 gap-0.5">
               {navigationItems.map((item) => {
                 const isAIChat = item.url === "/ai-chat";
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <div className={isAIChat && !collapsed ? "flex items-center" : undefined}>
-                      <SidebarMenuButton
-                        asChild
-                        className={isAIChat && !collapsed ? "flex-1" : undefined}
-                      >
+                    <div className={isAIChat && !collapsed ? "flex items-center gap-0.5" : undefined}>
+                      <SidebarMenuButton asChild className={isAIChat && !collapsed ? "flex-1 min-w-0" : undefined}>
                         <NavLink
                           to={item.url}
                           className={getNavClass(item.url)}
                           title={collapsed ? item.title : undefined}
                         >
-                          <item.icon className="w-5 h-5 flex-shrink-0" />
-                          {!collapsed && <span>{item.title}</span>}
+                          <item.icon className="w-[18px] h-[18px] flex-shrink-0" />
+                          {!collapsed && <span className="truncate">{item.title}</span>}
                         </NavLink>
                       </SidebarMenuButton>
                       {isAIChat && !collapsed && (
                         <button
                           onClick={handleNewAIChat}
                           title={t("navigation.newConversation")}
-                          className="w-7 h-7 flex items-center justify-center rounded-md text-foreground-muted hover:text-foreground hover:bg-white/10 transition-colors flex-shrink-0 mx-1"
+                          className="w-7 h-7 flex items-center justify-center rounded-lg transition-all flex-shrink-0"
+                          style={{ color: 'rgba(255,255,255,0.3)' }}
+                          onMouseEnter={e => {
+                            const el = e.currentTarget as HTMLElement;
+                            el.style.background = 'rgba(255,255,255,0.08)';
+                            el.style.color = 'rgba(255,255,255,0.85)';
+                          }}
+                          onMouseLeave={e => {
+                            const el = e.currentTarget as HTMLElement;
+                            el.style.background = 'transparent';
+                            el.style.color = 'rgba(255,255,255,0.3)';
+                          }}
                         >
                           <Plus className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </div>
 
-                    {/* Sessions sub-list under AI Chat */}
+                    {/* Sessions */}
                     {isAIChat && !collapsed && isOnAIChat && sessions.length > 0 && (
-                      <div className="ml-4 mt-1 border-l border-sidebar-border pl-2">
-                        <p className="text-[10px] uppercase tracking-wider text-foreground-muted px-1 py-1">
+                      <div className="ml-4 mt-1 border-l pl-2" style={{ borderColor: 'rgba(255,255,255,0.09)' }}>
+                        <p className="text-[10px] uppercase tracking-wider px-1 py-1"
+                          style={{ color: 'rgba(255,255,255,0.25)' }}>
                           {t("aiChat.conversations")}
                         </p>
                         <ScrollArea className="max-h-52">
@@ -190,11 +207,14 @@ export function AppSidebar() {
                             {sessions.map((session) => (
                               <div
                                 key={session.id}
-                                className={`group flex items-center gap-1 rounded-md px-2 py-1.5 text-xs transition-colors cursor-pointer ${
+                                className={`group flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs transition-all cursor-pointer ${
                                   activeSessionId === session.id
-                                    ? "bg-primary/20 text-primary"
-                                    : "text-foreground-secondary hover:bg-surface-hover hover:text-foreground"
+                                    ? "bg-primary/15 border border-primary/25"
+                                    : "hover:bg-white/[0.05] border border-transparent"
                                 }`}
+                                style={activeSessionId === session.id
+                                  ? { color: 'rgba(147,197,253,0.9)' }
+                                  : { color: 'rgba(255,255,255,0.45)' }}
                               >
                                 <MessageSquare className="w-3 h-3 flex-shrink-0 opacity-60" />
                                 <button
@@ -207,7 +227,8 @@ export function AppSidebar() {
                                 <AlertDialog>
                                   <AlertDialogTrigger asChild>
                                     <button
-                                      className="w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity hover:text-destructive flex-shrink-0"
+                                      className="w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                                      style={{ color: 'rgba(248,113,113,0.7)' }}
                                       onClick={(e) => e.stopPropagation()}
                                       title={t("aiChat.deleteConversation")}
                                     >
@@ -216,9 +237,7 @@ export function AppSidebar() {
                                   </AlertDialogTrigger>
                                   <AlertDialogContent className="bg-surface border-border">
                                     <AlertDialogHeader>
-                                      <AlertDialogTitle>
-                                        {t("aiChat.deleteConversation")}
-                                      </AlertDialogTitle>
+                                      <AlertDialogTitle>{t("aiChat.deleteConversation")}</AlertDialogTitle>
                                       <AlertDialogDescription className="text-foreground-muted">
                                         {t("aiChat.confirmDeleteDesc", {
                                           title: session.title || t("aiChat.noTitle"),
@@ -249,14 +268,22 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Admin Section */}
+        {/* Admin section */}
         {(userRole === "admin" || userRole === "reviewer") && (
-          <SidebarGroup>
-            <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>
-              Administración
-            </SidebarGroupLabel>
+          <SidebarGroup className="flex-shrink-0">
+            {!collapsed ? (
+              <div className="px-4 pt-4 pb-1.5">
+                <div className="h-px mb-3" style={{ background: 'rgba(255,255,255,0.07)' }} />
+                <p className="text-[10px] font-semibold uppercase tracking-[0.15em]"
+                  style={{ color: 'rgba(255,255,255,0.25)' }}>
+                  Administración
+                </p>
+              </div>
+            ) : (
+              <div className="mx-3 h-px my-2" style={{ background: 'rgba(255,255,255,0.07)' }} />
+            )}
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="px-2 gap-0.5">
                 {adminItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
@@ -265,8 +292,8 @@ export function AppSidebar() {
                         className={getNavClass(item.url)}
                         title={collapsed ? item.title : undefined}
                       >
-                        <item.icon className="w-5 h-5 flex-shrink-0" />
-                        {!collapsed && <span>{item.title}</span>}
+                        <item.icon className="w-[18px] h-[18px] flex-shrink-0" />
+                        {!collapsed && <span className="truncate">{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -274,6 +301,15 @@ export function AppSidebar() {
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
+        )}
+
+        {/* Bottom version */}
+        {!collapsed && (
+          <div className="mt-auto p-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
+            <p className="text-[10px] text-center" style={{ color: 'rgba(255,255,255,0.18)' }}>
+              SmartMatch · v2.0
+            </p>
+          </div>
         )}
       </SidebarContent>
     </Sidebar>
