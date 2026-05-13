@@ -206,16 +206,17 @@ class SearchRequest(BaseModel):
     n:                 int           = 8
 
 class SearchResultItem(BaseModel):
-    id:          str
-    text:        str
-    source_file: str
-    country:     str
-    year:        Optional[int]
-    apostillado: bool
-    doc_type:    Optional[str]
-    client:      Optional[str]
-    summary:     Optional[str]
-    distance:    float
+    id:            str
+    text:          str
+    source_file:   str
+    relative_path: Optional[str]
+    country:       str
+    year:          Optional[int]
+    apostillado:   bool
+    doc_type:      Optional[str]
+    client:        Optional[str]
+    summary:       Optional[str]
+    distance:      float
 
 class SearchResponse(BaseModel):
     items: list[SearchResultItem]
@@ -298,20 +299,37 @@ def query(req: QueryRequest):
     return QueryResponse(answer=r.choices[0].message.content,
                          sources=sources, tipo=tipo, filtros=filtros)
 
+def _get_relative_paths(document_ids: list[str]) -> dict[str, str]:
+    if not document_ids:
+        return {}
+    placeholders = ",".join("?" * len(document_ids))
+    with get_db() as conn:
+        rows = conn.execute(
+            f"SELECT document_id, relative_path FROM documents WHERE document_id IN ({placeholders})",
+            document_ids,
+        ).fetchall()
+    return {r["document_id"]: r["relative_path"] for r in rows if r["relative_path"]}
+
 @app.post("/search", response_model=SearchResponse)
 def search(req: SearchRequest):
     if not req.question.strip():
         raise HTTPException(400, "Pregunta vacía")
-    tipo    = detectar_tipo(req.question)
+    # Always search at doc level for chat (titles/summaries), fall back to chunk if no results
     filtros = extraer_filtros(req.question, req.pais, req.solo_apostillados)
-    items   = buscar(req.question, tipo, filtros, n=req.n)
+    items   = buscar(req.question, "doc", filtros, n=req.n)
+    if not items:
+        items = buscar(req.question, "chunk", filtros, n=req.n)
+    tipo = "doc" if items else "chunk"
     if req.ano_desde:
         items = [x for x in items if (x["meta"].get("year") or 0) >= req.ano_desde]
+    doc_ids = [it["id"] for it in items]
+    rel_paths = _get_relative_paths(doc_ids)
     return SearchResponse(
         items=[SearchResultItem(
             id=it["id"],
             text=it["text"],
             source_file=it["meta"].get("source_file", ""),
+            relative_path=rel_paths.get(it["id"]),
             country=it["meta"].get("country", ""),
             year=it["meta"].get("year") or None,
             apostillado=it["meta"].get("is_apostilled") == 1,

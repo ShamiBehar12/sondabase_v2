@@ -863,7 +863,7 @@ app.post("/api/ai/chat/query", async (request) => {
           recordId: item.id,
           title: item.source_file.replace(/\.pdf$/i, "").replace(/[-_]/g, " "),
           fileName: item.source_file,
-          filePath: item.source_file,
+          filePath: item.relative_path || item.source_file,
           score: Math.max(0, Number((1 - item.distance).toFixed(3))),
           reason: item.summary || item.doc_type || "Documento de RACER",
           matchTerms: [],
@@ -941,6 +941,8 @@ app.post("/api/ai/chat/query", async (request) => {
     }
   }
 
+  const userMsgTime = new Date();
+  const assistantMsgTime = new Date(userMsgTime.getTime() + 1);
   await prisma.aiChatMessage.createMany({
     data: [
       {
@@ -948,6 +950,7 @@ app.post("/api/ai/chat/query", async (request) => {
         userId: user.id,
         role: "user",
         content: message,
+        createdAt: userMsgTime,
       },
       {
         sessionId: session.id,
@@ -955,6 +958,7 @@ app.post("/api/ai/chat/query", async (request) => {
         role: "assistant",
         content: answer,
         sourcesJson: finalMatches,
+        createdAt: assistantMsgTime,
       },
     ],
   });

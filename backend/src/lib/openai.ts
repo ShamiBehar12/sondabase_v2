@@ -94,7 +94,7 @@ export async function generateOpenAIAnswer(
       model,
       messages,
       ...(isReasoningModel(model) ? {} : { temperature: 0.2 }),
-    });
+    }, { timeout: 30000 });
 
     return response.choices[0]?.message?.content?.trim() || null;
   } catch (error) {
