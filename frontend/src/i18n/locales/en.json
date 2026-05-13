@@ -1,4 +1,21 @@
 {
+  "home": {
+    "subtitle": "Manage documents, certificates and success stories from one place",
+    "goToDashboard": "Go to Dashboard",
+    "quickAccess": "Quick Access",
+    "featureDashboard": "Dashboard",
+    "featureDashboardDesc": "Overview of metrics and recent activity",
+    "featureDocuments": "Documents",
+    "featureDocumentsDesc": "Manage and search certificates and records",
+    "featureStories": "Success Stories",
+    "featureStoriesDesc": "Share and review business success cases",
+    "featureAI": "AI Assistant",
+    "featureAIDesc": "Smart queries on your knowledge base",
+    "featureCertificates": "My Certificates",
+    "featureCertificatesDesc": "Your certificates and pending approvals",
+    "featureSettings": "Settings",
+    "featureSettingsDesc": "Customize your profile and preferred language"
+  },
   "navigation": {
     "dashboard": "Dashboard",
     "main": "Main",
@@ -77,8 +94,6 @@
     "tableActions": "Actions",
     "emittedOn": "Issued on",
     "contract": "Contract",
-    "contractStart": "Contract start",
-    "contractEnd": "Contract end",
     "size": "Size",
     "actions": "Actions",
     "noCertificatesFound": "No certificates found",
@@ -319,7 +334,6 @@
     "insufficientPermissions": "Insufficient permissions",
     "insufficientPermissionsMessage": "You don't have permission for this action"
   },
-  "profile": "Profile",
   "users": {
     "title": "Users",
     "subtitle": "Manage system users",
@@ -356,5 +370,33 @@
     "createUserError": "Could not create user",
     "allFieldsRequired": "All fields are required",
     "resetPasswordTitle": "Send password reset link"
+  },
+  "aiChat": {
+    "title": "AI Assistant",
+    "subtitle": "Query indexed documents using artificial intelligence",
+    "chat": "Chat",
+    "chatDesc": "Ask questions about available documents",
+    "loading": "Loading messages...",
+    "noMessages": "No messages yet. Ask your first question!",
+    "question": "You",
+    "assistant": "Assistant",
+    "querying": "Querying...",
+    "inputPlaceholder": "Type your query...",
+    "send": "Send",
+    "sources": "Sources",
+    "sourcesDesc": "Documents retrieved by the assistant",
+    "sourcesFor": "Sources for selected message",
+    "sourcesEmpty": "Sources will appear here after your query",
+    "newSessionError": "Could not create session",
+    "chatError": "Error sending message",
+    "newChat": "New conversation",
+    "conversations": "Conversations",
+    "noTitle": "No title",
+    "deleteConversation": "Delete conversation",
+    "confirmDeleteDesc": "Delete \"{{title}}\"? This action cannot be undone.",
+    "deletedSuccess": "Conversation deleted",
+    "errorDelete": "Error deleting conversation",
+    "errorCreate": "Error creating conversation",
+    "recentSessions": "Recent sessions"
   }
 }

@@ -23,13 +23,13 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: 'pt',
-    lng: 'pt', // default language
-    
+    fallbackLng: 'es',
+    lng: 'es',
+
     interpolation: {
       escapeValue: false,
     },
-    
+
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],

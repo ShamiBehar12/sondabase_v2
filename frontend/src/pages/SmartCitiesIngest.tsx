@@ -19,6 +19,8 @@ type FileEntry = {
   uploadedPath?: string;
 };
 
+type RacerDoc = { original_filename: string };
+
 const STATUS_ICON: Record<FileStatus, React.ReactNode> = {
   pending:    <Loader2 className="w-4 h-4 text-muted-foreground" />,
   uploading:  <Loader2 className="w-4 h-4 animate-spin text-blue-400" />,
@@ -34,7 +36,7 @@ const STATUS_LABEL: Record<FileStatus, string> = {
   uploading: "Subiendo",
   ingesting: "Procesando",
   done:      "Listo",
-  duplicate: "Duplicado",
+  duplicate: "Ya ingestado",
   error:     "Error",
   empty:     "Sin texto",
 };
@@ -77,7 +79,19 @@ export default function SmartCitiesIngest() {
     if (!pending.length) return;
     setRunning(true);
 
+    // Fetch already-ingested documents so we can skip them without re-uploading
+    const { data: existingDocs } = await apiFetch<RacerDoc[]>("/api/racer/documents");
+    const existingFilenames = new Set(
+      (existingDocs ?? []).map(d => d.original_filename?.toLowerCase())
+    );
+
     for (const entry of pending) {
+      // Skip files already present in RACER
+      if (existingFilenames.has(entry.file.name.toLowerCase())) {
+        updateFile(entry.id, { status: "duplicate", duplicateOf: entry.file.name });
+        continue;
+      }
+
       // 1 — Upload to storage
       updateFile(entry.id, { status: "uploading" });
       const formData = new FormData();
@@ -133,7 +147,7 @@ export default function SmartCitiesIngest() {
           Carga Masiva RAG
         </h1>
         <p className="text-foreground-muted mt-2">
-          Sube PDFs o carpetas completas. Se detectan duplicados automáticamente antes de ingestar.
+          Sube PDFs o carpetas completas. Los documentos ya ingestados se omiten automáticamente.
         </p>
       </div>
 

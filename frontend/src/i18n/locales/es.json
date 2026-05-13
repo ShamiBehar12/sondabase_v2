@@ -1,4 +1,21 @@
 {
+  "home": {
+    "subtitle": "Gestiona documentos, certificados e historias de éxito desde un solo lugar",
+    "goToDashboard": "Ir al Dashboard",
+    "quickAccess": "Acceso Rápido",
+    "featureDashboard": "Dashboard",
+    "featureDashboardDesc": "Vista general de métricas y actividad reciente",
+    "featureDocuments": "Documentos",
+    "featureDocumentsDesc": "Gestiona y busca certificados y expedientes",
+    "featureStories": "Historias de Éxito",
+    "featureStoriesDesc": "Comparte y revisa casos de éxito empresarial",
+    "featureAI": "Asistente IA",
+    "featureAIDesc": "Consulta inteligente sobre tu base de conocimiento",
+    "featureCertificates": "Mis Certificados",
+    "featureCertificatesDesc": "Tus certificados y los pendientes de aprobación",
+    "featureSettings": "Configuración",
+    "featureSettingsDesc": "Personaliza tu perfil e idioma preferido"
+  },
   "navigation": {
     "dashboard": "Dashboard",
     "main": "Principal",
@@ -77,8 +94,6 @@
     "tableActions": "Acciones",
     "emittedOn": "Emitido en",
     "contract": "Contrato",
-    "contractStart": "Inicio contrato",
-    "contractEnd": "Fin contrato",
     "size": "Tamaño",
     "actions": "Acciones",
     "noCertificatesFound": "No se encontraron certificados",
@@ -319,7 +334,6 @@
     "insufficientPermissions": "Permisos insuficientes",
     "insufficientPermissionsMessage": "No tienes permiso para esta acción"
   },
-  "profile": "Perfil",
   "users": {
     "title": "Usuarios",
     "subtitle": "Gestionar usuarios del sistema",
@@ -356,5 +370,33 @@
     "createUserError": "No se pudo crear el usuario",
     "allFieldsRequired": "Todos los campos son requeridos",
     "resetPasswordTitle": "Enviar enlace de restablecimiento de contraseña"
+  },
+  "aiChat": {
+    "title": "Asistente IA",
+    "subtitle": "Consulta los documentos indexados usando inteligencia artificial",
+    "chat": "Chat",
+    "chatDesc": "Haz preguntas sobre los documentos disponibles",
+    "loading": "Cargando mensajes...",
+    "noMessages": "Sin mensajes. ¡Haz tu primera pregunta!",
+    "question": "Tú",
+    "assistant": "Asistente",
+    "querying": "Consultando...",
+    "inputPlaceholder": "Escribe tu consulta...",
+    "send": "Enviar",
+    "sources": "Fuentes",
+    "sourcesDesc": "Documentos recuperados por el asistente",
+    "sourcesFor": "Fuentes del mensaje seleccionado",
+    "sourcesEmpty": "Las fuentes aparecerán aquí tras tu consulta",
+    "newSessionError": "No se pudo crear la sesión",
+    "chatError": "Error al enviar el mensaje",
+    "newChat": "Nueva conversación",
+    "conversations": "Conversaciones",
+    "noTitle": "Sin título",
+    "deleteConversation": "Eliminar conversación",
+    "confirmDeleteDesc": "¿Eliminar \"{{title}}\"? Esta acción no se puede deshacer.",
+    "deletedSuccess": "Conversación eliminada",
+    "errorDelete": "Error al eliminar conversación",
+    "errorCreate": "Error al crear conversación",
+    "recentSessions": "Sesiones recientes"
   }
 }
