@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "all": "concurrently -k -n FE,BE,RACER -c cyan,yellow,magenta \"npm --prefix frontend run dev\" \"npm --prefix backend run dev\" \"cd racer && .\\venv\\Scripts\\python.exe -m uvicorn server:app --port 8000 --reload\"",
-    "setup": "npm install && npm --prefix frontend install && npm --prefix backend install && cd racer && python -m venv venv && .\\venv\\Scripts\\python.exe -m pip install -r requirements.txt",
+    "setup": "npm install && npm --prefix frontend install && npm --prefix backend install && cd racer && python -m venv venv && .\\venv\\Scripts\\python.exe -m pip install -r requirements.txt"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
