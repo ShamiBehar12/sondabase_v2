@@ -215,7 +215,7 @@ const Index = () => {
       <div
         className="absolute inset-0"
         style={{
-          backgroundImage: 'url(https://news.america-digital.com/wp-content/uploads/2019/12/Conoce-las-102-empresas-esta%CC%81n-impulsando-el-desarrollo-de-las-Smart-Cities_-America-Digital.jpg)',
+          backgroundImage: 'url(/smart-city-bg.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           opacity: 0.07,
