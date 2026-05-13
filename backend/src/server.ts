@@ -285,6 +285,12 @@ async function ensureAiSettings() {
   });
 
   if (existing) {
+    if (existing.activeChatModel === "gpt-5") {
+      return prisma.aiSettings.update({
+        where: { id: existing.id },
+        data: { activeChatModel: "gpt-4o-mini" },
+      });
+    }
     return existing;
   }
 

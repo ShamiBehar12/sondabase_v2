@@ -5,7 +5,7 @@ export type AiRagMode = "internal" | "provider_managed";
 
 export const AI_PROVIDER_MODELS: Record<AiProviderName, { chat: string[]; embeddings: string[] }> = {
   openai: {
-    chat: ["gpt-5", "gpt-4.1"],
+    chat: ["gpt-4o-mini", "gpt-4o", "gpt-4.1", "gpt-5"],
     embeddings: ["text-embedding-3-large", "text-embedding-3-small"],
   },
   anthropic: {
@@ -43,7 +43,7 @@ export function tokenize(input: string) {
 const STOPWORDS = new Set([
   "a", "al", "algo", "algum", "alguna", "alguno", "ante", "ano", "anos",
   "ao", "aos", "as", "at", "ate", "com", "como", "con", "contra",
-  "certificacion", "certificado", "certificados", "count",
+  "count",
   "da", "das", "de", "del", "desde", "do", "dos",
   "e", "el", "ella", "em", "en", "entre", "era", "es", "esa", "ese",
   "esta", "estado", "este", "esto", "experiencia", "experiencias",
