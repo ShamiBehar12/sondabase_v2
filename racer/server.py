@@ -198,6 +198,30 @@ class QueryRequest(BaseModel):
     ano_desde:         Optional[int] = None
     conversation_id:   Optional[str] = None
 
+class SearchRequest(BaseModel):
+    question:          str
+    pais:              Optional[str] = None
+    solo_apostillados: bool          = False
+    ano_desde:         Optional[int] = None
+    n:                 int           = 8
+
+class SearchResultItem(BaseModel):
+    id:          str
+    text:        str
+    source_file: str
+    country:     str
+    year:        Optional[int]
+    apostillado: bool
+    doc_type:    Optional[str]
+    client:      Optional[str]
+    summary:     Optional[str]
+    distance:    float
+
+class SearchResponse(BaseModel):
+    items: list[SearchResultItem]
+    tipo:  str
+    filtros: dict
+
 class RFPRequest(BaseModel):
     rfp_text: str
 
@@ -273,6 +297,32 @@ def query(req: QueryRequest):
     ) for x in items]
     return QueryResponse(answer=r.choices[0].message.content,
                          sources=sources, tipo=tipo, filtros=filtros)
+
+@app.post("/search", response_model=SearchResponse)
+def search(req: SearchRequest):
+    if not req.question.strip():
+        raise HTTPException(400, "Pregunta vacía")
+    tipo    = detectar_tipo(req.question)
+    filtros = extraer_filtros(req.question, req.pais, req.solo_apostillados)
+    items   = buscar(req.question, tipo, filtros, n=req.n)
+    if req.ano_desde:
+        items = [x for x in items if (x["meta"].get("year") or 0) >= req.ano_desde]
+    return SearchResponse(
+        items=[SearchResultItem(
+            id=it["id"],
+            text=it["text"],
+            source_file=it["meta"].get("source_file", ""),
+            country=it["meta"].get("country", ""),
+            year=it["meta"].get("year") or None,
+            apostillado=it["meta"].get("is_apostilled") == 1,
+            doc_type=it["meta"].get("doc_type") or None,
+            client=it["meta"].get("client") or None,
+            summary=it["meta"].get("summary_one_line") or None,
+            distance=round(it["distance"], 4),
+        ) for it in items],
+        tipo=tipo,
+        filtros=filtros,
+    )
 
 @app.post("/rfp", response_model=RFPResponse)
 def check_rfp(req: RFPRequest):

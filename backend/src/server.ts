@@ -824,24 +824,60 @@ app.post("/api/ai/chat/query", async (request) => {
     prisma.aiDocumentIndex.count({ where: { status: "indexed", isVerifiedSnapshot: true, recordType: "certificate" } }),
   ]);
 
-  const indexedDocuments = await prisma.aiDocumentIndex.findMany({
-    where: {
-      status: "indexed",
-      isVerifiedSnapshot: true,
-      recordType: "certificate",
-    },
-    orderBy: { updatedAt: "desc" },
-    include: {
-      chunks: {
-        orderBy: { chunkOrder: "asc" },
-      },
-    },
-  });
+  const indexedDocuments = totalVerified > 0
+    ? await prisma.aiDocumentIndex.findMany({
+        where: { status: "indexed", isVerifiedSnapshot: true, recordType: "certificate" },
+        orderBy: { updatedAt: "desc" },
+        include: { chunks: { orderBy: { chunkOrder: "asc" } } },
+      })
+    : [];
 
   const shouldUseOpenAI = settings.activeProvider === "openai" && Boolean(env.openAiApiKey);
   let queryEmbedding: number[] | null = null;
 
-  if (shouldUseOpenAI) {
+  type MatchEntry = {
+    recordType: string; recordId: string; title: string; fileName: string;
+    filePath: string; score: number; reason: string; matchTerms: string[];
+    referenceLabel?: string; referencePages: number[]; citations: string[];
+  };
+  // Try RACER search when aiDocumentIndex is empty
+  let racerMatches: MatchEntry[] = [];
+  if (totalVerified === 0) {
+    try {
+      const racerResp = await fetch(`${RACER_URL}/search`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: message, n: topK }),
+        signal: AbortSignal.timeout(8000),
+      });
+      if (racerResp.ok) {
+        const racerData = await racerResp.json() as {
+          items: Array<{
+            id: string; text: string; source_file: string; country: string;
+            year: number | null; apostillado: boolean; doc_type: string | null;
+            client: string | null; summary: string | null; distance: number;
+          }>;
+        };
+        racerMatches = racerData.items.map((item) => ({
+          recordType: item.doc_type || "certificate",
+          recordId: item.id,
+          title: item.source_file.replace(/\.pdf$/i, "").replace(/[-_]/g, " "),
+          fileName: item.source_file,
+          filePath: item.source_file,
+          score: Math.max(0, Number((1 - item.distance).toFixed(3))),
+          reason: item.summary || item.doc_type || "Documento de RACER",
+          matchTerms: [],
+          referenceLabel: item.country || undefined,
+          referencePages: [],
+          citations: [item.text.slice(0, 300)],
+        }));
+      }
+    } catch (err: any) {
+      app.log.warn(`RACER search fallback failed: ${err?.message || err}`);
+    }
+  }
+
+  if (shouldUseOpenAI && totalVerified === 0 && racerMatches.length === 0) {
     try {
       queryEmbedding = await generateOpenAIEmbedding(message, settings.activeEmbeddingModel);
     } catch (error: any) {
@@ -853,7 +889,7 @@ app.post("/api/ai/chat/query", async (request) => {
     .map((document: any) => rankDocumentMatch(message, document, queryEmbedding))
     .filter((item) => isStrongMatch(item.lexicalStats));
 
-  const finalMatches = rankedCandidates
+  const sqlMatches = rankedCandidates
     .sort((left, right) => right.finalScore - left.finalScore)
     .slice(0, topK)
     .map((item) => {
@@ -876,6 +912,8 @@ app.post("/api/ai/chat/query", async (request) => {
         citations: reference.citations,
       };
     });
+
+  const finalMatches: MatchEntry[] = sqlMatches.length > 0 ? sqlMatches : racerMatches;
 
   const providerContext = finalMatches
     .map(
