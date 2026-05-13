@@ -199,17 +199,27 @@ export function useAIChat() {
 
   const sendMessage = async (message: string) => {
     let sessionId = activeSessionId;
+    console.group("[RAG] Nueva consulta");
+    console.log("[RAG] 1. Mensaje del usuario:", message);
+
     if (!sessionId) {
+      console.log("[RAG] 2. Sin sesión activa → creando sesión nueva...");
       const created = await createSession(message.slice(0, 60));
       sessionId = created.data?.id || null;
+      console.log("[RAG] 2. Sesión creada:", sessionId);
+    } else {
+      console.log("[RAG] 2. Usando sesión existente:", sessionId);
     }
 
+    console.log("[RAG] 3. Enviando POST /api/ai/chat/query...");
     const response = await apiFetch<{
       sessionId: string;
       answer: string;
       matches: AiChatMatch[];
       providerUsed: string;
       modelUsed: string;
+      ragMode?: string;
+      intent?: string;
     }>("/api/ai/chat/query", {
       method: "POST",
       body: {
@@ -218,12 +228,27 @@ export function useAIChat() {
       },
     });
 
+    if (response.error) {
+      console.error("[RAG] 4. ERROR en la respuesta:", response.error);
+    } else {
+      const d = response.data!;
+      console.log("[RAG] 4. Respuesta recibida:");
+      console.log("      provider:", d.providerUsed, "| modelo:", d.modelUsed);
+      console.log("      intent detectado:", d.intent);
+      console.log("      ragMode:", d.ragMode);
+      console.log("      matches encontrados:", d.matches?.length ?? 0, d.matches);
+      console.log("      respuesta (preview):", d.answer?.slice(0, 200));
+    }
+
     if (response.data?.sessionId) {
+      console.log("[RAG] 5. Cargando mensajes de la sesión:", response.data.sessionId);
       setActiveSessionId(response.data.sessionId);
       await loadSessions();
       await loadMessages(response.data.sessionId);
+      console.log("[RAG] 6. Mensajes cargados en estado.");
     }
 
+    console.groupEnd();
     return response;
   };
 
