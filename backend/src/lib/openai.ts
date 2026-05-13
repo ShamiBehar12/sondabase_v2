@@ -54,6 +54,10 @@ export async function generateOpenAIEmbedding(input: string, model: string) {
   }
 }
 
+function isReasoningModel(model: string) {
+  return /^o\d|^gpt-5/i.test(model);
+}
+
 export type ChatMessage = { role: "user" | "assistant"; content: string };
 export type QueryIntent = "rag" | "clarification";
 
@@ -89,7 +93,7 @@ export async function generateOpenAIAnswer(
     const response = await openai.chat.completions.create({
       model,
       messages,
-      temperature: 0.2,
+      ...(isReasoningModel(model) ? {} : { temperature: 0.2 }),
     });
 
     return response.choices[0]?.message?.content?.trim() || null;

@@ -21,7 +21,7 @@ export const AI_PROVIDER_MODELS: Record<AiProviderName, { chat: string[]; embedd
 export function defaultAiSettings() {
   return {
     activeProvider: "openai" as AiProviderName,
-    activeChatModel: "gpt-5",
+    activeChatModel: "gpt-4o-mini",
     activeEmbeddingModel: "text-embedding-3-large",
     ragMode: "internal" as AiRagMode,
     topK: 5,
