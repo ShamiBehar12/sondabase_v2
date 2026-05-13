@@ -189,7 +189,18 @@ function AiBadge({ label, color }: { label: string; color: string }) {
 const Index = () => {
   const { t, i18n } = useTranslation();
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const [racerDocCount, setRacerDocCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+    fetch("/api/racer/documents")
+      .then((r) => r.json())
+      .then((data) => {
+        const arr = Array.isArray(data) ? data : (data?.documents ?? data?.data ?? []);
+        setRacerDocCount(arr.length);
+      })
+      .catch(() => {});
+  }, []);
 
   const languages = [
     { code: 'es', label: 'ES' },
@@ -209,7 +220,7 @@ const Index = () => {
   const currentLang = i18n.language?.split('-')[0] || 'es';
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ background: 'hsl(222,32%,6%)' }}>
+    <div className="min-h-screen relative overflow-hidden" style={{ background: 'hsl(218,16%,11%)' }}>
 
       {/* ── ambient background image ── */}
       <div
@@ -223,7 +234,7 @@ const Index = () => {
         }}
       />
       {/* overlay to darken image further */}
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(160deg, rgba(8,12,28,0.92) 0%, rgba(10,15,35,0.88) 50%, rgba(8,12,28,0.94) 100%)' }} />
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(160deg, rgba(10,14,26,0.85) 0%, rgba(12,16,28,0.80) 50%, rgba(10,14,26,0.87) 100%)' }} />
 
       {/* ── glow orbs ── */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
@@ -243,7 +254,7 @@ const Index = () => {
           <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
         </div>
         <div>
-          <div className="text-xs font-bold text-white">164 docs</div>
+          <div className="text-xs font-bold text-white">{racerDocCount !== null ? `${racerDocCount} docs` : "… docs"}</div>
           <div className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>indexados · RAG</div>
         </div>
       </FloatingCard>
@@ -397,7 +408,7 @@ const Index = () => {
           transition={{ delay: 0.8, duration: 0.5 }}
         >
           {[
-            { value: '164', label: 'Documentos indexados' },
+            { value: racerDocCount !== null ? String(racerDocCount) : '…', label: 'Documentos indexados' },
             { value: '8', label: 'Países activos' },
             { value: '98%', label: 'Precisión de match' },
             { value: '<2s', label: 'Tiempo de respuesta' },

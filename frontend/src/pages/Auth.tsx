@@ -34,7 +34,7 @@ export default function Auth() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'hsl(222,32%,6%)' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'hsl(218,16%,11%)' }}>
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
@@ -43,7 +43,7 @@ export default function Auth() {
   if (user) return <Navigate to="/dashboard" replace />;
 
   return (
-    <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ background: 'hsl(222,32%,6%)' }}>
+    <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ background: 'hsl(218,16%,11%)' }}>
 
       {/* ambient city background */}
       <div className="absolute inset-0" style={{
@@ -53,7 +53,7 @@ export default function Auth() {
         opacity: 0.10,
         filter: 'blur(6px) saturate(0.5)',
       }} />
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(160deg, rgba(8,12,28,0.86) 0%, rgba(10,15,35,0.82) 50%, rgba(8,12,28,0.88) 100%)' }} />
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(160deg, rgba(10,14,26,0.80) 0%, rgba(12,16,28,0.76) 50%, rgba(10,14,26,0.82) 100%)' }} />
 
       {/* glow orbs */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
@@ -68,7 +68,7 @@ export default function Auth() {
         style={{ background: 'rgba(59,130,246,0.10)', border: '1px solid rgba(59,130,246,0.20)', backdropFilter: 'blur(16px)' }}
         animate={{ y: [0, -8, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}>
         <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-        <span style={{ color: 'rgba(147,197,253,0.85)', fontSize: '0.7rem', fontWeight: 600 }}>RAG · 164 documentos</span>
+        <span style={{ color: 'rgba(147,197,253,0.85)', fontSize: '0.7rem', fontWeight: 600 }}>RAG · Smart Cities</span>
       </motion.div>
       <motion.div className="absolute right-[7%] top-[30%] hidden lg:flex items-center gap-2 px-3 py-2 rounded-xl pointer-events-none"
         style={{ background: 'rgba(139,92,246,0.10)', border: '1px solid rgba(139,92,246,0.20)', backdropFilter: 'blur(16px)' }}

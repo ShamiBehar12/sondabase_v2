@@ -9,11 +9,11 @@
 @layer base {
   :root {
     /* Background System */
-    --background: 215 20% 9%;
-    --background-secondary: 215 25% 12%;
-    --background-tertiary: 215 30% 15%;
-    --surface: 215 25% 13%;
-    --surface-hover: 215 30% 18%;
+    --background: 218 16% 11%;
+    --background-secondary: 218 18% 14%;
+    --background-tertiary: 218 20% 17%;
+    --surface: 218 18% 15%;
+    --surface-hover: 218 22% 20%;
     --glow-cyan: rgba(0, 255, 255, 0.07);
     
     /* Text Colors */
@@ -28,7 +28,7 @@
     
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(217, 91%, 60%) 0%, hsl(230, 91%, 68%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(215, 25%, 10%) 0%, hsl(215, 30%, 15%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(218, 16%, 11%) 0%, hsl(218, 18%, 14%) 100%);
     --gradient-hero: linear-gradient(135deg, hsl(217, 91%, 60%) 0%, hsl(230, 91%, 68%) 50%, hsl(245, 91%, 72%) 100%);
     --gradient-glass: linear-gradient(135deg, rgba(0, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 200, 255, 0.04) 100%);
     
