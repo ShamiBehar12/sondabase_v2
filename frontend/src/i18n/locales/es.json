@@ -389,6 +389,14 @@
     "sourcesEmpty": "Las fuentes aparecerán aquí tras tu consulta",
     "newSessionError": "No se pudo crear la sesión",
     "chatError": "Error al enviar el mensaje",
-    "newChat": "Nueva conversación"
+    "newChat": "Nueva conversación",
+    "conversations": "Conversaciones",
+    "noTitle": "Sin título",
+    "deleteConversation": "Eliminar conversación",
+    "confirmDeleteDesc": "¿Eliminar \"{{title}}\"? Esta acción no se puede deshacer.",
+    "deletedSuccess": "Conversación eliminada",
+    "errorDelete": "Error al eliminar conversación",
+    "errorCreate": "Error al crear conversación",
+    "recentSessions": "Sesiones recientes"
   }
 }

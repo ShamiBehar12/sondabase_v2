@@ -389,6 +389,14 @@
     "sourcesEmpty": "Sources will appear here after your query",
     "newSessionError": "Could not create session",
     "chatError": "Error sending message",
-    "newChat": "New conversation"
+    "newChat": "New conversation",
+    "conversations": "Conversations",
+    "noTitle": "No title",
+    "deleteConversation": "Delete conversation",
+    "confirmDeleteDesc": "Delete \"{{title}}\"? This action cannot be undone.",
+    "deletedSuccess": "Conversation deleted",
+    "errorDelete": "Error deleting conversation",
+    "errorCreate": "Error creating conversation",
+    "recentSessions": "Recent sessions"
   }
 }

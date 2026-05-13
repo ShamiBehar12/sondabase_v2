@@ -390,6 +390,14 @@
     "sourcesEmpty": "As fontes aparecerão aqui após sua consulta",
     "newSessionError": "Não foi possível criar a sessão",
     "chatError": "Erro ao enviar a mensagem",
-    "newChat": "Nova conversa"
+    "newChat": "Nova conversa",
+    "conversations": "Conversas",
+    "noTitle": "Sem título",
+    "deleteConversation": "Excluir conversa",
+    "confirmDeleteDesc": "Excluir \"{{title}}\"? Esta ação não pode ser desfeita.",
+    "deletedSuccess": "Conversa excluída",
+    "errorDelete": "Erro ao excluir conversa",
+    "errorCreate": "Erro ao criar conversa",
+    "recentSessions": "Sessões recentes"
   }
 }
