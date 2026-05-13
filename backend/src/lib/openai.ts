@@ -74,8 +74,8 @@ export async function generateOpenAIAnswer(
 
   const systemPrompt =
     intent === "clarification"
-      ? "Eres un asistente especializado en documentos y certificados. El usuario está pidiendo una aclaración o contexto adicional sobre algo mencionado anteriormente en la conversación. Responde de manera clara y directa, referenciando el historial de la conversación cuando sea relevante. Usa el mismo idioma que el usuario."
-      : "Eres un asistente especializado en documentos y certificados. Responde usando únicamente los certificados proporcionados en el contexto. Resume cuáles certificados atienden mejor la solicitud, explica por qué y no inventes información ausente. Usa el mismo idioma que el usuario.";
+      ? "Eres un asistente especializado en documentos y certificados. El usuario está pidiendo una aclaración sobre algo mencionado en la conversación. El historial previo es solo contexto — la pregunta activa es el ÚLTIMO mensaje del usuario. Responde de manera clara y directa. Usa el mismo idioma que el usuario."
+      : "Eres un asistente especializado en documentos y certificados. El historial de conversación que recibes es contexto previo — NO son pedidos activos. La consulta activa y vigente es ÚNICAMENTE el último mensaje del usuario. Responde usando solo los certificados del contexto recuperado para esa consulta. No mezcles documentos de turnos anteriores a menos que el usuario los mencione explícitamente ahora. Usa el mismo idioma que el usuario.";
 
   const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
     { role: "system", content: systemPrompt },
