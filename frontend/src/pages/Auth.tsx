@@ -50,17 +50,38 @@ export default function Auth() {
         backgroundImage: 'url(/smart-city-bg.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        opacity: 0.07,
-        filter: 'blur(6px) saturate(0.4)',
+        opacity: 0.10,
+        filter: 'blur(6px) saturate(0.5)',
       }} />
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(160deg, rgba(8,12,28,0.92) 0%, rgba(10,15,35,0.88) 50%, rgba(8,12,28,0.94) 100%)' }} />
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(160deg, rgba(8,12,28,0.86) 0%, rgba(10,15,35,0.82) 50%, rgba(8,12,28,0.88) 100%)' }} />
 
       {/* glow orbs */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div style={{ position: 'absolute', top: '-8%', left: '-6%', width: '55%', height: '55%', background: 'radial-gradient(ellipse, rgba(59,130,246,0.14) 0%, transparent 65%)', filter: 'blur(80px)' }} />
         <div style={{ position: 'absolute', bottom: '-10%', right: '-8%', width: '60%', height: '60%', background: 'radial-gradient(ellipse, rgba(139,92,246,0.12) 0%, transparent 65%)', filter: 'blur(90px)' }} />
+        <div style={{ position: 'absolute', top: '45%', right: '10%', width: '30%', height: '30%', background: 'radial-gradient(ellipse, rgba(6,182,212,0.08) 0%, transparent 65%)', filter: 'blur(60px)' }} />
         <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px)', backgroundSize: '52px 52px' }} />
       </div>
+
+      {/* floating ambient badges */}
+      <motion.div className="absolute left-[8%] top-[22%] hidden lg:flex items-center gap-2 px-3 py-2 rounded-xl pointer-events-none"
+        style={{ background: 'rgba(59,130,246,0.10)', border: '1px solid rgba(59,130,246,0.20)', backdropFilter: 'blur(16px)' }}
+        animate={{ y: [0, -8, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}>
+        <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+        <span style={{ color: 'rgba(147,197,253,0.85)', fontSize: '0.7rem', fontWeight: 600 }}>RAG · 164 documentos</span>
+      </motion.div>
+      <motion.div className="absolute right-[7%] top-[30%] hidden lg:flex items-center gap-2 px-3 py-2 rounded-xl pointer-events-none"
+        style={{ background: 'rgba(139,92,246,0.10)', border: '1px solid rgba(139,92,246,0.20)', backdropFilter: 'blur(16px)' }}
+        animate={{ y: [0, -6, 0] }} transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }}>
+        <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
+        <span style={{ color: 'rgba(196,181,253,0.85)', fontSize: '0.7rem', fontWeight: 600 }}>AI · GPT-4o</span>
+      </motion.div>
+      <motion.div className="absolute left-[10%] bottom-[25%] hidden lg:flex items-center gap-2 px-3 py-2 rounded-xl pointer-events-none"
+        style={{ background: 'rgba(6,182,212,0.09)', border: '1px solid rgba(6,182,212,0.18)', backdropFilter: 'blur(16px)' }}
+        animate={{ y: [0, -7, 0] }} transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 2.5 }}>
+        <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+        <span style={{ color: 'rgba(103,232,249,0.85)', fontSize: '0.7rem', fontWeight: 600 }}>Smart Cities · ISO</span>
+      </motion.div>
 
       {/* language selector */}
       <div className="absolute top-4 right-5 z-30 flex items-center gap-1 px-1 py-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(20px)' }}>
