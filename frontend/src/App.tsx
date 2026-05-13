@@ -57,7 +57,12 @@ const App = () => (
               <ProtectedRoute>
                 <AIChatProvider>
                 <SidebarProvider>
-                  <div className="min-h-screen flex w-full">
+                  <div className="min-h-screen flex w-full relative" style={{ background: 'hsl(222,32%,6%)' }}>
+                    {/* ambient city background for all inner pages */}
+                    <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+                      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/smart-city-bg.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.045, filter: 'blur(8px) saturate(0.3)' }} />
+                      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg, rgba(8,12,28,0.94) 0%, rgba(10,15,35,0.9) 50%, rgba(8,12,28,0.95) 100%)' }} />
+                    </div>
                     <AppSidebar />
                     <div className="flex-1">
                       <AppHeader />
