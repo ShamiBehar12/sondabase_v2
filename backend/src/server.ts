@@ -819,6 +819,11 @@ app.post("/api/ai/chat/query", async (request) => {
 
   const topK = Math.max(1, Math.min(body.topK ?? settings.topK, 10));
 
+  const [totalIndexed, totalVerified] = await Promise.all([
+    prisma.aiDocumentIndex.count({ where: { status: "indexed", recordType: "certificate" } }),
+    prisma.aiDocumentIndex.count({ where: { status: "indexed", isVerifiedSnapshot: true, recordType: "certificate" } }),
+  ]);
+
   const indexedDocuments = await prisma.aiDocumentIndex.findMany({
     where: {
       status: "indexed",
@@ -930,6 +935,7 @@ app.post("/api/ai/chat/query", async (request) => {
       answer,
       matches: finalMatches,
       intent,
+      _debug: { totalIndexed, totalVerified },
     },
     error: null,
   };

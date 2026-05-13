@@ -236,6 +236,7 @@ export function useAIChat() {
       console.log("      provider:", d.providerUsed, "| modelo:", d.modelUsed);
       console.log("      intent detectado:", d.intent);
       console.log("      ragMode:", d.ragMode);
+      console.log("      docs indexados (total):", (d as any)._debug?.totalIndexed, "| verificados (isVerified=true):", (d as any)._debug?.totalVerified);
       console.log("      matches encontrados:", d.matches?.length ?? 0, d.matches);
       console.log("      respuesta (preview):", d.answer?.slice(0, 200));
     }
