@@ -8,6 +8,8 @@ import {
   Plus,
   MessageSquare,
   Trash2,
+  MessageSquareText,
+  ShieldCheck,
 } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -58,7 +60,11 @@ export function AppSidebar() {
     { title: t("navigation.aiAssistant"), url: "/ai-chat", icon: Bot },
   ];
 
-  const adminItems = [{ title: t("navigation.users"), url: "/users", icon: Users }];
+  const adminItems = [
+    { title: t("navigation.users"),             url: "/users",                  icon: Users },
+    { title: t("navigation.adminConversations"), url: "/admin/conversations",    icon: MessageSquareText },
+    { title: t("navigation.docPermissions"),     url: "/admin/doc-permissions",  icon: ShieldCheck },
+  ];
 
   const isActive = (path: string) => {
     if (path === "/") return currentPath === "/";

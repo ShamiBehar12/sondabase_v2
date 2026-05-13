@@ -913,7 +913,28 @@ app.post("/api/ai/chat/query", async (request) => {
       };
     });
 
-  const finalMatches: MatchEntry[] = sqlMatches.length > 0 ? sqlMatches : racerMatches;
+  let mergedMatches: MatchEntry[] = sqlMatches.length > 0 ? sqlMatches : racerMatches;
+
+  // Enforce document-level permissions for non-admin users
+  if (user.role !== "admin" && user.role !== "moderator") {
+    const access = await prisma.userDocumentAccess.findUnique({ where: { userId: user.id } });
+    if (access && !access.allowAll && access.filters) {
+      const f = access.filters as {
+        countries?: string[];
+        docTypes?: string[];
+        clients?: string[];
+        apostilledOnly?: boolean;
+      };
+      mergedMatches = mergedMatches.filter((m) => {
+        if (f.countries?.length && !f.countries.includes(m.referenceLabel ?? "")) return false;
+        if (f.docTypes?.length && !f.docTypes.includes(m.recordType)) return false;
+        if (f.apostilledOnly && !(m as any).apostillado) return false;
+        return true;
+      });
+    }
+  }
+
+  const finalMatches: MatchEntry[] = mergedMatches;
 
   const providerContext = finalMatches
     .map(
@@ -2024,6 +2045,56 @@ app.get("/api/usage/summary", async (req) => {
     },
     error: null,
   };
+});
+
+// ── Admin: Chat Audit ──────────────────────────────────────────────────────
+app.get("/api/admin/chat/sessions", async (request) => {
+  requireAdmin(request);
+  const sessions = await prisma.aiChatSession.findMany({
+    orderBy: { updatedAt: "desc" },
+    take: 500,
+    include: {
+      user: { select: { id: true, email: true, profile: { select: { fullName: true } } } },
+      _count: { select: { messages: true } },
+    },
+  });
+  return {
+    data: sessions.map((s) => ({
+      id: s.id,
+      title: s.title,
+      createdAt: s.createdAt,
+      updatedAt: s.updatedAt,
+      userId: s.userId,
+      messageCount: s._count.messages,
+      user: s.user
+        ? { id: s.user.id, email: s.user.email, fullName: s.user.profile?.fullName ?? null }
+        : null,
+    })),
+    error: null,
+  };
+});
+
+// ── Admin: Document Access ──────────────────────────────────────────────────
+app.get("/api/admin/doc-access/:userId", async (request) => {
+  requireAdmin(request);
+  const userId = pathParam(request, "userId");
+  const access = await prisma.userDocumentAccess.findUnique({ where: { userId } });
+  return {
+    data: access ?? { userId, allowAll: true, filters: null },
+    error: null,
+  };
+});
+
+app.put("/api/admin/doc-access/:userId", async (request) => {
+  requireAdmin(request);
+  const userId = pathParam(request, "userId");
+  const body = request.body as { allowAll: boolean; filters?: Record<string, any> | null };
+  const data = await prisma.userDocumentAccess.upsert({
+    where: { userId },
+    create: { userId, allowAll: body.allowAll, filters: body.filters ?? null },
+    update: { allowAll: body.allowAll, filters: body.filters ?? null },
+  });
+  return { data, error: null };
 });
 
 app.listen({ port: env.port, host: env.host });

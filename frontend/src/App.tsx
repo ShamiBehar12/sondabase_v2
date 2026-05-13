@@ -33,6 +33,7 @@ import Biblioteca from "./pages/Biblioteca";
 import SmartCitiesChat from "./pages/SmartCitiesChat";
 import SmartCitiesIngest from "./pages/SmartCitiesIngest";
 import Analytics from "./pages/Analytics";
+import AdminDocPermissions from "./pages/AdminDocPermissions";
 import { useAnalytics } from "./hooks/useAnalytics";
 
 const queryClient = new QueryClient();
@@ -118,6 +119,11 @@ const App = () => (
                           <Route path="/biblioteca" element={
                             <ProtectedRoute requireRole="admin">
                               <Biblioteca />
+                            </ProtectedRoute>
+                          } />
+                          <Route path="/admin/doc-permissions" element={
+                            <ProtectedRoute requireRole="admin">
+                              <AdminDocPermissions />
                             </ProtectedRoute>
                           } />
                           <Route path="/settings" element={<Settings />} />

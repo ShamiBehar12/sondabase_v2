@@ -30,7 +30,8 @@
     "myCertificates": "Mis Documentos",
     "newConversation": "Nueva conversación",
     "documentExplorer": "Explorador de Documentos",
-    "adminConversations": "Auditoría de Chats"
+    "adminConversations": "Auditoría de Chats",
+    "docPermissions": "Permisos Documentales"
   },
   "common": {
     "search": "Buscar",
