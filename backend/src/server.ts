@@ -128,6 +128,166 @@ function toJsonSafe<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;
 }
 
+function asStringArray(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((entry) => typeof entry === "string")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+function normalizeDocAccessFilters(filters: unknown) {
+  if (!filters || typeof filters !== "object" || Array.isArray(filters)) {
+    return {
+      countries: [] as string[],
+      docTypes: [] as string[],
+      clients: [] as string[],
+      apostilledOnly: false,
+    };
+  }
+
+  const raw = filters as Record<string, unknown>;
+  return {
+    countries: asStringArray(raw.countries),
+    docTypes: asStringArray(raw.docTypes),
+    clients: asStringArray(raw.clients),
+    apostilledOnly: raw.apostilledOnly === true,
+  };
+}
+
+type UserDocumentAccessRecord = {
+  id?: string;
+  userId: string;
+  allowAll: boolean;
+  filters: unknown;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+};
+
+function normalizeStoredJson(value: unknown) {
+  if (typeof value !== "string") return value ?? null;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
+
+function isMissingUserDocumentAccessTableError(error: unknown) {
+  const message = String((error as any)?.message || error || "");
+  return message.includes("1146") || message.includes("user_document_access") && message.toLowerCase().includes("doesn't exist");
+}
+
+async function findUserDocumentAccess(userId: string): Promise<UserDocumentAccessRecord | null> {
+  const delegate = (prisma as any).userDocumentAccess;
+  if (delegate?.findUnique) {
+    try {
+      return await delegate.findUnique({ where: { userId } });
+    } catch (error) {
+      if (isMissingUserDocumentAccessTableError(error)) {
+        app.log.warn(`[doc-access] table missing while reading access for user=${userId}; falling back to allowAll`);
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  let rows: Array<Record<string, unknown>> = [];
+  try {
+    rows = await prisma.$queryRawUnsafe<Array<Record<string, unknown>>>(
+      `
+        SELECT
+          id,
+          user_id AS userId,
+          allow_all AS allowAll,
+          filters,
+          created_at AS createdAt,
+          updated_at AS updatedAt
+        FROM user_document_access
+        WHERE user_id = ?
+        LIMIT 1
+      `,
+      userId,
+    );
+  } catch (error) {
+    if (isMissingUserDocumentAccessTableError(error)) {
+      app.log.warn(`[doc-access] table missing while querying access for user=${userId}; falling back to allowAll`);
+      return null;
+    }
+    throw error;
+  }
+
+  if (!rows.length) return null;
+  const row = rows[0];
+  return {
+    id: String(row.id),
+    userId: String(row.userId),
+    allowAll: Boolean(row.allowAll),
+    filters: normalizeStoredJson(row.filters),
+    createdAt: row.createdAt as string | Date | undefined,
+    updatedAt: row.updatedAt as string | Date | undefined,
+  };
+}
+
+async function upsertUserDocumentAccess(
+  userId: string,
+  payload: { allowAll: boolean; filters?: Record<string, any> | null },
+): Promise<UserDocumentAccessRecord> {
+  const delegate = (prisma as any).userDocumentAccess;
+  if (delegate?.upsert) {
+    try {
+      return await delegate.upsert({
+        where: { userId },
+        create: { userId, allowAll: payload.allowAll, filters: payload.filters ?? null },
+        update: { allowAll: payload.allowAll, filters: payload.filters ?? null },
+      });
+    } catch (error) {
+      if (isMissingUserDocumentAccessTableError(error)) {
+        app.log.warn(`[doc-access] table missing while saving access for user=${userId}; returning in-memory default`);
+        return {
+          userId,
+          allowAll: payload.allowAll,
+          filters: payload.filters ?? null,
+        };
+      }
+      throw error;
+    }
+  }
+
+  const serializedFilters = payload.filters == null ? null : JSON.stringify(payload.filters);
+  try {
+    await prisma.$executeRawUnsafe(
+      `
+        INSERT INTO user_document_access (id, user_id, allow_all, filters, created_at, updated_at)
+        VALUES (UUID(), ?, ?, ?, NOW(), NOW())
+        ON DUPLICATE KEY UPDATE
+          allow_all = VALUES(allow_all),
+          filters = VALUES(filters),
+          updated_at = NOW()
+      `,
+      userId,
+      payload.allowAll ? 1 : 0,
+      serializedFilters,
+    );
+  } catch (error) {
+    if (isMissingUserDocumentAccessTableError(error)) {
+      app.log.warn(`[doc-access] table missing while upserting access for user=${userId}; returning in-memory default`);
+      return {
+        userId,
+        allowAll: payload.allowAll,
+        filters: payload.filters ?? null,
+      };
+    }
+    throw error;
+  }
+
+  const record = await findUserDocumentAccess(userId);
+  if (!record) {
+    throw new Error(`Failed to persist user document access for ${userId}`);
+  }
+  return record;
+}
+
 function pathParam(request: { params: unknown }, key: string) {
   return (request.params as Record<string, string>)[key];
 }
@@ -817,6 +977,8 @@ app.post("/api/ai/chat/query", async (request) => {
     throw app.httpErrors.badRequest("Message is required");
   }
 
+  app.log.warn(`[ai-chat-query] start session=${body.sessionId ?? "new"} user=${user.id} role=${user.role}`);
+
   const settings = await ensureAiSettings();
   const session =
     body.sessionId
@@ -905,6 +1067,7 @@ app.post("/api/ai/chat/query", async (request) => {
           referencePages: [],
           citations: [item.text.slice(0, 300)],
         }));
+        app.log.warn(`[ai-chat-query] racer matches=${racerMatches.length} session=${session.id}`);
       }
     } catch (err: any) {
       app.log.warn(`RACER search fallback failed: ${err?.message || err}`);
@@ -951,25 +1114,30 @@ app.post("/api/ai/chat/query", async (request) => {
 
   // Enforce document-level permissions for non-admin users
   if (user.role !== "admin" && user.role !== "moderator") {
-    const access = await prisma.userDocumentAccess.findUnique({ where: { userId: user.id } });
-    if (access && !access.allowAll && access.filters) {
-      const f = access.filters as {
-        countries?: string[];
-        docTypes?: string[];
-        clients?: string[];
-        apostilledOnly?: boolean;
-      };
+    const access = await findUserDocumentAccess(user.id);
+    app.log.warn(
+      `[ai-chat-query] access user=${user.id} exists=${Boolean(access)} allowAll=${access?.allowAll ?? "n/a"} filtersType=${
+        access?.filters == null ? "null" : Array.isArray(access.filters) ? "array" : typeof access.filters
+      }`,
+    );
+    if (access && !access.allowAll) {
+      const f = normalizeDocAccessFilters(access.filters);
+      app.log.warn(
+        `[ai-chat-query] applying filters session=${session.id} countries=${f.countries.length} docTypes=${f.docTypes.length} clients=${f.clients.length} apostilledOnly=${f.apostilledOnly}`,
+      );
       mergedMatches = mergedMatches.filter((m) => {
         if (f.countries?.length && !f.countries.includes(m.referenceLabel ?? "")) return false;
         if (f.docTypes?.length && !f.docTypes.includes(m.recordType)) return false;
         if (f.apostilledOnly && !(m as any).apostillado) return false;
         return true;
       });
+      app.log.warn(`[ai-chat-query] matches after filters=${mergedMatches.length} session=${session.id}`);
     }
   }
 
   const finalMatches: MatchEntry[] = mergedMatches;
   const serializableMatches = toJsonSafe(finalMatches);
+  app.log.warn(`[ai-chat-query] final matches=${serializableMatches.length} session=${session.id}`);
 
   const providerContext = finalMatches
     .map(
@@ -999,6 +1167,7 @@ app.post("/api/ai/chat/query", async (request) => {
 
   const userMsgTime = new Date();
   const assistantMsgTime = new Date(userMsgTime.getTime() + 1);
+  app.log.warn(`[ai-chat-query] persisting messages session=${session.id}`);
   await prisma.aiChatMessage.createMany({
     data: [
       {
@@ -2125,7 +2294,7 @@ app.get("/api/admin/chat/sessions", async (request) => {
 app.get("/api/admin/doc-access/:userId", async (request) => {
   requireAdmin(request);
   const userId = pathParam(request, "userId");
-  const access = await prisma.userDocumentAccess.findUnique({ where: { userId } });
+  const access = await findUserDocumentAccess(userId);
   return {
     data: access ?? { userId, allowAll: true, filters: null },
     error: null,
@@ -2136,11 +2305,7 @@ app.put("/api/admin/doc-access/:userId", async (request) => {
   requireAdmin(request);
   const userId = pathParam(request, "userId");
   const body = request.body as { allowAll: boolean; filters?: Record<string, any> | null };
-  const data = await prisma.userDocumentAccess.upsert({
-    where: { userId },
-    create: { userId, allowAll: body.allowAll, filters: body.filters ?? null },
-    update: { allowAll: body.allowAll, filters: body.filters ?? null },
-  });
+  const data = await upsertUserDocumentAccess(userId, body);
   return { data, error: null };
 });
 

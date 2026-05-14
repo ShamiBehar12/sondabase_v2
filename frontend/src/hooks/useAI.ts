@@ -229,7 +229,14 @@ export function useAIChat() {
     });
 
     if (response.error) {
-      console.error("[RAG] 4. ERROR en la respuesta:", response.error);
+      console.error(
+        "[RAG] 4. ERROR en la respuesta:",
+        response.error.message,
+        "| status:",
+        response.error.statusCode,
+        "| raw:",
+        response.error,
+      );
     } else {
       const d = response.data!;
       console.log("[RAG] 4. Respuesta recibida:");

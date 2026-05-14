@@ -54,7 +54,9 @@ export function AppSidebar() {
   const isOnAIChat = currentPath.startsWith("/ai-chat");
 
   const navigationItems = [
-    { title: t("navigation.dashboard"), url: "/dashboard", icon: Home },
+    ...(userRole === "admin" || userRole === "moderator"
+      ? [{ title: t("navigation.dashboard"), url: "/dashboard", icon: Home }]
+      : []),
     { title: t("navigation.certificates"), url: "/certificates", icon: Award },
     { title: t("navigation.aiAssistant"), url: "/ai-chat", icon: Bot },
   ];
