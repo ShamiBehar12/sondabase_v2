@@ -57,17 +57,17 @@ const App = () => (
               <ProtectedRoute>
                 <AIChatProvider>
                 <SidebarProvider>
-                  <div className="min-h-screen flex w-full relative" style={{ background: 'hsl(218,16%,11%)' }}>
+                  <div className="min-h-screen flex w-full relative" style={{ background: '#101A2B' }}>
                     {/* ambient city background for all inner pages */}
                     <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
-                      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/smart-city-bg.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.09, filter: 'blur(6px) saturate(0.4)' }} />
-                      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg, rgba(10,14,26,0.82) 0%, rgba(12,16,28,0.78) 50%, rgba(10,14,26,0.84) 100%)' }} />
+                      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/smart-city-bg.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.06, filter: 'blur(5px) saturate(0.55)' }} />
+                      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg, rgba(16,26,43,0.90) 0%, rgba(18,30,51,0.86) 50%, rgba(14,24,41,0.90) 100%)' }} />
                       {/* glow orbs */}
-                      <div style={{ position: 'absolute', top: '-10%', left: '-8%', width: '50%', height: '50%', background: 'radial-gradient(ellipse, rgba(59,130,246,0.10) 0%, transparent 65%)', filter: 'blur(80px)' }} />
-                      <div style={{ position: 'absolute', bottom: '-12%', right: '-10%', width: '55%', height: '55%', background: 'radial-gradient(ellipse, rgba(139,92,246,0.09) 0%, transparent 65%)', filter: 'blur(90px)' }} />
-                      <div style={{ position: 'absolute', top: '40%', right: '20%', width: '30%', height: '30%', background: 'radial-gradient(ellipse, rgba(6,182,212,0.06) 0%, transparent 65%)', filter: 'blur(60px)' }} />
+                      <div style={{ position: 'absolute', top: '-10%', left: '-8%', width: '50%', height: '50%', background: 'radial-gradient(ellipse, rgba(59,130,246,0.12) 0%, transparent 65%)', filter: 'blur(80px)' }} />
+                      <div style={{ position: 'absolute', bottom: '-12%', right: '-10%', width: '55%', height: '55%', background: 'radial-gradient(ellipse, rgba(99,102,241,0.10) 0%, transparent 65%)', filter: 'blur(90px)' }} />
+                      <div style={{ position: 'absolute', top: '40%', right: '20%', width: '30%', height: '30%', background: 'radial-gradient(ellipse, rgba(14,165,233,0.08) 0%, transparent 65%)', filter: 'blur(60px)' }} />
                       {/* subtle grid */}
-                      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.010) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.010) 1px, transparent 1px)', backgroundSize: '52px 52px' }} />
+                      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(96,165,250,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(96,165,250,0.035) 1px, transparent 1px)', backgroundSize: '52px 52px' }} />
                     </div>
                     <AppSidebar />
                     <div className="flex-1">

@@ -108,10 +108,10 @@ export default function Biblioteca() {
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <BookOpen className="w-6 h-6 text-primary" />Biblioteca de Conocimiento
+          <h1 className="text-2xl font-bold text-[#F3F7FC] flex items-center gap-2">
+            <BookOpen className="w-6 h-6 text-[#3B82F6]" />Biblioteca de Conocimiento
           </h1>
-          <p className="text-foreground-muted text-sm mt-1">
+          <p className="text-white text-sm mt-1">
             {loading ? "Cargando…" : racerDown ? "RACER no disponible" : `${docs.length} documento${docs.length !== 1 ? "s" : ""} indexado${docs.length !== 1 ? "s" : ""} en el asistente IA`}
           </p>
         </div>
@@ -151,28 +151,28 @@ export default function Biblioteca() {
 
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted" />
-          <Input placeholder="Buscar por nombre, cliente, país…" value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9 text-sm bg-background/50" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white" />
+          <Input placeholder="Buscar por nombre, cliente, país…" value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9 text-sm bg-[rgba(23,28,37,0.5)]" />
         </div>
         {selected.size > 0 && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" size="sm" disabled={deleting}><Trash2 className="w-4 h-4 mr-1.5" />Eliminar seleccionados ({selected.size})</Button>
             </AlertDialogTrigger>
-            <AlertDialogContent className="bg-surface border-border">
-              <AlertDialogHeader><AlertDialogTitle>Eliminar {selected.size} documento(s)</AlertDialogTitle><AlertDialogDescription className="text-foreground-muted">Se eliminarán del índice del asistente IA. Esta acción no se puede deshacer.</AlertDialogDescription></AlertDialogHeader>
-              <AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={deleteSelected}>Eliminar</AlertDialogAction></AlertDialogFooter>
+            <AlertDialogContent className="bg-[#202938] border-[#3E4A5F]">
+              <AlertDialogHeader><AlertDialogTitle>Eliminar {selected.size} documento(s)</AlertDialogTitle><AlertDialogDescription className="text-white">Se eliminarán del índice del asistente IA. Esta acción no se puede deshacer.</AlertDialogDescription></AlertDialogHeader>
+              <AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction className="bg-[#E5484D] text-[#F3F7FC] hover:bg-[#E5484D]/90" onClick={deleteSelected}>Eliminar</AlertDialogAction></AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
         )}
         <AlertDialog onOpenChange={() => setDeleteAllPassword("")}>
           <AlertDialogTrigger asChild>
-            <Button variant="outline" size="sm" className="text-destructive border-destructive/40 hover:bg-destructive/10" disabled={deleting || docs.length === 0}><AlertTriangle className="w-4 h-4 mr-1.5" />Borrar todo</Button>
+            <Button variant="outline" size="sm" className="text-destructive border-destructive/40 hover:bg-[rgba(229,72,77,0.1)]" disabled={deleting || docs.length === 0}><AlertTriangle className="w-4 h-4 mr-1.5" />Borrar todo</Button>
           </AlertDialogTrigger>
-          <AlertDialogContent className="bg-surface border-border">
-            <AlertDialogHeader><AlertDialogTitle className="text-destructive">Borrar toda la biblioteca</AlertDialogTitle><AlertDialogDescription className="text-foreground-muted">Se eliminarán <strong className="text-foreground">{docs.length} documentos</strong>. Escribe <strong className="text-foreground">borrar todo</strong> para confirmar:</AlertDialogDescription></AlertDialogHeader>
-            <Input value={deleteAllPassword} onChange={e => setDeleteAllPassword(e.target.value)} placeholder="borrar todo" className="bg-background/50" />
-            <AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={deleteAll} disabled={deleteAllPassword !== "borrar todo"}>Borrar todo</AlertDialogAction></AlertDialogFooter>
+          <AlertDialogContent className="bg-[#202938] border-[#3E4A5F]">
+            <AlertDialogHeader><AlertDialogTitle className="text-destructive">Borrar toda la biblioteca</AlertDialogTitle><AlertDialogDescription className="text-white">Se eliminarán <strong className="text-[#F3F7FC]">{docs.length} documentos</strong>. Escribe <strong className="text-[#F3F7FC]">borrar todo</strong> para confirmar:</AlertDialogDescription></AlertDialogHeader>
+            <Input value={deleteAllPassword} onChange={e => setDeleteAllPassword(e.target.value)} placeholder="borrar todo" className="bg-[rgba(23,28,37,0.5)]" />
+            <AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction className="bg-[#E5484D] text-[#F3F7FC] hover:bg-[#E5484D]/90" onClick={deleteAll} disabled={deleteAllPassword !== "borrar todo"}>Borrar todo</AlertDialogAction></AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
       </div>
@@ -181,7 +181,7 @@ export default function Biblioteca() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/10 text-foreground-muted text-xs uppercase tracking-wider">
+              <tr className="border-b border-white/10 text-white text-xs uppercase tracking-wider">
                 <th className="w-10 px-4 py-3"><Checkbox checked={filtered.length > 0 && selected.size === filtered.length} onCheckedChange={toggleAll} className="h-3.5 w-3.5" /></th>
                 <th className="text-left py-3 pr-4">Archivo</th>
                 <th className="text-left py-3 px-3">Cliente</th>
@@ -194,37 +194,37 @@ export default function Biblioteca() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {loading && <tr><td colSpan={9} className="py-12 text-center text-foreground-muted"><RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2" />Cargando documentos…</td></tr>}
+              {loading && <tr><td colSpan={9} className="py-12 text-center text-white"><RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2" />Cargando documentos…</td></tr>}
               {!loading && racerDown && <tr><td colSpan={9} className="py-12 text-center text-red-400"><WifiOff className="w-5 h-5 mx-auto mb-2" />RACER no disponible — inicia el servidor e intenta de nuevo.</td></tr>}
-              {!loading && !racerDown && filtered.length === 0 && <tr><td colSpan={9} className="py-12 text-center text-foreground-muted">{showDuplicates ? "No se encontraron duplicados." : search ? "Sin resultados." : "No hay documentos indexados aún. Usa la carga por lote para ingestar PDFs."}</td></tr>}
+              {!loading && !racerDown && filtered.length === 0 && <tr><td colSpan={9} className="py-12 text-center text-white">{showDuplicates ? "No se encontraron duplicados." : search ? "Sin resultados." : "No hay documentos indexados aún. Usa la carga por lote para ingestar PDFs."}</td></tr>}
               {filtered.map(doc => {
                 const isDup = !!(doc.content_hash && duplicateHashSet.has(doc.content_hash));
                 return (
-                  <tr key={doc.document_id} className={`hover:bg-white/[0.03] transition-colors ${selected.has(doc.document_id) ? "bg-primary/5" : ""} ${isDup && showDuplicates ? "bg-amber-500/5" : ""}` }>
+                  <tr key={doc.document_id} className={`hover:bg-white/[0.03] transition-colors ${selected.has(doc.document_id) ? "bg-[rgba(59,130,246,0.05)]" : ""} ${isDup && showDuplicates ? "bg-amber-500/5" : ""}` }>
                     <td className="px-4 py-3"><Checkbox checked={selected.has(doc.document_id)} onCheckedChange={() => toggleOne(doc.document_id)} className="h-3.5 w-3.5" /></td>
                     <td className="py-3 pr-4">
                       <div className="flex items-center gap-2">
                         {isDup && <Copy className="w-3 h-3 text-amber-400 shrink-0" title="Contenido duplicado" />}
                         <div>
-                          <p className="font-medium text-foreground truncate max-w-[260px]" title={doc.original_filename}>{doc.original_filename}</p>
-                          {doc.summary_one_line && <p className="text-xs text-foreground-muted truncate max-w-[260px]">{doc.summary_one_line}</p>}
+                          <p className="font-medium text-[#F3F7FC] truncate max-w-[260px]" title={doc.original_filename}>{doc.original_filename}</p>
+                          {doc.summary_one_line && <p className="text-xs text-white truncate max-w-[260px]">{doc.summary_one_line}</p>}
                         </div>
                       </div>
                     </td>
-                    <td className="py-3 px-3 text-foreground-secondary">{doc.client ?? "—"}</td>
-                    <td className="py-3 px-3 text-foreground-secondary">{doc.country ?? "—"}</td>
-                    <td className="py-3 px-3">{doc.doc_type ? <Badge variant="outline" className="text-[10px] capitalize border-border/60 text-foreground-muted">{doc.doc_type.replace(/_/g, " ")}</Badge> : "—"}</td>
-                    <td className="py-3 px-3 text-right text-foreground-secondary">{doc.year ?? "—"}</td>
+                    <td className="py-3 px-3 text-white">{doc.client ?? "—"}</td>
+                    <td className="py-3 px-3 text-white">{doc.country ?? "—"}</td>
+                    <td className="py-3 px-3">{doc.doc_type ? <Badge variant="outline" className="text-[10px] capitalize border-[rgba(62,74,95,0.6)] text-white">{doc.doc_type.replace(/_/g, " ")}</Badge> : "—"}</td>
+                    <td className="py-3 px-3 text-right text-white">{doc.year ?? "—"}</td>
                     <td className="py-3 px-3 text-center">
-                      {doc.is_apostilled === 1 ? <Badge className="bg-green-600/20 text-green-400 border-green-600/30 text-[10px]">Sí</Badge> : doc.is_apostilled === 0 ? <span className="text-xs text-foreground-muted">No</span> : <span className="text-xs text-foreground-muted">—</span>}
+                      {doc.is_apostilled === 1 ? <Badge className="bg-green-600/20 text-green-400 border-green-600/30 text-[10px]">Sí</Badge> : doc.is_apostilled === 0 ? <span className="text-xs text-white">No</span> : <span className="text-xs text-white">—</span>}
                     </td>
-                    <td className="py-3 px-3 text-right text-xs text-foreground-muted whitespace-nowrap">{formatDate(doc.ingested_at)}</td>
+                    <td className="py-3 px-3 text-right text-xs text-white whitespace-nowrap">{formatDate(doc.ingested_at)}</td>
                     <td className="py-3 pl-3">
                       <AlertDialog>
-                        <AlertDialogTrigger asChild><button className="text-foreground-muted hover:text-destructive transition-colors" disabled={deleting}><Trash2 className="w-3.5 h-3.5" /></button></AlertDialogTrigger>
-                        <AlertDialogContent className="bg-surface border-border">
-                          <AlertDialogHeader><AlertDialogTitle>Eliminar documento</AlertDialogTitle><AlertDialogDescription className="text-foreground-muted">¿Eliminar <strong className="text-foreground">{doc.original_filename}</strong>? El archivo físico no se borrará.</AlertDialogDescription></AlertDialogHeader>
-                          <AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => deleteOne(doc.document_id)}>Eliminar</AlertDialogAction></AlertDialogFooter>
+                        <AlertDialogTrigger asChild><button className="text-white hover:text-destructive transition-colors" disabled={deleting}><Trash2 className="w-3.5 h-3.5" /></button></AlertDialogTrigger>
+                        <AlertDialogContent className="bg-[#202938] border-[#3E4A5F]">
+                          <AlertDialogHeader><AlertDialogTitle>Eliminar documento</AlertDialogTitle><AlertDialogDescription className="text-white">¿Eliminar <strong className="text-[#F3F7FC]">{doc.original_filename}</strong>? El archivo físico no se borrará.</AlertDialogDescription></AlertDialogHeader>
+                          <AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction className="bg-[#E5484D] text-[#F3F7FC] hover:bg-[#E5484D]/90" onClick={() => deleteOne(doc.document_id)}>Eliminar</AlertDialogAction></AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
                     </td>
@@ -238,3 +238,5 @@ export default function Biblioteca() {
     </div>
   );
 }
+
+

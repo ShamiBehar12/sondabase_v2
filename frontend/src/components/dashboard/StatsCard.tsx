@@ -21,7 +21,7 @@ export function StatsCard({
   const changeColors = {
     positive: "text-emerald-400",
     negative: "text-red-400",
-    neutral: "text-foreground-muted",
+    neutral: "text-white",
     warning: "text-amber-400",
   };
 
@@ -35,14 +35,14 @@ export function StatsCard({
   return (
     <div className={cn("premium-card p-5 relative overflow-hidden", className)}>
       {/* subtle top-left glow */}
-      <div className="absolute -top-6 -left-6 w-20 h-20 rounded-full bg-primary/10 blur-2xl pointer-events-none" />
+      <div className="absolute -top-6 -left-6 w-20 h-20 rounded-full bg-[rgba(59,130,246,0.1)] blur-2xl pointer-events-none" />
 
       <div className="flex items-start justify-between relative z-10">
         <div className="space-y-1.5 flex-1 min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-wider text-foreground-muted">
+          <p className="text-xs font-semibold uppercase tracking-wider text-white">
             {title}
           </p>
-          <p className="text-[2rem] font-bold text-foreground leading-none tracking-tight">
+          <p className="text-[2rem] font-bold text-[#F3F7FC] leading-none tracking-tight">
             {value}
           </p>
           {change && (
@@ -53,7 +53,7 @@ export function StatsCard({
         </div>
         <div
           className={cn(
-            "p-2.5 bg-gradient-primary rounded-xl flex-shrink-0 ml-3 shadow-lg",
+            "p-2.5 bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white rounded-xl flex-shrink-0 ml-3 shadow-lg",
             iconGlows[changeType]
           )}
         >
@@ -63,3 +63,5 @@ export function StatsCard({
     </div>
   );
 }
+
+

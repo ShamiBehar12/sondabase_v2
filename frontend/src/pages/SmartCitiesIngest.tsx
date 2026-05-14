@@ -22,13 +22,13 @@ type FileEntry = {
 type RacerDoc = { original_filename: string };
 
 const STATUS_ICON: Record<FileStatus, React.ReactNode> = {
-  pending:    <Loader2 className="w-4 h-4 text-muted-foreground" />,
+  pending:    <Loader2 className="w-4 h-4 text-white" />,
   uploading:  <Loader2 className="w-4 h-4 animate-spin text-blue-400" />,
   ingesting:  <Loader2 className="w-4 h-4 animate-spin text-yellow-400" />,
   done:       <CheckCircle className="w-4 h-4 text-green-500" />,
   duplicate:  <Copy className="w-4 h-4 text-orange-400" />,
   error:      <AlertCircle className="w-4 h-4 text-red-500" />,
-  empty:      <AlertCircle className="w-4 h-4 text-muted-foreground" />,
+  empty:      <AlertCircle className="w-4 h-4 text-white" />,
 };
 
 const STATUS_LABEL: Record<FileStatus, string> = {
@@ -142,11 +142,11 @@ export default function SmartCitiesIngest() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gradient flex items-center gap-3">
+        <h1 className="text-3xl font-bold bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white bg-clip-text text-transparent flex items-center gap-3">
           <FolderOpen className="w-8 h-8" />
           Carga Masiva RAG
         </h1>
-        <p className="text-foreground-muted mt-2">
+        <p className="text-white mt-2">
           Sube PDFs o carpetas completas. Los documentos ya ingestados se omiten automáticamente.
         </p>
       </div>
@@ -154,15 +154,15 @@ export default function SmartCitiesIngest() {
       {/* Drop zone */}
       <Card
         className={`premium-card border-2 border-dashed transition-colors cursor-pointer
-          ${dragOver ? "border-primary bg-primary/5" : "border-border"}`}
+          ${dragOver ? "border-[#3B82F6] bg-[rgba(59,130,246,0.05)]" : "border-[#3E4A5F]"}`}
         onDragOver={y => { y.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={onDrop}
         onClick={() => inputRef.current?.click()}
       >
         <CardContent className="flex flex-col items-center justify-center py-12 gap-3">
-          <Upload className="w-10 h-10 text-muted-foreground" />
-          <p className="text-sm text-foreground-muted">
+          <Upload className="w-10 h-10 text-white" />
+          <p className="text-sm text-white">
             Arrastra PDFs aquí o haz clic para seleccionar
           </p>
           <div className="flex gap-2">
@@ -186,7 +186,7 @@ export default function SmartCitiesIngest() {
       {files.length > 0 && (
         <div className="flex items-center gap-3">
           <Button onClick={processAll} disabled={running || !files.some(f => f.status === "pending")}
-            className="bg-gradient-primary hover:opacity-90">
+            className="bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white hover:brightness-110">
             {running
               ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Procesando...</>
               : <><Upload className="w-4 h-4 mr-2" />Ingestar {files.filter(f => f.status === "pending").length} archivo(s)</>}
@@ -194,7 +194,7 @@ export default function SmartCitiesIngest() {
           <Button variant="outline" size="sm" onClick={clear} disabled={running}>
             <X className="w-4 h-4 mr-1" />Limpiar
           </Button>
-          <span className="text-sm text-foreground-muted ml-auto">
+          <span className="text-sm text-white ml-auto">
             {done}/{total} completados
           </span>
         </div>
@@ -213,10 +213,10 @@ export default function SmartCitiesIngest() {
             <div className="space-y-2">
               {files.map(entry => (
                 <div key={entry.id}
-                  className="flex items-center gap-3 rounded-lg border border-border px-4 py-2">
+                  className="flex items-center gap-3 rounded-lg border border-[#3E4A5F] px-4 py-2">
                   {STATUS_ICON[entry.status]}
                   <span className="flex-1 text-sm truncate">{entry.file.name}</span>
-                  <span className="text-xs text-foreground-muted">
+                  <span className="text-xs text-white">
                     {(entry.file.size / 1024).toFixed(0)} KB
                   </span>
                   <Badge variant={
@@ -248,3 +248,6 @@ export default function SmartCitiesIngest() {
     </div>
   );
 }
+
+
+

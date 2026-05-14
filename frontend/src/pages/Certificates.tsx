@@ -23,13 +23,13 @@ type FileEntry = {
 };
 
 const STATUS_ICON: Record<FileStatus, React.ReactNode> = {
-  pending:   <Loader2 className="w-4 h-4 text-muted-foreground" />,
+  pending:   <Loader2 className="w-4 h-4 text-white" />,
   uploading: <Loader2 className="w-4 h-4 animate-spin text-blue-400" />,
   ingesting: <Loader2 className="w-4 h-4 animate-spin text-yellow-400" />,
   done:      <CheckCircle className="w-4 h-4 text-green-500" />,
   duplicate: <Copy className="w-4 h-4 text-orange-400" />,
   error:     <AlertCircle className="w-4 h-4 text-red-500" />,
-  empty:     <AlertCircle className="w-4 h-4 text-muted-foreground" />,
+  empty:     <AlertCircle className="w-4 h-4 text-white" />,
 };
 
 const STATUS_LABEL: Record<FileStatus, string> = {
@@ -134,32 +134,58 @@ export default function Certificates() {
 
   return (
     <div className="flex-1 space-y-6 p-8 pt-6">
-      <div className="flex items-center justify-between">
+      <div className="relative z-20 flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-white">{t('certificates.title')}</h2>
-          <p className="text-foreground-muted mt-2">{t('certificates.subtitle')}</p>
+          <h2
+            className="text-3xl font-bold"
+            style={{ color: "#FFFFFF", textShadow: "0 1px 10px rgba(0,0,0,0.28)" }}
+          >
+            {t('certificates.title')}
+          </h2>
+          <p
+            className="mt-2"
+            style={{ color: "rgba(255,255,255,0.82)", textShadow: "0 1px 8px rgba(0,0,0,0.24)" }}
+          >
+            {t('certificates.subtitle')}
+          </p>
         </div>
       </div>
 
       <div className="space-y-4">
         {/* Drop zone */}
         <Card
-          className={`premium-card border-2 border-dashed transition-colors cursor-pointer ${dragOver ? "border-primary bg-primary/5" : "border-border"}`}
+          className={`premium-card border-2 border-dashed transition-colors cursor-pointer ${dragOver ? "border-[#3B82F6] bg-[rgba(59,130,246,0.05)]" : "border-[#3E4A5F]"}`}
           onDragOver={e => { e.preventDefault(); setDragOver(true); }}
           onDragLeave={() => setDragOver(false)}
           onDrop={onDrop}
           onClick={() => inputRef.current?.click()}
         >
-          <CardContent className="flex flex-col items-center justify-center py-12 gap-3">
-            <Upload className="w-10 h-10 text-muted-foreground" />
-            <p className="text-sm text-foreground-muted">
+          <CardContent className="relative z-20 flex flex-col items-center justify-center py-12 gap-3">
+            <Upload
+              className="w-10 h-10"
+              style={{ color: "#FFFFFF", filter: "drop-shadow(0 1px 8px rgba(0,0,0,0.22))" }}
+            />
+            <p
+              className="text-sm"
+              style={{ color: "#FFFFFF", textShadow: "0 1px 8px rgba(0,0,0,0.24)" }}
+            >
               Arrastra PDFs aquí o haz clic para seleccionar
             </p>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={e => { e.stopPropagation(); inputRef.current?.click(); }}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={e => { e.stopPropagation(); inputRef.current?.click(); }}
+                style={{ color: "#FFFFFF", textShadow: "0 1px 8px rgba(0,0,0,0.24)" }}
+              >
                 Seleccionar archivos
               </Button>
-              <Button variant="outline" size="sm" onClick={e => { e.stopPropagation(); folderRef.current?.click(); }}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={e => { e.stopPropagation(); folderRef.current?.click(); }}
+                style={{ color: "#FFFFFF", textShadow: "0 1px 8px rgba(0,0,0,0.24)" }}
+              >
                 Seleccionar carpeta
               </Button>
             </div>
@@ -175,7 +201,7 @@ export default function Certificates() {
         {bulkFiles.length > 0 && (
           <div className="flex items-center gap-3">
             <Button onClick={processAll} disabled={bulkRunning || !bulkFiles.some(f => f.status === "pending")}
-              className="bg-gradient-primary hover:opacity-90">
+              className="bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white hover:brightness-110">
               {bulkRunning
                 ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Procesando...</>
                 : <><Upload className="w-4 h-4 mr-2" />Ingestar {bulkFiles.filter(f => f.status === "pending").length} archivo(s)</>}
@@ -188,7 +214,10 @@ export default function Certificates() {
             <Button variant="outline" size="sm" onClick={clearBulk} disabled={bulkRunning}>
               <X className="w-4 h-4 mr-1" />Limpiar
             </Button>
-            <span className="text-sm text-foreground-muted ml-auto">
+            <span
+              className="text-sm ml-auto"
+              style={{ color: "#FFFFFF", textShadow: "0 1px 8px rgba(0,0,0,0.24)" }}
+            >
               {bulkDone}/{bulkTotal} completados
             </span>
           </div>
@@ -205,10 +234,10 @@ export default function Certificates() {
             <CardContent>
               <div className="space-y-2">
                 {bulkFiles.map(entry => (
-                  <div key={entry.id} className="flex items-center gap-3 rounded-lg border border-border px-4 py-2">
+                  <div key={entry.id} className="flex items-center gap-3 rounded-lg border border-[#3E4A5F] px-4 py-2">
                     {STATUS_ICON[entry.status]}
                     <span className="flex-1 text-sm truncate">{entry.file.name}</span>
-                    <span className="text-xs text-foreground-muted">
+                    <span className="text-xs text-white">
                       {(entry.file.size / 1024).toFixed(0)} KB
                     </span>
                     <Badge variant={
@@ -234,7 +263,7 @@ export default function Certificates() {
                         <button
                           onClick={() => retryOne(entry.id)}
                           disabled={bulkRunning}
-                          className="text-foreground-muted hover:text-foreground transition-colors disabled:opacity-50"
+                          className="text-white hover:text-white transition-colors disabled:opacity-50"
                           title="Reintentar"
                         >
                           <RefreshCw className="w-3.5 h-3.5" />
@@ -251,3 +280,6 @@ export default function Certificates() {
     </div>
   );
 }
+
+
+

@@ -48,27 +48,27 @@ export function AppHeader() {
   };
   return (
     <header className="sticky top-0 z-50" style={{
-      background: 'rgba(22,26,38,0.85)',
+      background: 'rgba(16,26,43,0.86)',
       backdropFilter: 'blur(20px)',
-      borderBottom: '1px solid rgba(255,255,255,0.08)',
+      borderBottom: '1px solid rgba(96,165,250,0.12)',
     }}>
       <div className="flex items-center justify-between px-6 py-2.5">
         {/* Left */}
         <div className="flex items-center gap-3">
-          <SidebarTrigger className="text-foreground-muted hover:text-foreground" />
+          <SidebarTrigger className="text-white hover:text-[#F3F7FC]" />
         </div>
 
         {/* Right */}
         <div className="flex items-center gap-1">
           <LanguageSelector />
 
-          <div className="w-px h-5 mx-1" style={{ background: 'rgba(255,255,255,0.1)' }} />
+          <div className="w-px h-5 mx-1" style={{ background: 'rgba(96,165,250,0.16)' }} />
 
           {/* Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="relative w-9 h-9 p-0 rounded-xl hover:bg-white/[0.06]">
-                <Bell className="w-4 h-4 text-foreground-muted" />
+                <Bell className="w-4 h-4 text-white" />
                 <span className="absolute -top-0.5 -right-0.5 w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold text-white"
                   style={{ background: 'linear-gradient(135deg,#ef4444,#dc2626)' }}>
                   3
@@ -76,8 +76,8 @@ export function AppHeader() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80">
-              <div className="px-3 py-2.5 border-b border-border/40">
-                <h3 className="font-semibold text-sm text-foreground">{t('notifications')}</h3>
+              <div className="px-3 py-2.5 border-b border-[rgba(62,74,95,0.4)]">
+                <h3 className="font-semibold text-sm text-[#F3F7FC]">{t('notifications')}</h3>
               </div>
               {[
                 { color: 'bg-info', title: 'Nova exportação concluída', sub: 'Success Story - Cliente ABC' },
@@ -87,15 +87,15 @@ export function AppHeader() {
                 <DropdownMenuItem key={i} className="p-3 gap-3 focus:bg-white/[0.04] cursor-pointer">
                   <div className={`w-2 h-2 rounded-full ${n.color} flex-shrink-0 mt-1`} />
                   <div>
-                    <p className="font-medium text-sm text-foreground">{n.title}</p>
-                    <p className="text-xs text-foreground-muted mt-0.5">{n.sub}</p>
+                    <p className="font-medium text-sm text-[#F3F7FC]">{n.title}</p>
+                    <p className="text-xs text-white mt-0.5">{n.sub}</p>
                   </div>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div className="w-px h-5 mx-1" style={{ background: 'rgba(255,255,255,0.1)' }} />
+          <div className="w-px h-5 mx-1" style={{ background: 'rgba(96,165,250,0.16)' }} />
 
           {/* User menu */}
           <DropdownMenu>
@@ -103,15 +103,15 @@ export function AppHeader() {
               <Button variant="ghost" className="h-9 px-2 gap-2.5 rounded-xl hover:bg-white/[0.06]">
                 <Avatar className="w-7 h-7">
                   <AvatarImage src={profile.avatar_url || ''} />
-                  <AvatarFallback className="bg-gradient-primary text-white text-xs font-bold">
+                  <AvatarFallback className="bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white text-white text-xs font-bold">
                     {profile.full_name?.charAt(0) || user?.email?.charAt(0).toUpperCase() || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <div className="hidden sm:block text-left">
-                  <p className="text-sm font-semibold text-foreground leading-tight">
+                  <p className="text-sm font-semibold text-[#F3F7FC] leading-tight">
                     {profile.full_name || user?.email}
                   </p>
-                  <p className="text-[11px] text-foreground-muted leading-tight">{t('auth.loggedInUser')}</p>
+                  <p className="text-[11px] text-white leading-tight">{t('auth.loggedInUser')}</p>
                 </div>
               </Button>
             </DropdownMenuTrigger>
@@ -132,3 +132,5 @@ export function AppHeader() {
     </header>
   );
 }
+
+

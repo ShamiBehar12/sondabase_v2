@@ -183,7 +183,7 @@ export function ProfessionalCertificateUploadForm({
     <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <GraduationCap className="h-6 w-6 text-primary" />
+          <GraduationCap className="h-6 w-6 text-[#3B82F6]" />
           Adicionar Certificado Profissional
         </CardTitle>
       </CardHeader>
@@ -192,13 +192,13 @@ export function ProfessionalCertificateUploadForm({
           {/* File Upload */}
           <div>
             <Label htmlFor="file">Arquivo del Certificado *</Label>
-            <div className="mt-2 flex justify-center rounded-lg border border-dashed border-border px-6 py-10">
+            <div className="mt-2 flex justify-center rounded-lg border border-dashed border-[#3E4A5F] px-6 py-10">
               <div className="text-center">
-                <FileText className="mx-auto h-12 w-12 text-foreground-muted" />
-                <div className="mt-4 flex text-sm leading-6 text-foreground-muted">
+                <FileText className="mx-auto h-12 w-12 text-white" />
+                <div className="mt-4 flex text-sm leading-6 text-white">
                   <label
                     htmlFor="file"
-                    className="relative cursor-pointer rounded-md bg-surface font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-primary/80"
+                    className="relative cursor-pointer rounded-md bg-[#202938] font-semibold text-[#3B82F6] focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-[#3B82F6]/80"
                   >
                     <span>Enviar un archivo</span>
                     <input
@@ -212,11 +212,11 @@ export function ProfessionalCertificateUploadForm({
                   </label>
                   <p className="pl-1">o arraste y solte</p>
                 </div>
-                <p className="text-xs leading-5 text-foreground-muted">
+                <p className="text-xs leading-5 text-white">
                   PDF, PNG, JPG até 10MB
                 </p>
                 {file && (
-                  <p className="mt-2 text-sm text-primary font-medium">
+                  <p className="mt-2 text-sm text-[#3B82F6] font-medium">
                     Arquivo selecionado: {file.name}
                   </p>
                 )}
@@ -236,7 +236,7 @@ export function ProfessionalCertificateUploadForm({
                   value={formData.title}
                   onChange={(y) => setFormData(prev => ({ ...prev, title: y.target.value }))}
                   placeholder="Ex: Bacharel em Engenharia Civil"
-                  className="bg-surface border-border"
+                  className="bg-[#202938] border-[#3E4A5F]"
                 />
               </div>
 
@@ -247,7 +247,7 @@ export function ProfessionalCertificateUploadForm({
                   value={formData.description}
                   onChange={(y) => setFormData(prev => ({ ...prev, description: y.target.value }))}
                   placeholder="Descrição del certificado..."
-                  className="bg-surface border-border min-h-20"
+                  className="bg-[#202938] border-[#3E4A5F] min-h-20"
                 />
               </div>
 
@@ -257,7 +257,7 @@ export function ProfessionalCertificateUploadForm({
                   value={formData.certification_type} 
                   onValueChange={(value) => setFormData(prev => ({ ...prev, certification_type: value }))}
                 >
-                  <SelectTrigger className="bg-surface border-border">
+                  <SelectTrigger className="bg-[#202938] border-[#3E4A5F]">
                     <SelectValue placeholder="Selecione o tipo" />
                   </SelectTrigger>
                   <SelectContent>
@@ -276,7 +276,7 @@ export function ProfessionalCertificateUploadForm({
                   value={formData.status} 
                   onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
                 >
-                  <SelectTrigger className="bg-surface border-border">
+                  <SelectTrigger className="bg-[#202938] border-[#3E4A5F]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -301,7 +301,7 @@ export function ProfessionalCertificateUploadForm({
                   value={formData.institution}
                   onChange={(y) => setFormData(prev => ({ ...prev, institution: y.target.value }))}
                   placeholder="Ex: Universidade Federal del Rio de Janeiro"
-                  className="bg-surface border-border"
+                  className="bg-[#202938] border-[#3E4A5F]"
                 />
               </div>
 
@@ -312,7 +312,7 @@ export function ProfessionalCertificateUploadForm({
                   value={formData.professional_council}
                   onChange={(y) => setFormData(prev => ({ ...prev, professional_council: y.target.value }))}
                   placeholder="Ex: CREA-RJ, CRM, OAB"
-                  className="bg-surface border-border"
+                  className="bg-[#202938] border-[#3E4A5F]"
                 />
               </div>
 
@@ -323,7 +323,7 @@ export function ProfessionalCertificateUploadForm({
                   value={formData.professional_registration_number}
                   onChange={(y) => setFormData(prev => ({ ...prev, professional_registration_number: y.target.value }))}
                   placeholder="Ex: 123456789"
-                  className="bg-surface border-border"
+                  className="bg-[#202938] border-[#3E4A5F]"
                 />
               </div>
 
@@ -334,7 +334,7 @@ export function ProfessionalCertificateUploadForm({
                   value={formData.specialization_area}
                   onChange={(y) => setFormData(prev => ({ ...prev, specialization_area: y.target.value }))}
                   placeholder="Ex: Estruturas, Geotecnia"
-                  className="bg-surface border-border"
+                  className="bg-[#202938] border-[#3E4A5F]"
                 />
               </div>
 
@@ -346,7 +346,7 @@ export function ProfessionalCertificateUploadForm({
                   value={formData.course_hours}
                   onChange={(y) => setFormData(prev => ({ ...prev, course_hours: y.target.value }))}
                   placeholder="Ex: 360"
-                  className="bg-surface border-border"
+                  className="bg-[#202938] border-[#3E4A5F]"
                 />
               </div>
             </div>
@@ -363,8 +363,8 @@ export function ProfessionalCertificateUploadForm({
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-start text-left font-normal bg-surface border-border",
-                        !formData.issued_date && "text-muted-foreground"
+                        "w-full justify-start text-left font-normal bg-[#202938] border-[#3E4A5F]",
+                        !formData.issued_date && "text-white"
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
@@ -390,8 +390,8 @@ export function ProfessionalCertificateUploadForm({
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-start text-left font-normal bg-surface border-border",
-                        !formData.valid_from && "text-muted-foreground"
+                        "w-full justify-start text-left font-normal bg-[#202938] border-[#3E4A5F]",
+                        !formData.valid_from && "text-white"
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
@@ -417,8 +417,8 @@ export function ProfessionalCertificateUploadForm({
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-start text-left font-normal bg-surface border-border",
-                        !formData.valid_until && "text-muted-foreground"
+                        "w-full justify-start text-left font-normal bg-[#202938] border-[#3E4A5F]",
+                        !formData.valid_until && "text-white"
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
@@ -450,7 +450,7 @@ export function ProfessionalCertificateUploadForm({
                   value={formData.country}
                   onChange={(y) => setFormData(prev => ({ ...prev, country: y.target.value }))}
                   placeholder="Ex: Brasil"
-                  className="bg-surface border-border"
+                  className="bg-[#202938] border-[#3E4A5F]"
                 />
               </div>
               <div>
@@ -460,7 +460,7 @@ export function ProfessionalCertificateUploadForm({
                   value={formData.state_province}
                   onChange={(y) => setFormData(prev => ({ ...prev, state_province: y.target.value }))}
                   placeholder="Ex: Rio de Janeiro"
-                  className="bg-surface border-border"
+                  className="bg-[#202938] border-[#3E4A5F]"
                 />
               </div>
               <div>
@@ -470,7 +470,7 @@ export function ProfessionalCertificateUploadForm({
                   value={formData.city}
                   onChange={(y) => setFormData(prev => ({ ...prev, city: y.target.value }))}
                   placeholder="Ex: Rio de Janeiro"
-                  className="bg-surface border-border"
+                  className="bg-[#202938] border-[#3E4A5F]"
                 />
               </div>
             </div>
@@ -484,7 +484,7 @@ export function ProfessionalCertificateUploadForm({
                 value={tagInput}
                 onChange={(y) => setTagInput(y.target.value)}
                 placeholder="Digite uma tag..."
-                className="bg-surface border-border"
+                className="bg-[#202938] border-[#3E4A5F]"
                 onKeyPress={(y) => y.key === 'Enter' && (y.preventDefault(), addTag())}
               />
               <Button type="button" onClick={addTag} variant="outline">
@@ -511,7 +511,7 @@ export function ProfessionalCertificateUploadForm({
             <Button type="button" variant="outline" onClick={onCancel}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading} className="bg-gradient-primary">
+            <Button type="submit" disabled={loading} className="bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white text-white">
               <Upload className="h-4 w-4 mr-2" />
               {loading ? 'Enviando...' : 'Enviar Certificado'}
             </Button>
@@ -521,3 +521,5 @@ export function ProfessionalCertificateUploadForm({
     </Card>
   );
 }
+
+

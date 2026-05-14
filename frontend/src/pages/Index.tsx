@@ -441,7 +441,7 @@ const Index = () => {
                 <Link to={card.href}
                   className="group relative rounded-2xl p-5 flex items-start gap-4 transition-all duration-300 hover:scale-[1.025] hover:-translate-y-0.5 block"
                   style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', backdropFilter: 'blur(28px)' }}>
-                  <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300"
                     style={{ background: `radial-gradient(ellipse at 30% 50%, ${card.glow} 0%, transparent 70%)`, border: `1px solid ${card.border}` }} />
                   <div className="relative z-10 flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
                     style={{ background: card.bg, border: `1px solid ${card.border}`, boxShadow: `0 0 20px ${card.glow}` }}>
@@ -475,3 +475,4 @@ const Index = () => {
 };
 
 export default Index;
+

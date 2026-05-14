@@ -108,7 +108,7 @@ export function UserEditDialog({ user, isOpen, onClose, onUserUpdated }: UserEdi
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="bg-surface border-border">
+      <DialogContent className="bg-[#202938] border-[#3E4A5F]">
         <DialogHeader>
           <DialogTitle>Editar Usuario</DialogTitle>
           <DialogDescription>
@@ -123,7 +123,7 @@ export function UserEditDialog({ user, isOpen, onClose, onUserUpdated }: UserEdi
               placeholder="Digite o nome completo"
               value={formData.fullName}
               onChange={(y) => setFormData(prev => ({ ...prev, fullName: y.target.value }))}
-              className="bg-background border-border"
+              className="bg-[#171C25] border-[#3E4A5F]"
               disabled={loading}
             />
           </div>
@@ -134,11 +134,11 @@ export function UserEditDialog({ user, isOpen, onClose, onUserUpdated }: UserEdi
               id="email"
               type="email"
               value={formData.email}
-              className="bg-background border-border"
+              className="bg-[#171C25] border-[#3E4A5F]"
               disabled
               title="O email no pode ser alterado"
             />
-            <p className="text-xs text-foreground-muted">O email no pode ser alterado</p>
+            <p className="text-xs text-white">O email no pode ser alterado</p>
           </div>
 
           <Tabs defaultValue="avatar-selector" className="space-y-4">
@@ -162,7 +162,7 @@ export function UserEditDialog({ user, isOpen, onClose, onUserUpdated }: UserEdi
                 placeholder="https://exemplo.com/avatar.jpg"
                 value={formData.avatarUrl}
                 onChange={(y) => setFormData(prev => ({ ...prev, avatarUrl: y.target.value }))}
-                className="bg-background border-border"
+                className="bg-[#171C25] border-[#3E4A5F]"
                 disabled={loading}
               />
             </TabsContent>
@@ -171,7 +171,7 @@ export function UserEditDialog({ user, isOpen, onClose, onUserUpdated }: UserEdi
           <div className="space-y-2">
             <Label htmlFor="role">Função</Label>
             <Select value={formData.role} onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))}>
-              <SelectTrigger className="bg-background border-border" disabled={loading}>
+              <SelectTrigger className="bg-[#171C25] border-[#3E4A5F]" disabled={loading}>
                 <SelectValue placeholder="Selecione uma função" />
               </SelectTrigger>
               <SelectContent>
@@ -188,7 +188,7 @@ export function UserEditDialog({ user, isOpen, onClose, onUserUpdated }: UserEdi
             </Button>
             <Button 
               onClick={handleSubmit} 
-              className="bg-gradient-primary" 
+              className="bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white text-white" 
               disabled={loading}
             >
               {loading ? 'Salvando...' : 'Salvar'}
@@ -199,3 +199,5 @@ export function UserEditDialog({ user, isOpen, onClose, onUserUpdated }: UserEdi
     </Dialog>
   );
 }
+
+

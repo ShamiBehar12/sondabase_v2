@@ -35,7 +35,7 @@ export default function Auth() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'hsl(218,16%,11%)' }}>
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#3B82F6]" />
       </div>
     );
   }
@@ -167,3 +167,4 @@ export default function Auth() {
     </div>
   );
 }
+

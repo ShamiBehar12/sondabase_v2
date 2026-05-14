@@ -146,17 +146,17 @@ export default function ProfessionalCertificates() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <GraduationCap className="h-8 w-8 text-primary" />
+          <GraduationCap className="h-8 w-8 text-[#3B82F6]" />
           <div>
-            <h1 className="text-3xl font-bold text-gradient">Certificados Profissionais</h1>
-            <p className="text-foreground-muted mt-2">
+            <h1 className="text-3xl font-bold bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white bg-clip-text text-transparent">Certificados Profissionais</h1>
+            <p className="text-white mt-2">
               Gerencie seus certificados profissionais, registros y qualificações
             </p>
           </div>
         </div>
         <Button 
           onClick={() => setShowUploadForm(true)}
-          className="bg-gradient-primary"
+          className="bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
           Adicionar Certificado
@@ -167,10 +167,10 @@ export default function ProfessionalCertificates() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="premium-card p-4">
           <div className="flex items-center gap-3">
-            <Award className="h-8 w-8 text-primary" />
+            <Award className="h-8 w-8 text-[#3B82F6]" />
             <div>
-              <p className="text-2xl font-bold text-foreground">{stats.total}</p>
-              <p className="text-sm text-foreground-muted">Total de Certificados</p>
+              <p className="text-2xl font-bold text-[#F3F7FC]">{stats.total}</p>
+              <p className="text-sm text-white">Total de Certificados</p>
             </div>
           </div>
         </div>
@@ -181,8 +181,8 @@ export default function ProfessionalCertificates() {
               <GraduationCap className="h-4 w-4 text-white" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">{stats.active}</p>
-              <p className="text-sm text-foreground-muted">Ativos</p>
+              <p className="text-2xl font-bold text-[#F3F7FC]">{stats.active}</p>
+              <p className="text-sm text-white">Ativos</p>
             </div>
           </div>
         </div>
@@ -193,8 +193,8 @@ export default function ProfessionalCertificates() {
               <Calendar className="h-4 w-4 text-white" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">{stats.expiringSoon}</p>
-              <p className="text-sm text-foreground-muted">Expiram em breve</p>
+              <p className="text-2xl font-bold text-[#F3F7FC]">{stats.expiringSoon}</p>
+              <p className="text-sm text-white">Expiram em breve</p>
             </div>
           </div>
         </div>
@@ -205,8 +205,8 @@ export default function ProfessionalCertificates() {
               <Building2 className="h-4 w-4 text-white" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">{stats.verified}</p>
-              <p className="text-sm text-foreground-muted">Verificados</p>
+              <p className="text-2xl font-bold text-[#F3F7FC]">{stats.verified}</p>
+              <p className="text-sm text-white">Verificados</p>
             </div>
           </div>
         </div>
@@ -216,17 +216,17 @@ export default function ProfessionalCertificates() {
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-3 flex-1">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-foreground-muted" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white" />
             <Input
               placeholder="Buscar certificados..."
               value={searchTerm}
               onChange={(y) => setSearchTerm(y.target.value)}
-              className="pl-10 bg-surface border-border"
+              className="pl-10 bg-[#202938] border-[#3E4A5F]"
             />
           </div>
           
           <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-48 bg-surface border-border">
+            <SelectTrigger className="w-48 bg-[#202938] border-[#3E4A5F]">
               <SelectValue placeholder="Tipo" />
             </SelectTrigger>
             <SelectContent>
@@ -240,7 +240,7 @@ export default function ProfessionalCertificates() {
           </Select>
           
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-32 bg-surface border-border">
+            <SelectTrigger className="w-32 bg-[#202938] border-[#3E4A5F]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -275,21 +275,21 @@ export default function ProfessionalCertificates() {
       {/* Certificates Grid/List */}
       {loading ? (
         <div className="text-center py-12">
-          <div className="inline-flex items-center gap-2 text-foreground-muted">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+          <div className="inline-flex items-center gap-2 text-white">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#3B82F6]"></div>
             Carregando certificados...
           </div>
         </div>
       ) : filteredCertificates.length === 0 ? (
         <div className="text-center py-12">
-          <GraduationCap className="mx-auto h-12 w-12 text-foreground-muted mb-4" />
-          <h3 className="text-lg font-medium text-foreground mb-2">
+          <GraduationCap className="mx-auto h-12 w-12 text-white mb-4" />
+          <h3 className="text-lg font-medium text-[#F3F7FC] mb-2">
             {searchTerm || typeFilter || statusFilter 
               ? 'Ningún certificado encontrado' 
               : 'Ningún certificado profissional aún'
             }
           </h3>
-          <p className="text-foreground-muted mb-6">
+          <p className="text-white mb-6">
             {searchTerm || typeFilter || statusFilter
               ? 'Tente ajustar seus filtros de busca.'
               : 'Comece adicionando seus primeiros certificados profissionais.'
@@ -298,7 +298,7 @@ export default function ProfessionalCertificates() {
           {!searchTerm && !typeFilter && !statusFilter && (
             <Button 
               onClick={() => setShowUploadForm(true)}
-              className="bg-gradient-primary"
+              className="bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white text-white"
             >
               <Plus className="h-4 w-4 mr-2" />
               Adicionar Primeiro Certificado
@@ -324,3 +324,6 @@ export default function ProfessionalCertificates() {
     </div>
   );
 }
+
+
+

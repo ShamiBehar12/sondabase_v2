@@ -334,8 +334,8 @@ export default function MySuccessStories() {
     <div className="flex-1 space-y-6 p-8 pt-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-gradient">{t('mySuccessStories.title')}</h2>
-          <p className="text-muted-foreground mt-2">
+          <h2 className="text-3xl font-bold bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white bg-clip-text text-transparent">{t('mySuccessStories.title')}</h2>
+          <p className="text-white mt-2">
             {t('mySuccessStories.subtitle')} • {stories.length} {t('mySuccessStories.storiesRegistered')}
           </p>
         </div>
@@ -386,7 +386,7 @@ export default function MySuccessStories() {
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white" />
         <Input
           placeholder={t('mySuccessStories.searchPlaceholder')}
           value={searchTerm}
@@ -407,7 +407,7 @@ export default function MySuccessStories() {
         <TabsContent value="all">
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="text-muted-foreground">{t('mySuccessStories.loading')}</div>
+              <div className="text-white">{t('mySuccessStories.loading')}</div>
             </div>
           ) : (
             <Table>
@@ -424,7 +424,7 @@ export default function MySuccessStories() {
               <TableBody>
                 {filteredStories.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={6} className="text-center text-white py-8">
                       {t('mySuccessStories.noTotal')}
                     </TableCell>
                   </TableRow>
@@ -463,7 +463,7 @@ export default function MySuccessStories() {
         <TabsContent value="approved">
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="text-muted-foreground">{t('common.loading')}</div>
+              <div className="text-white">{t('common.loading')}</div>
             </div>
           ) : (
             <Table>
@@ -480,7 +480,7 @@ export default function MySuccessStories() {
               <TableBody>
                 {verifiedStories.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={6} className="text-center text-white py-8">
                       {t('mySuccessStories.noApproved')}
                     </TableCell>
                   </TableRow>
@@ -519,7 +519,7 @@ export default function MySuccessStories() {
         <TabsContent value="pending">
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="text-muted-foreground">{t('common.loading')}</div>
+              <div className="text-white">{t('common.loading')}</div>
             </div>
           ) : (
             <Table>
@@ -536,7 +536,7 @@ export default function MySuccessStories() {
               <TableBody>
                 {pendingStories.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={6} className="text-center text-white py-8">
                       {t('mySuccessStories.noPending')}
                     </TableCell>
                   </TableRow>
@@ -575,7 +575,7 @@ export default function MySuccessStories() {
         <TabsContent value="rejected">
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="text-muted-foreground">{t('common.loading')}</div>
+              <div className="text-white">{t('common.loading')}</div>
             </div>
           ) : (
             <Table>
@@ -592,7 +592,7 @@ export default function MySuccessStories() {
               <TableBody>
                 {rejectedStories.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={6} className="text-center text-white py-8">
                       {t('mySuccessStories.noRejected')}
                     </TableCell>
                   </TableRow>
@@ -653,3 +653,6 @@ export default function MySuccessStories() {
     </div>
   );
 }
+
+
+

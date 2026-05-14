@@ -25,13 +25,13 @@ const NotFound = () => {
         }}>
           404
         </h1>
-        <p className="text-lg font-semibold text-foreground mb-2">Página no encontrada</p>
-        <p className="text-sm text-foreground-muted mb-8">
+        <p className="text-lg font-semibold text-[#F3F7FC] mb-2">Página no encontrada</p>
+        <p className="text-sm text-white mb-8">
           La ruta <code className="text-blue-400 bg-blue-400/10 px-1.5 py-0.5 rounded text-xs">{location.pathname}</code> no existe.
         </p>
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:brightness-110"
           style={{ background: 'linear-gradient(135deg,#3b82f6,#6366f1)' }}
         >
           <Home className="w-4 h-4" />
@@ -43,3 +43,6 @@ const NotFound = () => {
 };
 
 export default NotFound;
+
+
+

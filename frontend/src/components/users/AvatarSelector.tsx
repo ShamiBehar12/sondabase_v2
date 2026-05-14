@@ -33,7 +33,7 @@ export function AvatarSelector({ selectedAvatarUrl, onAvatarSelect }: AvatarSele
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full justify-start">
-          <div className="w-6 h-6 mr-2 relative overflow-hidden rounded-full bg-muted flex items-center justify-center">
+          <div className="w-6 h-6 mr-2 relative overflow-hidden rounded-full bg-[#232C3A] flex items-center justify-center">
             {selectedAvatarUrl ? (
               <img 
                 src={selectedAvatarUrl} 
@@ -46,14 +46,14 @@ export function AvatarSelector({ selectedAvatarUrl, onAvatarSelect }: AvatarSele
                 }}
               />
             ) : null}
-            <div className={`absolute inset-0 ${selectedAvatarUrl ? 'hidden' : 'flex'} items-center justify-center bg-primary text-primary-foreground`}>
+            <div className={`absolute inset-0 ${selectedAvatarUrl ? 'hidden' : 'flex'} items-center justify-center bg-[#3B82F6] text-[#F8FBFF]`}>
               <User className="w-4 h-4" />
             </div>
           </div>
           {selectedAvatarUrl ? 'Alterar Avatar' : 'Selecionar Avatar'}
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-surface border-border max-w-2xl">
+      <DialogContent className="bg-[#202938] border-[#3E4A5F] max-w-2xl">
         <DialogHeader>
           <DialogTitle>Selecionar Avatar</DialogTitle>
           <DialogDescription>
@@ -64,11 +64,11 @@ export function AvatarSelector({ selectedAvatarUrl, onAvatarSelect }: AvatarSele
         <div className="space-y-4">
           {loading ? (
             <div className="text-center py-8">
-              <p className="text-foreground-muted">Carregando avatares...</p>
+              <p className="text-white">Carregando avatares...</p>
             </div>
           ) : templates.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-foreground-muted">Ningún avatar disponible.</p>
+              <p className="text-white">Ningún avatar disponible.</p>
             </div>
           ) : (
             <div className="space-y-6 max-h-96 overflow-y-auto">
@@ -78,7 +78,7 @@ export function AvatarSelector({ selectedAvatarUrl, onAvatarSelect }: AvatarSele
                     <Badge variant="secondary" className="capitalize">
                       {category}
                     </Badge>
-                    <span className="text-sm text-foreground-muted">
+                    <span className="text-sm text-white">
                       {categoryTemplates.length} avatares
                     </span>
                   </div>
@@ -93,8 +93,8 @@ export function AvatarSelector({ selectedAvatarUrl, onAvatarSelect }: AvatarSele
                           onClick={() => handleAvatarSelect(template.file_path)}
                           className={`p-2 rounded-lg border-2 transition-all hover:scale-105 ${
                             isSelected 
-                              ? 'border-primary bg-primary/10' 
-                              : 'border-border hover:border-primary/50'
+                              ? 'border-[#3B82F6] bg-[rgba(59,130,246,0.1)]' 
+                              : 'border-[#3E4A5F] hover:border-[rgba(59,130,246,0.5)]'
                           }`}
                           title={template.name}
                         >
@@ -119,3 +119,5 @@ export function AvatarSelector({ selectedAvatarUrl, onAvatarSelect }: AvatarSele
     </Dialog>
   );
 }
+
+

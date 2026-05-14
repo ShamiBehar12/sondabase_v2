@@ -74,9 +74,9 @@ export function AppSidebar() {
     const base =
       "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 font-medium text-sm w-full";
     if (isActive(path)) {
-      return `${base} bg-gradient-primary text-white shadow-primary`;
+      return `${base} bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white text-white shadow-primary`;
     }
-    return `${base} text-foreground-secondary hover:text-foreground hover:bg-white/[0.07]`;
+    return `${base} text-white hover:text-[#F3F7FC] hover:bg-white/[0.07]`;
   };
 
   const handleNewAIChat = async () => {
@@ -104,16 +104,22 @@ export function AppSidebar() {
 
   return (
     <Sidebar className={collapsed ? "w-16" : "w-64"}>
-      <SidebarContent className="bg-sidebar border-r border-sidebar-border flex flex-col">
+      <SidebarContent
+        className="border-r flex flex-col"
+        style={{
+          background: "linear-gradient(180deg, rgba(17,24,39,0.96) 0%, rgba(15,23,42,0.98) 100%)",
+          borderColor: "rgba(96,165,250,0.14)",
+        }}
+      >
 
         {/* Logo */}
-        <div className="p-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+        <div className="p-4 border-b" style={{ borderColor: 'rgba(96,165,250,0.12)' }}>
           {!collapsed ? (
             <div
               className="flex items-center gap-3 rounded-xl px-3 py-2.5"
               style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.18)' }}
             >
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/25 flex-shrink-0">
+              <div className="w-8 h-8 bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/25 flex-shrink-0">
                 <Award className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
@@ -132,7 +138,7 @@ export function AppSidebar() {
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/25">
+              <div className="w-8 h-8 bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/25">
                 <Award className="w-5 h-5 text-white" />
               </div>
               <button
@@ -209,7 +215,7 @@ export function AppSidebar() {
                                 key={session.id}
                                 className={`group flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs transition-all cursor-pointer ${
                                   activeSessionId === session.id
-                                    ? "bg-primary/15 border border-primary/25"
+                                    ? "bg-[rgba(59,130,246,0.15)] border border-[rgba(59,130,246,0.25)]"
                                     : "hover:bg-white/[0.05] border border-transparent"
                                 }`}
                                 style={activeSessionId === session.id
@@ -227,7 +233,7 @@ export function AppSidebar() {
                                 <AlertDialog>
                                   <AlertDialogTrigger asChild>
                                     <button
-                                      className="w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                                      className="w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
                                       style={{ color: 'rgba(248,113,113,0.7)' }}
                                       onClick={(e) => e.stopPropagation()}
                                       title={t("aiChat.deleteConversation")}
@@ -235,10 +241,10 @@ export function AppSidebar() {
                                       <Trash2 className="w-3 h-3" />
                                     </button>
                                   </AlertDialogTrigger>
-                                  <AlertDialogContent className="bg-surface border-border">
+                                  <AlertDialogContent className="bg-[#202938] border-[#3E4A5F]">
                                     <AlertDialogHeader>
                                       <AlertDialogTitle>{t("aiChat.deleteConversation")}</AlertDialogTitle>
-                                      <AlertDialogDescription className="text-foreground-muted">
+                                      <AlertDialogDescription className="text-white">
                                         {t("aiChat.confirmDeleteDesc", {
                                           title: session.title || t("aiChat.noTitle"),
                                         })}
@@ -247,7 +253,7 @@ export function AppSidebar() {
                                     <AlertDialogFooter>
                                       <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
                                       <AlertDialogAction
-                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                        className="bg-[#E5484D] text-[#F3F7FC] hover:bg-[#E5484D]/90"
                                         onClick={() => handleDeleteSession(session.id)}
                                       >
                                         {t("common.delete")}
@@ -315,3 +321,5 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
+
+

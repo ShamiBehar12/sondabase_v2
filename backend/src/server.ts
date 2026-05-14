@@ -94,6 +94,40 @@ function requireAdmin(request: typeof app extends any ? any : never) {
   return user;
 }
 
+function normalizeLookupName(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\.[^.]+$/i, "")
+    .replace(/[^\w\s()-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function resolveContentType(absolutePath: string) {
+  const extension = path.extname(absolutePath).toLowerCase();
+  return extension === ".pdf"
+    ? "application/pdf"
+    : extension === ".png"
+      ? "image/png"
+      : extension === ".jpg" || extension === ".jpeg"
+        ? "image/jpeg"
+        : "application/octet-stream";
+}
+
+async function sendStoredFile(reply: any, absolutePath: string, fileName: string, download?: string) {
+  reply.header("Content-Type", resolveContentType(absolutePath));
+  const disposition = download === "1" ? "attachment" : "inline";
+  const encodedFileName = encodeURIComponent(fileName);
+  reply.header("Content-Disposition", `${disposition}; filename="${fileName}"; filename*=UTF-8''${encodedFileName}`);
+  return reply.send(await fs.readFile(absolutePath));
+}
+
+function toJsonSafe<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T;
+}
+
 function pathParam(request: { params: unknown }, key: string) {
   return (request.params as Record<string, string>)[key];
 }
@@ -935,6 +969,7 @@ app.post("/api/ai/chat/query", async (request) => {
   }
 
   const finalMatches: MatchEntry[] = mergedMatches;
+  const serializableMatches = toJsonSafe(finalMatches);
 
   const providerContext = finalMatches
     .map(
@@ -978,7 +1013,7 @@ app.post("/api/ai/chat/query", async (request) => {
         userId: user.id,
         role: "assistant",
         content: answer,
-        sourcesJson: finalMatches,
+        sourcesJson: serializableMatches,
         createdAt: assistantMsgTime,
       },
     ],
@@ -996,7 +1031,7 @@ app.post("/api/ai/chat/query", async (request) => {
       modelUsed: settings.activeChatModel,
       ragMode: settings.ragMode,
       answer,
-      matches: finalMatches,
+      matches: serializableMatches,
       intent,
       _debug: { totalIndexed, totalVerified },
     },
@@ -1540,23 +1575,35 @@ app.get("/api/storage/:bucket/file", async (request, reply) => {
     throw app.httpErrors.notFound("File not found");
   }
 
-  const extension = path.extname(absolute).toLowerCase();
   const fileName = filename || path.basename(absolute);
-  const contentType =
-    extension === ".pdf"
-      ? "application/pdf"
-      : extension === ".png"
-        ? "image/png"
-        : extension === ".jpg" || extension === ".jpeg"
-          ? "image/jpeg"
-          : "application/octet-stream";
+  return sendStoredFile(reply, absolute, fileName, download);
+});
 
-  reply.header("Content-Type", contentType);
-  const disposition = download === "1" ? "attachment" : "inline";
-  const encodedFileName = encodeURIComponent(fileName);
-  reply.header("Content-Disposition", `${disposition}; filename="${fileName}"; filename*=UTF-8''${encodedFileName}`);
+app.get("/api/storage/certificates/smart-cities-file", async (request, reply) => {
+  const { name, download } = request.query as { name: string; download?: string };
+  if (!name?.trim()) {
+    throw app.httpErrors.badRequest("Name is required");
+  }
 
-  return reply.send(await fs.readFile(absolute));
+  const baseDir = bucketFilePath("certificates", "smart-cities-ingest");
+  if (!(await fileExists(baseDir))) {
+    throw app.httpErrors.notFound("Smart Cities ingest folder not found");
+  }
+
+  const targetName = normalizeLookupName(name);
+  const files = (await fs.readdir(baseDir)).filter((entry) => entry.toLowerCase().endsWith(".pdf"));
+
+  const exact = files.find((entry) => normalizeLookupName(entry) === targetName);
+  const partial = exact
+    ? exact
+    : files.find((entry) => normalizeLookupName(entry).includes(targetName) || targetName.includes(normalizeLookupName(entry)));
+
+  if (!partial) {
+    throw app.httpErrors.notFound(`File not found for citation: ${name}`);
+  }
+
+  const absolute = path.join(baseDir, partial);
+  return sendStoredFile(reply, absolute, partial, download);
 });
 
 app.setErrorHandler((error: any, _request, reply) => {

@@ -232,7 +232,7 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
   return (
     <Card className="premium-card">
       <CardHeader>
-        <CardTitle className="text-gradient">{t('certificates.uploadTitle')}</CardTitle>
+        <CardTitle className="bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white bg-clip-text text-transparent">{t('certificates.uploadTitle')}</CardTitle>
         <CardDescription>
           {t('certificates.uploadSubtitle')}
         </CardDescription>
@@ -244,22 +244,22 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
             <div
               className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 ${
                 dragActive
-                  ? 'border-primary bg-primary/10 scale-[1.02]'
-                  : 'border-border hover:border-primary/50 hover:bg-surface/50'
+                  ? 'border-[#3B82F6] bg-[rgba(59,130,246,0.1)] scale-[1.02]'
+                  : 'border-[#3E4A5F] hover:border-[rgba(59,130,246,0.5)] hover:bg-[rgba(32,41,56,0.5)]'
               }`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
               onDrop={handleDrop}
             >
-              <Upload className="mx-auto h-12 w-12 text-primary mb-4" />
+              <Upload className="mx-auto h-12 w-12 text-[#3B82F6] mb-4" />
               {selectedFile ? (
                 <div className="space-y-3">
                   <div className="flex items-center justify-center gap-2">
-                    <FileText className="h-5 w-5 text-primary" />
-                    <p className="text-sm font-medium text-foreground">{selectedFile.name}</p>
+                    <FileText className="h-5 w-5 text-[#3B82F6]" />
+                    <p className="text-sm font-medium text-[#F3F7FC]">{selectedFile.name}</p>
                   </div>
-                  <p className="text-xs text-foreground-muted">
+                  <p className="text-xs text-white">
                     {(selectedFile.size / 1024 / 1024).toFixed(2)} MB • PDF
                   </p>
                   <Button
@@ -275,10 +275,10 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <p className="text-sm text-foreground-muted">
+                  <p className="text-sm text-white">
                     <strong>Arraste o PDF original aqui</strong> o clique para selecionar
                   </p>
-                  <p className="text-xs text-foreground-muted">
+                  <p className="text-xs text-white">
                     Arquivos PDF de até 10MB
                   </p>
                   <Button 
@@ -307,23 +307,23 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
               )}
             </div>
 
-            <div className="rounded-xl border border-border p-5 space-y-4 bg-surface/40">
+            <div className="rounded-xl border border-[#3E4A5F] p-5 space-y-4 bg-[rgba(32,41,56,0.4)]">
               <div>
                 <Label>Arquivo OCR para IA (opcional)</Label>
-                <p className="text-xs text-foreground-muted mt-1">
+                <p className="text-xs text-white mt-1">
                   Envia aqui a versão OCR/textual del documento apenas para a indexação de la IA. O download y a visualização del certificado continuarão a usar sempre o PDF original.
                 </p>
               </div>
 
               {selectedOcrFile ? (
-                <div className="space-y-3 rounded-lg border border-border p-4">
+                <div className="space-y-3 rounded-lg border border-[#3E4A5F] p-4">
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <FileText className="h-5 w-5 text-primary" />
-                        <p className="text-sm font-medium text-foreground break-words">{selectedOcrFile.name}</p>
+                        <FileText className="h-5 w-5 text-[#3B82F6]" />
+                        <p className="text-sm font-medium text-[#F3F7FC] break-words">{selectedOcrFile.name}</p>
                       </div>
-                      <p className="text-xs text-foreground-muted mt-1">
+                      <p className="text-xs text-white mt-1">
                         {(selectedOcrFile.size / 1024 / 1024).toFixed(2)} MB • PDF OCR
                       </p>
                     </div>
@@ -339,9 +339,9 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
                   </div>
                 </div>
               ) : (
-                <div className="rounded-lg border border-dashed border-border p-4">
+                <div className="rounded-lg border border-dashed border-[#3E4A5F] p-4">
                   <div className="space-y-3">
-                    <p className="text-sm text-foreground-muted">
+                    <p className="text-sm text-white">
                       Se tiveres uma versão OCR del documento, adiciona-a aqui para melhorar o RAG.
                     </p>
                     <Button
@@ -519,7 +519,7 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
                           <SelectValue placeholder="Selecione o país" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-background border border-border shadow-lg max-h-[200px] overflow-y-auto z-50">
+                      <SelectContent className="bg-[#171C25] border border-[#3E4A5F] shadow-lg max-h-[200px] overflow-y-auto z-50">
                         {countries.map((country) => (
                           <SelectItem key={country} value={country}>
                             {country}
@@ -573,13 +573,13 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
                       onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                     />
                     {showSuggestions && tagSuggestions.length > 0 && (
-                      <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-lg shadow-lg mt-1 max-h-40 overflow-y-auto z-50">
+                      <div className="absolute top-full left-0 right-0 bg-[#171C25] border border-[#3E4A5F] rounded-lg shadow-lg mt-1 max-h-40 overflow-y-auto z-50">
                         {tagSuggestions
                           .filter(suggestion => !tags.includes(suggestion))
                           .map((suggestion, index) => (
                             <div
                               key={index}
-                              className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
+                              className="px-3 py-2 hover:bg-[#232C3A] cursor-pointer text-sm"
                               onClick={() => addSuggestedTag(suggestion)}
                             >
                               {suggestion}
@@ -598,7 +598,7 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
 
             <Button 
               type="submit" 
-              className="w-full bg-gradient-primary hover:opacity-90 transition-opacity" 
+              className="w-full bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white hover:brightness-110 transition-all" 
               disabled={uploading}
               size="lg"
             >
@@ -610,3 +610,5 @@ export const CertificateUploadForm = ({ onSuccess }: CertificateUploadFormProps)
     </Card>
   );
 };
+
+

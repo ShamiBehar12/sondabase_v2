@@ -81,7 +81,7 @@ export function ReviewDialog({
   };
 
   const renderFieldValue = (field: any, value: any) => {
-    if (!value && value !== 0) return <span className="text-muted-foreground">No informado</span>;
+    if (!value && value !== 0) return <span className="text-white">No informado</span>;
     
     switch (field.type) {
       case 'date':
@@ -125,7 +125,7 @@ export function ReviewDialog({
                       const value = itemData?.[field.name];
                       return (
                         <div key={field.name} className="border-l-2 border-muted pl-3">
-                          <label className="text-sm font-medium text-muted-foreground">
+                          <label className="text-sm font-medium text-white">
                             {field.label_pt || field.name}
                           </label>
                           <div className="mt-1">
@@ -142,19 +142,19 @@ export function ReviewDialog({
                   <h4 className="font-semibold mb-2">Informações</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Tipo:</span>
+                      <span className="text-white">Tipo:</span>
                       <span>{item.content_type?.name_pt}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Autor:</span>
+                      <span className="text-white">Autor:</span>
                       <span>{item.author_name || 'Unknown'}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Criado em:</span>
+                      <span className="text-white">Criado em:</span>
                       <span>{format(new Date(item.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Atualizado em:</span>
+                      <span className="text-white">Atualizado em:</span>
                       <span>{format(new Date(item.updated_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}</span>
                     </div>
                   </div>
@@ -182,8 +182,8 @@ export function ReviewDialog({
                           {review.decisao === 'ajustes' && <AlertCircle className="w-3 h-3 text-orange-600" />}
                           <span className="font-medium">{review.reviewer_name}</span>
                         </div>
-                        <p className="text-muted-foreground">{review.comentario}</p>
-                        <p className="text-muted-foreground mt-1">
+                        <p className="text-white">{review.comentario}</p>
+                        <p className="text-white mt-1">
                           {format(new Date(review.created_at), 'dd/MM HH:mm', { locale: ptBR })}
                         </p>
                       </div>
@@ -241,3 +241,4 @@ export function ReviewDialog({
     </Dialog>
   );
 }
+

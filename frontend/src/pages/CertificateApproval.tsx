@@ -482,7 +482,7 @@ export default function CertificateApproval() {
     <div className="container mx-auto py-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">{t('approval.certificateApproval')}</h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-white mt-2">
           {t('approval.certificateApprovalDescription')}
         </p>
       </div>
@@ -501,7 +501,7 @@ export default function CertificateApproval() {
           {unverifiedCertificates.length === 0 ? (
             <Card>
               <CardContent className="p-6 text-center">
-                <p className="text-muted-foreground">
+                <p className="text-white">
                   Ningún certificado esperando aprobación.
                 </p>
               </CardContent>
@@ -528,13 +528,13 @@ export default function CertificateApproval() {
                         <TableCell className="font-medium">{certificate.title}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <User className="w-4 w-4 text-muted-foreground" />
+                            <User className="w-4 w-4 text-white" />
                             <span>{certificate.full_name || 'Nombre no disponible'}</span>
                           </div>
                         </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Building className="w-4 h-4 text-muted-foreground" />
+                          <Building className="w-4 h-4 text-white" />
                           <span>{certificate.issuing_organization || 'No informado'}</span>
                         </div>
                       </TableCell>
@@ -602,7 +602,7 @@ export default function CertificateApproval() {
           {unverifiedProfessionalCertificates.length === 0 ? (
             <Card>
               <CardContent className="p-6 text-center">
-                <p className="text-muted-foreground">
+                <p className="text-white">
                   Ningún certificado profesional esperando aprobación.
                 </p>
               </CardContent>
@@ -630,13 +630,13 @@ export default function CertificateApproval() {
                         <TableCell className="font-medium">{certificate.title}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <User className="w-4 w-4 text-muted-foreground" />
+                            <User className="w-4 w-4 text-white" />
                             <span>{certificate.full_name || 'Nombre no disponible'}</span>
                           </div>
                         </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Building className="w-4 h-4 text-muted-foreground" />
+                          <Building className="w-4 h-4 text-white" />
                           <span>{certificate.institution || 'No informado'}</span>
                         </div>
                       </TableCell>
@@ -772,3 +772,5 @@ export default function CertificateApproval() {
     </div>
   );
 }
+
+

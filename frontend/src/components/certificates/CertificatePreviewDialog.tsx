@@ -38,10 +38,10 @@ export function CertificatePreviewDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0 bg-background border-border">
+      <DialogContent className="max-w-4xl max-h-[90vh] p-0 bg-[#171C25] border-[#3E4A5F]">
         <DialogHeader className="p-6 pb-0">
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-foreground">{certificateName}</DialogTitle>
+            <DialogTitle className="text-[#F3F7FC]">{certificateName}</DialogTitle>
             <div className="flex items-center gap-2">
               {onDownload && (
                 <Button
@@ -77,12 +77,12 @@ export function CertificatePreviewDialog({
 
         <div className="flex-1 p-6 pt-4">
           {pdfUrl ? (
-            <div className="relative w-full h-[75vh] bg-muted rounded-lg overflow-hidden flex items-center justify-center">
+            <div className="relative w-full h-[75vh] bg-[#232C3A] rounded-lg overflow-hidden flex items-center justify-center">
               {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-background/50 z-10">
+                <div className="absolute inset-0 flex items-center justify-center bg-[rgba(23,28,37,0.5)] z-10">
                   <div className="flex flex-col items-center gap-2">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                    <p className="text-sm text-muted-foreground">Carregando PDF...</p>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3B82F6]"></div>
+                    <p className="text-sm text-white">Carregando PDF...</p>
                   </div>
                 </div>
               )}
@@ -98,9 +98,9 @@ export function CertificatePreviewDialog({
               />
             </div>
           ) : (
-            <div className="flex items-center justify-center h-[70vh] bg-muted rounded-lg">
+            <div className="flex items-center justify-center h-[70vh] bg-[#232C3A] rounded-lg">
               <div className="text-center">
-                <p className="text-muted-foreground">No fue posible carregar o PDF</p>
+                <p className="text-white">No fue posible carregar o PDF</p>
                 <Button
                   variant="outline"
                   onClick={onClose}
@@ -116,3 +116,4 @@ export function CertificatePreviewDialog({
     </Dialog>
   );
 }
+

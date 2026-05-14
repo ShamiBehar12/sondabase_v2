@@ -246,8 +246,8 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
         <div
           className={`border-2 border-dashed rounded-lg p-4 text-center transition-all duration-300 ${
             dragActive === fieldName
-              ? 'border-primary bg-primary/10 scale-[1.02]'
-              : 'border-border hover:border-primary/50 hover:bg-surface/50'
+              ? 'border-[#3B82F6] bg-[rgba(59,130,246,0.1)] scale-[1.02]'
+              : 'border-[#3E4A5F] hover:border-[rgba(59,130,246,0.5)] hover:bg-[rgba(32,41,56,0.5)]'
           }`}
           onDragEnter={(y) => handleImageDrag(y, fieldName)}
           onDragLeave={(y) => handleImageDrag(y, fieldName)}
@@ -257,10 +257,10 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
           {selectedFile ? (
             <div className="space-y-2">
               <div className="flex items-center justify-center gap-2">
-                <Image className="h-4 w-4 text-primary" />
-                <p className="text-sm font-medium text-foreground">{selectedFile.name}</p>
+                <Image className="h-4 w-4 text-[#3B82F6]" />
+                <p className="text-sm font-medium text-[#F3F7FC]">{selectedFile.name}</p>
               </div>
-              <p className="text-xs text-foreground-muted">
+              <p className="text-xs text-white">
                 {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
               </p>
               <Button
@@ -276,11 +276,11 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
             </div>
           ) : (
             <div className="space-y-2">
-              <Upload className="mx-auto h-8 w-8 text-primary" />
-              <p className="text-sm text-foreground-muted">
+              <Upload className="mx-auto h-8 w-8 text-[#3B82F6]" />
+              <p className="text-sm text-white">
                 Arraste uma imagem o clique para selecionar
               </p>
-              <p className="text-xs text-foreground-muted">
+              <p className="text-xs text-white">
                 Imagens de até 5MB
               </p>
               <Button 
@@ -314,7 +314,7 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
   return (
     <Card className="premium-card">
       <CardHeader>
-        <CardTitle className="text-gradient">Cadastrar Historia de Éxito</CardTitle>
+        <CardTitle className="bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white bg-clip-text text-transparent">Cadastrar Historia de Éxito</CardTitle>
         <CardDescription>
           Compartilhe un caso de éxito de la sua empresa. Organize as informações por categoria usando as abas abaixo.
         </CardDescription>
@@ -348,10 +348,10 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
               <TabsContent value="basic" className="space-y-6 mt-6">
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-primary" />
+                    <FileText className="h-5 w-5 text-[#3B82F6]" />
                     <Label className="text-base font-semibold">Informações Básicas</Label>
                   </div>
-                  <p className="text-sm text-foreground-muted">
+                  <p className="text-sm text-white">
                     Dados essenciais de la historia de éxito. Os campos marcados com * são obrigatórios apenas em português.
                   </p>
                   
@@ -450,7 +450,7 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
                                     <SelectValue placeholder="Selecione o país" />
                                   </SelectTrigger>
                                 </FormControl>
-                                <SelectContent className="bg-background border border-border shadow-lg max-h-[200px] overflow-y-auto z-50">
+                                <SelectContent className="bg-[#171C25] border border-[#3E4A5F] shadow-lg max-h-[200px] overflow-y-auto z-50">
                                   {countries.map((country) => (
                                     <SelectItem key={country} value={country}>
                                       {country}
@@ -582,10 +582,10 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
               <TabsContent value="content" className="space-y-6 mt-6">
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-primary" />
+                    <FileText className="h-5 w-5 text-[#3B82F6]" />
                     <Label className="text-base font-semibold">Conteúdo Detalhado</Label>
                   </div>
-                  <p className="text-sm text-foreground-muted">
+                  <p className="text-sm text-white">
                     Descreva o desafio, solução implementada y benefícios obtidos.
                   </p>
                   
@@ -798,10 +798,10 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
               <TabsContent value="media" className="space-y-6 mt-6">
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <Camera className="h-5 w-5 text-primary" />
+                    <Camera className="h-5 w-5 text-[#3B82F6]" />
                     <Label className="text-base font-semibold">Imagens y Logo</Label>
                   </div>
-                  <p className="text-sm text-foreground-muted">
+                  <p className="text-sm text-white">
                     Añade o logo del cliente y imagens que ilustrem o caso de éxito.
                   </p>
                   
@@ -819,10 +819,10 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
               <TabsContent value="settings" className="space-y-6 mt-6">
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <Settings className="h-5 w-5 text-primary" />
+                    <Settings className="h-5 w-5 text-[#3B82F6]" />
                     <Label className="text-base font-semibold">Configurações Adicionais</Label>
                   </div>
-                  <p className="text-sm text-foreground-muted">
+                  <p className="text-sm text-white">
                     Informações complementares sobre o projeto y tags para categorização.
                   </p>
                   
@@ -876,7 +876,7 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
                       <Tag className="h-4 w-4" />
                       Tags de Categorização
                     </Label>
-                    <p className="text-sm text-foreground-muted">
+                    <p className="text-sm text-white">
                       Añade palavras-chave para facilitar a busca y categorização.
                     </p>
                     
@@ -895,12 +895,12 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
                       </div>
                       
                       {showSuggestions && tagSuggestions.length > 0 && (
-                        <div className="absolute top-full left-0 right-0 z-10 bg-background border border-border rounded-md shadow-lg mt-1 max-h-40 overflow-y-auto">
+                        <div className="absolute top-full left-0 right-0 z-10 bg-[#171C25] border border-[#3E4A5F] rounded-md shadow-lg mt-1 max-h-40 overflow-y-auto">
                           {tagSuggestions.map((suggestion, index) => (
                             <button
                               key={index}
                               type="button"
-                              className="w-full text-left px-3 py-2 hover:bg-surface text-sm"
+                              className="w-full text-left px-3 py-2 hover:bg-[#202938] text-sm"
                               onClick={() => addSuggestedTag(suggestion)}
                             >
                               {suggestion}
@@ -952,3 +952,4 @@ export const SuccessStoryUploadForm = ({ onSuccess }: SuccessStoryUploadFormProp
     </Card>
   );
 };
+

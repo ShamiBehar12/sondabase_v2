@@ -10,11 +10,16 @@ import remarkGfm from "remark-gfm";
 import type { AiChatMatch } from "@/hooks/useAI";
 
 function getDocumentUrl(src: AiChatMatch): string {
-  const bucket =
-    src.recordType === "professional_certificate"
-      ? "professional-certificates"
-      : "certificates";
-  return `/api/storage/${bucket}/file?path=${encodeURIComponent(src.filePath)}`;
+  if (src.recordType !== "professional_certificate") {
+    const preferredName =
+      src.fileName?.trim() ||
+      src.title?.trim() ||
+      src.filePath.split(/[\\/]/).pop()?.trim() ||
+      "";
+    return `/api/storage/certificates/smart-cities-file?name=${encodeURIComponent(preferredName)}`;
+  }
+
+  return `/api/storage/professional-certificates/file?path=${encodeURIComponent(src.filePath)}`;
 }
 
 const SUGGESTED = [
@@ -152,7 +157,7 @@ export default function AIChat() {
                   style={{ maxWidth: "80%" }}
                 >
                   <div
-                    className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${isUser ? "rounded-tr-sm" : "rounded-tl-sm"}`}
+                    className={`relative z-20 rounded-2xl px-4 py-3 text-sm leading-relaxed ${isUser ? "rounded-tr-sm" : "rounded-tl-sm"}`}
                     style={
                       isUser
                         ? {
@@ -162,7 +167,8 @@ export default function AIChat() {
                         : {
                             background: "rgba(255,255,255,0.05)",
                             border: "1px solid rgba(255,255,255,0.08)",
-                            color: "rgba(255,255,255,0.88)",
+                            color: "#FFFFFF",
+                            textShadow: "0 1px 8px rgba(0,0,0,0.24)",
                           }
                     }
                   >
@@ -172,11 +178,12 @@ export default function AIChat() {
                       <div
                         className="prose prose-invert prose-sm max-w-none
                           [&_table]:w-full [&_table]:border-collapse [&_table]:text-xs
-                          [&_th]:border [&_th]:border-white/10 [&_th]:px-2 [&_th]:py-1 [&_th]:text-left [&_th]:text-white/70
-                          [&_td]:border [&_td]:border-white/10 [&_td]:px-2 [&_td]:py-1 [&_td]:text-white/80
+                          [&_th]:border [&_th]:border-white/10 [&_th]:px-2 [&_th]:py-1 [&_th]:text-left [&_th]:text-white
+                          [&_td]:border [&_td]:border-white/10 [&_td]:px-2 [&_td]:py-1 [&_td]:text-white
                           [&_tr:nth-child(even)]:bg-white/[0.03]
-                          [&_p]:mb-2 [&_p]:text-white/88 [&_ul]:pl-4 [&_li]:mb-1
-                          [&_strong]:text-white [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white/90"
+                          [&_p]:mb-2 [&_p]:text-white [&_ul]:pl-4 [&_li]:mb-1
+                          [&_strong]:text-white [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white"
+                        style={{ color: "#FFFFFF", textShadow: "0 1px 8px rgba(0,0,0,0.24)" }}
                       >
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
                           {message.content}
@@ -187,7 +194,10 @@ export default function AIChat() {
 
                   {/* Sources */}
                   {msgSources.length > 0 && (
-                    <div className="flex flex-wrap gap-x-3 gap-y-1 px-1">
+                    <div
+                      className="relative z-30 flex flex-wrap gap-x-3 gap-y-1 px-1"
+                      style={{ color: "#60A5FA", WebkitTextFillColor: "#60A5FA", opacity: 1, mixBlendMode: "normal" }}
+                    >
                       {msgSources.map((src, i) => (
                         <a
                           key={i}
@@ -195,10 +205,28 @@ export default function AIChat() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 text-xs hover:underline"
-                          style={{ color: "rgba(96,165,250,0.8)" }}
+                          style={{
+                            color: "#60A5FA",
+                            WebkitTextFillColor: "#60A5FA",
+                            opacity: 1,
+                            fontWeight: 500,
+                            mixBlendMode: "normal",
+                            textShadow: "0 1px 8px rgba(0,0,0,0.22)",
+                          }}
                         >
-                          <ExternalLink className="w-2.5 h-2.5 flex-shrink-0" />
-                          <span>
+                          <ExternalLink
+                            className="w-2.5 h-2.5 flex-shrink-0"
+                            style={{ color: "#60A5FA", filter: "drop-shadow(0 1px 6px rgba(0,0,0,0.18))" }}
+                          />
+                          <span
+                            style={{
+                              color: "#60A5FA",
+                              WebkitTextFillColor: "#60A5FA",
+                              opacity: 1,
+                              mixBlendMode: "normal",
+                              textShadow: "0 1px 8px rgba(0,0,0,0.22)",
+                            }}
+                          >
                             {src.title || src.fileName}
                             {src.referenceLabel ? ` — ${src.referenceLabel}` : ""}
                           </span>
@@ -282,3 +310,4 @@ export default function AIChat() {
     </div>
   );
 }
+

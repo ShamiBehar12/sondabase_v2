@@ -80,12 +80,12 @@ export default function Settings() {
     <div className="container mx-auto p-6 max-w-4xl">
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center">
+          <div className="w-10 h-10 bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white rounded-lg flex items-center justify-center">
             <User className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gradient">{t('profile')}</h1>
-            <p className="text-foreground-muted">{t('settings.description')}</p>
+            <h1 className="text-3xl font-bold bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white bg-clip-text text-transparent">{t('profile')}</h1>
+            <p className="text-white">{t('settings.description')}</p>
           </div>
         </div>
       </div>
@@ -93,14 +93,14 @@ export default function Settings() {
       <div className="space-y-6">
         <Card className="premium-card">
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-xl"><User className="h-5 w-5 text-primary" />{t('settings.profile')}</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-xl"><User className="h-5 w-5 text-[#3B82F6]" />{t('settings.profile')}</CardTitle>
             <CardDescription>{t('settings.profileDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-4 bg-surface/50 rounded-lg border border-border/50">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-4 bg-[rgba(32,41,56,0.5)] rounded-lg border border-[rgba(62,74,95,0.5)]">
               <Avatar className="h-20 w-20 shadow-lg">
                 <AvatarImage src={profile.avatar_url} />
-                <AvatarFallback className="bg-primary text-primary-foreground text-xl font-semibold">{profile.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}</AvatarFallback>
+                <AvatarFallback className="bg-[#3B82F6] text-[#F8FBFF] text-xl font-semibold">{profile.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}</AvatarFallback>
               </Avatar>
               <div className="flex-1 space-y-2">
                 <Label className="text-sm font-medium">{t('settings.avatarUrl')}</Label>
@@ -110,12 +110,12 @@ export default function Settings() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="full_name" className="text-sm font-medium">{t('settings.fullName')}</Label>
-                <Input id="full_name" value={profile.full_name} onChange={(e) => setProfile(prev => ({ ...prev, full_name: e.target.value }))} placeholder={t('settings.fullNamePlaceholder')} className="bg-surface border-border h-10" />
+                <Input id="full_name" value={profile.full_name} onChange={(e) => setProfile(prev => ({ ...prev, full_name: e.target.value }))} placeholder={t('settings.fullNamePlaceholder')} className="bg-[#202938] border-[#3E4A5F] h-10" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">{t('settings.email')}</Label>
-                <Input id="email" value={user?.email || ''} disabled className="bg-surface border-border opacity-60 h-10" />
-                <p className="text-xs text-foreground-muted">{t('settings.emailNote')}</p>
+                <Input id="email" value={user?.email || ''} disabled className="bg-[#202938] border-[#3E4A5F] opacity-60 h-10" />
+                <p className="text-xs text-white">{t('settings.emailNote')}</p>
               </div>
             </div>
           </CardContent>
@@ -124,14 +124,14 @@ export default function Settings() {
         <div className="grid gap-6 md:grid-cols-2">
           <Card className="premium-card">
             <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2"><Globe className="h-5 w-5 text-primary" />{t('settings.language')}</CardTitle>
+              <CardTitle className="flex items-center gap-2"><Globe className="h-5 w-5 text-[#3B82F6]" />{t('settings.language')}</CardTitle>
               <CardDescription>{t('settings.languageDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <Label className="text-sm font-medium">{t('settings.preferredLanguage')}</Label>
                 <Select value={profile.language_preference} onValueChange={(value) => setProfile(prev => ({ ...prev, language_preference: value }))}>
-                  <SelectTrigger className="bg-surface border-border h-10">
+                  <SelectTrigger className="bg-[#202938] border-[#3E4A5F] h-10">
                     <SelectValue><div className="flex items-center gap-2"><span>{selectedLanguage.flag}</span><span>{selectedLanguage.name}</span></div></SelectValue>
                   </SelectTrigger>
                   <SelectContent>
@@ -148,14 +148,14 @@ export default function Settings() {
 
           <Card className="premium-card">
             <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2"><Grid3x3 className="h-5 w-5 text-primary" />{t('settings.certificates')}</CardTitle>
+              <CardTitle className="flex items-center gap-2"><Grid3x3 className="h-5 w-5 text-[#3B82F6]" />{t('settings.certificates')}</CardTitle>
               <CardDescription>{t('settings.certificatesDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <Label className="text-sm font-medium">{t('settings.certificatesViewMode')}</Label>
                 <Select value={profile.certificates_view_mode} onValueChange={(value) => setProfile(prev => ({ ...prev, certificates_view_mode: value }))}>
-                  <SelectTrigger className="bg-surface border-border h-10"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="bg-[#202938] border-[#3E4A5F] h-10"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="grid"><div className="flex items-center gap-2"><Grid3x3 className="h-4 w-4" /><span>{t('certificates.gridView')}</span></div></SelectItem>
                     <SelectItem value="list"><div className="flex items-center gap-2"><Grid3x3 className="h-4 w-4 rotate-90" /><span>{t('certificates.listView')}</span></div></SelectItem>
@@ -168,26 +168,26 @@ export default function Settings() {
 
         <Card className="premium-card">
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-xl"><Lock className="h-5 w-5 text-primary" />Cambiar contraseña</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-xl"><Lock className="h-5 w-5 text-[#3B82F6]" />Cambiar contraseña</CardTitle>
             <CardDescription>Actualiza tu contraseña de acceso</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Contraseña actual</Label>
-                <Input type="password" placeholder="••••••••" value={passwords.currentPassword} onChange={(e) => setPasswords(prev => ({ ...prev, currentPassword: e.target.value }))} className="bg-surface border-border h-10" />
+                <Input type="password" placeholder="••••••••" value={passwords.currentPassword} onChange={(e) => setPasswords(prev => ({ ...prev, currentPassword: e.target.value }))} className="bg-[#202938] border-[#3E4A5F] h-10" />
               </div>
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Nueva contraseña</Label>
-                <Input type="password" placeholder="••••••••" value={passwords.newPassword} onChange={(e) => setPasswords(prev => ({ ...prev, newPassword: e.target.value }))} className="bg-surface border-border h-10" />
+                <Input type="password" placeholder="••••••••" value={passwords.newPassword} onChange={(e) => setPasswords(prev => ({ ...prev, newPassword: e.target.value }))} className="bg-[#202938] border-[#3E4A5F] h-10" />
               </div>
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Confirmar contraseña</Label>
-                <Input type="password" placeholder="••••••••" value={passwords.confirmPassword} onChange={(e) => setPasswords(prev => ({ ...prev, confirmPassword: e.target.value }))} className="bg-surface border-border h-10" />
+                <Input type="password" placeholder="••••••••" value={passwords.confirmPassword} onChange={(e) => setPasswords(prev => ({ ...prev, confirmPassword: e.target.value }))} className="bg-[#202938] border-[#3E4A5F] h-10" />
               </div>
             </div>
             <div className="flex justify-end pt-2">
-              <Button onClick={handlePasswordChange} disabled={pwLoading} variant="outline" className="border-primary/40 text-primary hover:bg-primary/10 min-w-[180px] h-10">
+              <Button onClick={handlePasswordChange} disabled={pwLoading} variant="outline" className="border-[rgba(59,130,246,0.4)] text-[#3B82F6] hover:bg-[rgba(59,130,246,0.1)] min-w-[180px] h-10">
                 <Lock className="h-4 w-4 mr-2" />
                 {pwLoading ? 'Guardando…' : 'Cambiar contraseña'}
               </Button>
@@ -195,8 +195,8 @@ export default function Settings() {
           </CardContent>
         </Card>
 
-        <div className="flex justify-end pt-4 border-t border-border/50">
-          <Button onClick={handleSave} disabled={loading} className="bg-gradient-primary hover:opacity-90 min-w-[160px] h-10 text-sm font-medium">
+        <div className="flex justify-end pt-4 border-t border-[rgba(62,74,95,0.5)]">
+          <Button onClick={handleSave} disabled={loading} className="bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white hover:brightness-110 min-w-[160px] h-10 text-sm font-medium">
             <Save className="h-4 w-4 mr-2" />
             {loading ? t('common.saving') : t('common.save')}
           </Button>
@@ -205,3 +205,6 @@ export default function Settings() {
     </div>
   );
 }
+
+
+

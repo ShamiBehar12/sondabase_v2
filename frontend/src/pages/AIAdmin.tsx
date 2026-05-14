@@ -193,18 +193,18 @@ export default function AIAdmin() {
   }, [racerDocs, docsSearch]);
 
   if (loading) {
-    return <div className="container mx-auto p-6 text-foreground-muted">Carregando configuração de IA...</div>;
+    return <div className="container mx-auto p-6 text-white">Carregando configuração de IA...</div>;
   }
 
   return (
     <div className="container mx-auto p-6 space-y-10">
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div>
-        <h1 className="text-3xl font-bold text-gradient flex items-center gap-3">
+        <h1 className="text-3xl font-bold bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white bg-clip-text text-transparent flex items-center gap-3">
           <Bot className="w-8 h-8" />
           {t('navigation.aiAdministration')}
         </h1>
-        <p className="text-foreground-muted mt-2">
+        <p className="text-white mt-2">
           {t('navigation.aiAdministrationSubtitle')}
         </p>
       </div>
@@ -295,7 +295,7 @@ export default function AIAdmin() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <Button onClick={handleSave} className="bg-gradient-primary hover:opacity-90">
+              <Button onClick={handleSave} className="bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white hover:brightness-110">
                 <Save className="w-4 h-4 mr-2" />Guardar
               </Button>
               <Button variant="outline" onClick={handleTest}>
@@ -321,10 +321,10 @@ export default function AIAdmin() {
             </div>
             <div className="space-y-3">
               {indexStatus?.recent.map((item) => (
-                <div key={item.id} className="rounded-lg border border-border p-3">
-                  <div className="font-medium text-foreground">{item.title || "Sin título"}</div>
-                  <div className="text-sm text-foreground-muted">{item.recordType}</div>
-                  <div className="text-xs text-foreground-muted mt-1">
+                <div key={item.id} className="rounded-lg border border-[#3E4A5F] p-3">
+                  <div className="font-medium text-[#F3F7FC]">{item.title || "Sin título"}</div>
+                  <div className="text-sm text-white">{item.recordType}</div>
+                  <div className="text-xs text-white mt-1">
                     {item.status} em {new Date(item.updatedAt).toLocaleString("pt-BR")}
                   </div>
                 </div>
@@ -336,12 +336,12 @@ export default function AIAdmin() {
 
       {/* ── RACER Smart Cities ─────────────────────────────────────────── */}
       <div className="space-y-6">
-        <div className="border-t border-border pt-6">
-          <h2 className="text-2xl font-bold text-gradient flex items-center gap-3">
+        <div className="border-t border-[#3E4A5F] pt-6">
+          <h2 className="text-2xl font-bold bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white bg-clip-text text-transparent flex items-center gap-3">
             <MapPin className="w-6 h-6" />
             RACER Smart Cities
           </h2>
-          <p className="text-foreground-muted mt-1">
+          <p className="text-white mt-1">
             Gestión del índice vectorial de documentos Smart Cities (ChromaDB + SQLite).
           </p>
         </div>
@@ -357,7 +357,7 @@ export default function AIAdmin() {
             </CardHeader>
             <CardContent className="space-y-3">
               {healthLoading ? (
-                <div className="flex items-center gap-2 text-foreground-muted">
+                <div className="flex items-center gap-2 text-white">
                   <Loader2 className="w-4 h-4 animate-spin" /><span className="text-sm">Verificando...</span>
                 </div>
               ) : racerHealthErr ? (
@@ -370,13 +370,13 @@ export default function AIAdmin() {
                     <CheckCircle className="w-4 h-4" /><span className="text-sm font-medium">Activo</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 mt-2">
-                    <div className="rounded-lg bg-muted/50 p-2 text-center">
-                      <p className="text-2xl font-bold text-foreground">{racerHealth.docs}</p>
-                      <p className="text-xs text-foreground-muted">documentos</p>
+                    <div className="rounded-lg bg-[rgba(35,44,58,0.5)] p-2 text-center">
+                      <p className="text-2xl font-bold text-[#F3F7FC]">{racerHealth.docs}</p>
+                      <p className="text-xs text-white">documentos</p>
                     </div>
-                    <div className="rounded-lg bg-muted/50 p-2 text-center">
-                      <p className="text-2xl font-bold text-foreground">{racerHealth.chunks}</p>
-                      <p className="text-xs text-foreground-muted">chunks</p>
+                    <div className="rounded-lg bg-[rgba(35,44,58,0.5)] p-2 text-center">
+                      <p className="text-2xl font-bold text-[#F3F7FC]">{racerHealth.chunks}</p>
+                      <p className="text-xs text-white">chunks</p>
                     </div>
                   </div>
                 </>
@@ -402,7 +402,7 @@ export default function AIAdmin() {
               {seedResult && (
                 <div className="rounded-lg bg-success/10 border border-success/20 p-3 space-y-1">
                   <p className="text-sm font-medium text-success">Completado</p>
-                  <p className="text-xs text-foreground-muted">
+                  <p className="text-xs text-white">
                     <span className="font-medium">{seedResult.created}</span> creados ·{" "}
                     <span className="font-medium">{seedResult.skipped}</span> ya existían
                   </p>
@@ -411,13 +411,13 @@ export default function AIAdmin() {
               <Button
                 onClick={handleSeed}
                 disabled={seeding}
-                className="w-full bg-gradient-primary hover:opacity-90"
+                className="w-full bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white hover:brightness-110"
               >
                 {seeding
                   ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Sembrando...</>
                   : <><Sprout className="w-4 h-4 mr-2" />Sembrar {racerDocs.length} documentos</>}
               </Button>
-              <p className="text-xs text-foreground-muted text-center">
+              <p className="text-xs text-white text-center">
                 Los ya existentes se omiten automáticamente.
               </p>
             </CardContent>
@@ -432,7 +432,7 @@ export default function AIAdmin() {
             </CardHeader>
             <CardContent className="space-y-2">
               {docsLoading ? (
-                <div className="flex items-center gap-2 text-foreground-muted text-sm">
+                <div className="flex items-center gap-2 text-white text-sm">
                   <Loader2 className="w-4 h-4 animate-spin" />Cargando...
                 </div>
               ) : (
@@ -465,7 +465,7 @@ export default function AIAdmin() {
                     <p className="font-semibold text-sm text-orange-400">
                       {failedDocs.length} documento{failedDocs.length > 1 ? "s" : ""} sin metadata
                     </p>
-                    <p className="text-xs text-foreground-muted">
+                    <p className="text-xs text-white">
                       La extracción con GPT falló durante la ingesta inicial. Puedes re-intentarlo ahora.
                     </p>
                   </div>
@@ -500,7 +500,7 @@ export default function AIAdmin() {
                 </CardDescription>
               </div>
               <div className="relative w-64">
-                <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-muted-foreground" />
+                <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-white" />
                 <Input
                   placeholder="Buscar por nombre, país, cliente..."
                   className="pl-8"
@@ -512,11 +512,11 @@ export default function AIAdmin() {
           </CardHeader>
           <CardContent>
             {docsLoading ? (
-              <div className="flex items-center justify-center py-12 gap-2 text-foreground-muted">
+              <div className="flex items-center justify-center py-12 gap-2 text-white">
                 <Loader2 className="w-5 h-5 animate-spin" /><span>Cargando documentos...</span>
               </div>
             ) : filteredDocs.length === 0 ? (
-              <div className="text-center py-12 text-foreground-muted text-sm">
+              <div className="text-center py-12 text-white text-sm">
                 {racerDocs.length === 0
                   ? "No hay documentos en el índice. Verifica que el RACER esté activo y que metadata.jsonl exista."
                   : "Ningún documento coincide con la búsqueda."}
@@ -525,14 +525,14 @@ export default function AIAdmin() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-border text-left">
-                      <th className="pb-2 pr-4 font-medium text-foreground-muted">Archivo</th>
-                      <th className="pb-2 pr-4 font-medium text-foreground-muted">Tipo</th>
-                      <th className="pb-2 pr-4 font-medium text-foreground-muted">Cliente</th>
-                      <th className="pb-2 pr-4 font-medium text-foreground-muted">País</th>
-                      <th className="pb-2 pr-4 font-medium text-foreground-muted">Año</th>
-                      <th className="pb-2 pr-4 font-medium text-foreground-muted">Apostilla</th>
-                      <th className="pb-2 font-medium text-foreground-muted">Acciones</th>
+                    <tr className="border-b border-[#3E4A5F] text-left">
+                      <th className="pb-2 pr-4 font-medium text-white">Archivo</th>
+                      <th className="pb-2 pr-4 font-medium text-white">Tipo</th>
+                      <th className="pb-2 pr-4 font-medium text-white">Cliente</th>
+                      <th className="pb-2 pr-4 font-medium text-white">País</th>
+                      <th className="pb-2 pr-4 font-medium text-white">Año</th>
+                      <th className="pb-2 pr-4 font-medium text-white">Apostilla</th>
+                      <th className="pb-2 font-medium text-white">Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -543,15 +543,15 @@ export default function AIAdmin() {
                       return (
                         <tr
                           key={doc.document_id}
-                          className={`border-b border-border/50 transition-colors ${
-                            isFailed ? "bg-orange-500/5 hover:bg-orange-500/10" : "hover:bg-muted/20"
+                          className={`border-b border-[rgba(62,74,95,0.5)] transition-colors ${
+                            isFailed ? "bg-orange-500/5 hover:bg-orange-500/10" : "hover:bg-[rgba(35,44,58,0.2)]"
                           }`}
                         >
                           <td className="py-2 pr-4 max-w-[200px]">
                             <div className="flex items-center gap-1.5">
                               {isFailed && <AlertCircle className="w-3 h-3 text-orange-400 flex-shrink-0" />}
                               {result === "ok" && <CheckCircle className="w-3 h-3 text-green-500 flex-shrink-0" />}
-                              <span className="truncate font-mono text-xs text-foreground" title={doc.source_file}>
+                              <span className="truncate font-mono text-xs text-[#F3F7FC]" title={doc.source_file}>
                                 {doc.source_file}
                               </span>
                             </div>
@@ -564,16 +564,16 @@ export default function AIAdmin() {
                               {doc.doc_type || "—"}
                             </Badge>
                           </td>
-                          <td className="py-2 pr-4 text-foreground-secondary max-w-[160px] truncate" title={doc.client}>
-                            {doc.client || <span className="text-foreground-muted italic text-xs">sin datos</span>}
+                          <td className="py-2 pr-4 text-white max-w-[160px] truncate" title={doc.client}>
+                            {doc.client || <span className="text-white italic text-xs">sin datos</span>}
                           </td>
-                          <td className="py-2 pr-4 text-foreground-secondary">{doc.country || "—"}</td>
-                          <td className="py-2 pr-4 text-foreground-secondary">{doc.year || "—"}</td>
+                          <td className="py-2 pr-4 text-white">{doc.country || "—"}</td>
+                          <td className="py-2 pr-4 text-white">{doc.year || "—"}</td>
                           <td className="py-2 pr-4">
                             {doc.is_apostilled === true || doc.is_apostilled === 1 ? (
                               <CheckCircle className="w-4 h-4 text-green-500" />
                             ) : (
-                              <span className="text-foreground-muted">—</span>
+                              <span className="text-white">—</span>
                             )}
                           </td>
                           <td className="py-2">
@@ -610,9 +610,12 @@ export default function AIAdmin() {
 
 function StatRow({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex items-center justify-between py-1 border-b border-border/40 last:border-0">
-      <span className="text-xs text-foreground-muted">{label}</span>
-      <span className="text-sm font-semibold text-foreground">{value}</span>
+    <div className="flex items-center justify-between py-1 border-b border-[rgba(62,74,95,0.4)] last:border-0">
+      <span className="text-xs text-white">{label}</span>
+      <span className="text-sm font-semibold text-[#F3F7FC]">{value}</span>
     </div>
   );
 }
+
+
+

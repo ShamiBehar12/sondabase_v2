@@ -104,7 +104,7 @@ export default function ContentManagement() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Meus Certificados</h1>
-          <p className="text-muted-foreground">
+          <p className="text-white">
             Gerencie seus certificados y documentos pessoais
           </p>
         </div>
@@ -112,44 +112,44 @@ export default function ContentManagement() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="border border-border">
+        <Card className="border border-[#3E4A5F]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Rascunhos</p>
+                <p className="text-sm font-medium text-white">Rascunhos</p>
                 <p className="text-3xl font-bold">{statusCounts.rascunho || 0}</p>
               </div>
               <Badge variant="secondary" className="text-xs">DRAFT</Badge>
             </div>
           </CardContent>
         </Card>
-        <Card className="border border-border">
+        <Card className="border border-[#3E4A5F]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Em Revisão</p>
+                <p className="text-sm font-medium text-white">Em Revisão</p>
                 <p className="text-3xl font-bold">{statusCounts.em_revisao || 0}</p>
               </div>
               <Badge variant="default" className="bg-blue-100 text-blue-800 text-xs">REVIEW</Badge>
             </div>
           </CardContent>
         </Card>
-        <Card className="border border-border">
+        <Card className="border border-[#3E4A5F]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Aprovados</p>
+                <p className="text-sm font-medium text-white">Aprovados</p>
                 <p className="text-3xl font-bold">{statusCounts.aprovado || 0}</p>
               </div>
               <Badge variant="default" className="bg-green-100 text-green-800 text-xs">APPROVED</Badge>
             </div>
           </CardContent>
         </Card>
-        <Card className="border border-border">
+        <Card className="border border-[#3E4A5F]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Rejeitados</p>
+                <p className="text-sm font-medium text-white">Rejeitados</p>
                 <p className="text-3xl font-bold">{statusCounts.rechazado || 0}</p>
               </div>
               <Badge variant="destructive" className="text-xs">REJECTED</Badge>
@@ -177,7 +177,7 @@ export default function ContentManagement() {
               >
                 <h3 className="font-semibold">{type.name_pt}</h3>
                 {type.description_pt && (
-                  <p className="text-sm text-muted-foreground text-left">
+                  <p className="text-sm text-white text-left">
                     {type.description_pt}
                   </p>
                 )}
@@ -191,7 +191,7 @@ export default function ContentManagement() {
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="flex flex-1 gap-2 w-full sm:w-auto">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white w-4 h-4" />
             <Input
               placeholder="Buscar por título o descrição..."
               value={searchTerm}
@@ -254,7 +254,7 @@ export default function ContentManagement() {
       ) : filteredItems.length === 0 ? (
         <Card>
           <CardContent className="text-center py-8">
-            <p className="text-muted-foreground">
+            <p className="text-white">
               {items.length === 0 
                 ? 'Ningún item encontrado. Comece criando seu primeiro conteúdo!' 
                 : 'Ningún item corresponde aos filtros selecionados.'}
@@ -318,3 +318,4 @@ export default function ContentManagement() {
     </div>
   );
 }
+

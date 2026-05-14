@@ -50,7 +50,7 @@ export const CleanupCertificates = () => {
     <div className="container mx-auto py-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Limpeza de Certificados</h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-white mt-2">
           Ferramenta para limpeza completa dos archivos de certificados no storage
         </p>
       </div>
@@ -106,7 +106,7 @@ export const CleanupCertificates = () => {
             </div>
           )}
 
-          <div className="text-sm text-muted-foreground">
+          <div className="text-sm text-white">
             <h4 className="font-medium mb-2">O que foi limpo de la base de dados:</h4>
             <ul className="list-disc list-inside space-y-1">
               <li>✅ Tabela certificates (0 registros restantes)</li>
@@ -128,3 +128,4 @@ export const CleanupCertificates = () => {
     </div>
   );
 };
+

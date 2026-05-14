@@ -46,7 +46,7 @@ export function CertificateRagCompareDialog({
 }: CertificateRagCompareDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-7xl h-[90vh] p-0 bg-background border-border">
+      <DialogContent className="max-w-7xl h-[90vh] p-0 bg-[#171C25] border-[#3E4A5F]">
         <DialogHeader className="px-6 pt-6 pb-0">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -54,7 +54,7 @@ export function CertificateRagCompareDialog({
                 <FileSearch className="h-5 w-5" />
                 Comparar PDF x Documento RAG
               </DialogTitle>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-white mt-1">
                 {certificateName || "Certificado"}: comparação entre o archivo original y o conteúdo indexado para IA.
               </p>
             </div>
@@ -83,9 +83,9 @@ export function CertificateRagCompareDialog({
         </DialogHeader>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 h-full min-h-0">
-          <div className="border-r border-border p-6 min-h-0">
+          <div className="border-r border-[#3E4A5F] p-6 min-h-0">
             <h3 className="font-semibold mb-3">PDF original</h3>
-            <div className="h-[72vh] rounded-lg border border-border overflow-hidden bg-muted/20">
+            <div className="h-[72vh] rounded-lg border border-[#3E4A5F] overflow-hidden bg-[rgba(35,44,58,0.2)]">
               {pdfUrl ? (
                 <iframe
                   src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`}
@@ -93,7 +93,7 @@ export function CertificateRagCompareDialog({
                   title={certificateName || "PDF original"}
                 />
               ) : (
-                <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
+                <div className="h-full flex items-center justify-center text-sm text-white">
                   No fue posible carregar o PDF.
                 </div>
               )}
@@ -104,41 +104,41 @@ export function CertificateRagCompareDialog({
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold">Documento RAG</h3>
               {ragDocument?.updatedAt && (
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-white">
                   Atualizado em {new Date(ragDocument.updatedAt).toLocaleString("pt-BR")}
                 </span>
               )}
             </div>
 
             {loading ? (
-              <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground">
+              <div className="flex-1 flex items-center justify-center text-sm text-white">
                 Carregando documento indexado...
               </div>
             ) : !ragDocument ? (
-              <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground">
+              <div className="flex-1 flex items-center justify-center text-sm text-white">
                 Este certificado aún no possui documento RAG disponible.
               </div>
             ) : (
               <div className="grid grid-rows-[auto_1fr_1fr] gap-4 min-h-0 flex-1">
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="rounded-lg border border-border p-3">
-                    <div className="text-xs text-muted-foreground">Tipo</div>
+                  <div className="rounded-lg border border-[#3E4A5F] p-3">
+                    <div className="text-xs text-white">Tipo</div>
                     <div className="text-sm font-medium">{ragDocument.recordType}</div>
                   </div>
-                  <div className="rounded-lg border border-border p-3">
-                    <div className="text-xs text-muted-foreground">Páginas indexadas</div>
+                  <div className="rounded-lg border border-[#3E4A5F] p-3">
+                    <div className="text-xs text-white">Páginas indexadas</div>
                     <div className="text-sm font-medium">{ragDocument.chunkCount}</div>
                   </div>
-                  <div className="rounded-lg border border-border p-3">
-                    <div className="text-xs text-muted-foreground">Verificado</div>
+                  <div className="rounded-lg border border-[#3E4A5F] p-3">
+                    <div className="text-xs text-white">Verificado</div>
                     <div className="text-sm font-medium">{ragDocument.isVerifiedSnapshot ? "Sim" : "No"}</div>
                   </div>
                 </div>
 
                 <div className="min-h-0">
                   <div className="text-sm font-medium mb-2">Texto consolidado del índice</div>
-                  <ScrollArea className="h-full rounded-lg border border-border bg-muted/10 p-4">
-                    <pre className="text-xs whitespace-pre-wrap break-words text-foreground font-mono">
+                  <ScrollArea className="h-full rounded-lg border border-[#3E4A5F] bg-[rgba(35,44,58,0.1)] p-4">
+                    <pre className="text-xs whitespace-pre-wrap break-words text-[#F3F7FC] font-mono">
                       {ragDocument.searchText || "Sem texto consolidado."}
                     </pre>
                   </ScrollArea>
@@ -146,15 +146,15 @@ export function CertificateRagCompareDialog({
 
                 <div className="min-h-0">
                   <div className="text-sm font-medium mb-2">Páginas indexadas</div>
-                  <ScrollArea className="h-full rounded-lg border border-border bg-muted/10 p-4">
+                  <ScrollArea className="h-full rounded-lg border border-[#3E4A5F] bg-[rgba(35,44,58,0.1)] p-4">
                     <div className="space-y-4">
                       {ragDocument.chunks.map((chunk) => (
-                        <div key={chunk.id} className="rounded-lg border border-border bg-background/40 p-3">
+                        <div key={chunk.id} className="rounded-lg border border-[#3E4A5F] bg-[#171C25]/40 p-3">
                           <div className="flex items-center justify-between mb-2">
                             <Badge variant="outline">Página {chunk.chunkOrder + 1}</Badge>
-                            <span className="text-xs text-muted-foreground">{chunk.tokenCount} tokens aprox.</span>
+                            <span className="text-xs text-white">{chunk.tokenCount} tokens aprox.</span>
                           </div>
-                          <pre className="text-xs whitespace-pre-wrap break-words text-foreground font-mono">
+                          <pre className="text-xs whitespace-pre-wrap break-words text-[#F3F7FC] font-mono">
                             {chunk.chunkText}
                           </pre>
                         </div>
@@ -170,3 +170,5 @@ export function CertificateRagCompareDialog({
     </Dialog>
   );
 }
+
+

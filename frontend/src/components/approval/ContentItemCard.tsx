@@ -72,18 +72,18 @@ export function ContentItemCard({
   const canSubmitForReview = item.status === 'rascunho' && onSubmitForReview;
 
   return (
-    <Card className={`hover:shadow-md transition-shadow border border-border ${className}`}>
+    <Card className={`hover:shadow-md transition-shadow border border-[#3E4A5F] ${className}`}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="space-y-1 flex-1">
             <CardTitle className="text-lg font-semibold">{title}</CardTitle>
             {item.content_type && (
-              <p className="text-sm text-muted-foreground font-medium">
+              <p className="text-sm text-white font-medium">
                 {item.content_type.name_pt}
               </p>
             )}
             {showAuthor && item.author_name && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-white">
                 Por: {item.author_name}
               </p>
             )}
@@ -96,12 +96,12 @@ export function ContentItemCard({
       
       <CardContent className="pt-0">
         {description && (
-          <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+          <p className="text-sm text-white mb-4 line-clamp-3">
             {description}
           </p>
         )}
         
-        <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
+        <div className="flex items-center justify-between text-xs text-white mb-4">
           <span>
             Criado em {format(new Date(item.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
           </span>
@@ -128,7 +128,7 @@ export function ContentItemCard({
           )}
           
           {canSubmitForReview && (
-            <Button size="sm" onClick={() => onSubmitForReview(item)} className="bg-primary hover:bg-primary/90">
+            <Button size="sm" onClick={() => onSubmitForReview(item)} className="bg-[#3B82F6] hover:bg-[#3B82F6]/90">
               <Send className="w-4 h-4 mr-1" />
               Enviar para Revisão
             </Button>
@@ -138,3 +138,4 @@ export function ContentItemCard({
     </Card>
   );
 }
+

@@ -13,8 +13,8 @@ export function ProtectedRoute({ children, requireRole }: ProtectedRouteProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-secondary">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-[linear-gradient(135deg,#171C25_0%,#1D2430_100%)]">
+        <Loader2 className="h-8 w-8 animate-spin text-[#3B82F6]" />
       </div>
     );
   }
@@ -29,10 +29,10 @@ export function ProtectedRoute({ children, requireRole }: ProtectedRouteProps) {
   
   if (requireRole && effectiveRole !== requireRole && effectiveRole !== 'admin') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-secondary">
+      <div className="min-h-screen flex items-center justify-center bg-[linear-gradient(135deg,#171C25_0%,#1D2430_100%)]">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-2">Acesso Negado</h1>
-          <p className="text-foreground-muted">No tienes permiso para acessar esta página.</p>
+          <h1 className="text-2xl font-bold text-[#F3F7FC] mb-2">Acesso Negado</h1>
+          <p className="text-white">No tienes permiso para acessar esta página.</p>
         </div>
       </div>
     );
@@ -40,3 +40,4 @@ export function ProtectedRoute({ children, requireRole }: ProtectedRouteProps) {
 
   return <>{children}</>;
 }
+
