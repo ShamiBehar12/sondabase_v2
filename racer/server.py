@@ -136,7 +136,10 @@ def extraer_filtros(q: str, pais: Optional[str], solo_apostillados: bool) -> dic
 
 def buscar(pregunta: str, tipo: str, filtros: dict, n: int = 8) -> list:
     col    = col_docs if tipo == "doc" else col_chunks
-    kwargs: dict = dict(query_texts=[pregunta], n_results=min(n, col.count()),
+    count  = col.count()
+    if count == 0:
+        return []
+    kwargs: dict = dict(query_texts=[pregunta], n_results=min(n, count),
                         include=["documents","metadatas","distances"])
     if filtros:
         kwargs["where"] = filtros
