@@ -209,13 +209,13 @@ export const CertificateEditDialog = ({ certificate, open, onOpenChange }: Certi
         </DialogHeader>
 
         {(certificate as any)?._isFromRejection && (certificate as any)?._rejectionReason ? (
-          <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-foreground">
+          <div className="rounded-md border border-[rgba(229,72,77,0.3)] bg-[rgba(229,72,77,0.1)] p-3 text-sm text-[#F3F7FC]">
             <strong>Motivo de la rechazo:</strong> {(certificate as any)._rejectionReason}
           </div>
         ) : null}
 
         {(certificate as any)?._isFromRejection && (certificate as any)?._hasIncompleteSnapshot ? (
-          <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-foreground">
+          <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-[#F3F7FC]">
             Este certificado foi rechazado antes de la correção que preserva todos os dados del envio original. Os próximos certificados rejeitados abrirão esta tela já preenchidos; neste caso antigo, pode ser necessário completar os campos que no estavam salvos no histórico.
           </div>
         ) : null}
@@ -301,25 +301,25 @@ export const CertificateEditDialog = ({ certificate, open, onOpenChange }: Certi
               <div className="space-y-2">
                 <Label>Arquivo PDF</Label>
                 {certificate.file_name ? (
-                  <div className="rounded-md border border-primary/20 bg-primary/5 p-3 text-sm text-foreground">
+                  <div className="rounded-md border border-[rgba(59,130,246,0.2)] bg-[rgba(59,130,246,0.05)] p-3 text-sm text-[#F3F7FC]">
                     <strong>PDF atual:</strong> {certificate.file_name}
-                    <div className="text-muted-foreground">
+                    <div className="text-white">
                       O archivo original já está carregado. Se quiser, pode selecionar un nuevo PDF para substituí-lo.
                     </div>
                   </div>
                 ) : null}
                 <div className="flex items-center justify-center w-full">
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer bg-muted/50 hover:bg-muted/80 transition-colors">
+                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[#3E4A5F] rounded-lg cursor-pointer bg-[rgba(35,44,58,0.5)] hover:bg-[rgba(35,44,58,0.8)] transition-colors">
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <Upload className="w-8 h-8 mb-2 text-muted-foreground" />
-                      <p className="mb-2 text-sm text-muted-foreground">
+                      <Upload className="w-8 h-8 mb-2 text-white" />
+                      <p className="mb-2 text-sm text-white">
                         {selectedFile
                           ? selectedFile.name
                           : certificate.file_name
                             ? 'Clique para substituir o PDF atual'
                             : 'Clique para enviar o PDF del certificado'}
                       </p>
-                      <p className="text-xs text-muted-foreground">PDF (MAX. 10MB)</p>
+                      <p className="text-xs text-white">PDF (MAX. 10MB)</p>
                     </div>
                     <input
                       type="file"
@@ -412,7 +412,7 @@ export const CertificateEditDialog = ({ certificate, open, onOpenChange }: Certi
                           <SelectValue placeholder={t('common.country')} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-background border border-border shadow-lg max-h-[200px] overflow-y-auto z-50">
+                      <SelectContent className="bg-[#171C25] border border-[#3E4A5F] shadow-lg max-h-[200px] overflow-y-auto z-50">
                         {countries.map((country) => (
                           <SelectItem key={country} value={country}>
                             {country}
@@ -466,13 +466,13 @@ export const CertificateEditDialog = ({ certificate, open, onOpenChange }: Certi
                       onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                     />
                     {showSuggestions && tagSuggestions.length > 0 && (
-                      <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-lg shadow-lg mt-1 max-h-40 overflow-y-auto z-50">
+                      <div className="absolute top-full left-0 right-0 bg-[#171C25] border border-[#3E4A5F] rounded-lg shadow-lg mt-1 max-h-40 overflow-y-auto z-50">
                         {tagSuggestions
                           .filter(suggestion => !tags.includes(suggestion))
                           .map((suggestion, index) => (
                             <div
                               key={index}
-                              className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
+                              className="px-3 py-2 hover:bg-[#232C3A] cursor-pointer text-sm"
                               onClick={() => addSuggestedTag(suggestion)}
                             >
                               {suggestion}
@@ -495,7 +495,7 @@ export const CertificateEditDialog = ({ certificate, open, onOpenChange }: Certi
               </Button>
               <Button 
                 type="submit" 
-                className="bg-gradient-primary hover:opacity-90 transition-opacity" 
+                className="bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white hover:brightness-110 transition-all" 
                 disabled={uploading}
               >
                 {uploading 
@@ -511,3 +511,5 @@ export const CertificateEditDialog = ({ certificate, open, onOpenChange }: Certi
     </Dialog>
   );
 };
+
+

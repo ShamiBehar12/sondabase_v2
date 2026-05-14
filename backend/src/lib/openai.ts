@@ -54,20 +54,49 @@ export async function generateOpenAIEmbedding(input: string, model: string) {
   }
 }
 
-export async function generateOpenAIAnswer(model: string, question: string, context: string) {
+function isReasoningModel(model: string) {
+  return /^o\d|^gpt-5/i.test(model);
+}
+
+export type ChatMessage = { role: "user" | "assistant"; content: string };
+export type QueryIntent = "rag" | "clarification";
+
+export async function generateOpenAIAnswer(
+  model: string,
+  question: string,
+  context: string,
+  history: ChatMessage[] = [],
+  intent: QueryIntent = "rag",
+) {
   assertAvailable();
   const openai = getOpenAIClient();
   if (!openai) return null;
 
-  try {
-    const response = await openai.responses.create({
-      model,
-      instructions:
-        "Responde em português claro. Usa apenas os certificados fornecidos no contexto. Resume quais certificados atendem melhor ao pedido, explica por quê e não inventes informação ausente.",
-      input: `Pedido do utilizador:\n${question}\n\nContexto recuperado:\n${context}`,
-    });
+  const systemPrompt =
+    intent === "clarification"
+      ? "Eres un asistente especializado en documentos y certificados. El usuario está pidiendo una aclaración sobre algo mencionado en la conversación. El historial previo es solo contexto — la pregunta activa es el ÚLTIMO mensaje del usuario. Responde de manera clara y directa. Usa el mismo idioma que el usuario."
+      : "Eres un asistente especializado en documentos y certificados. El historial de conversación que recibes es contexto previo — NO son pedidos activos. La consulta activa y vigente es ÚNICAMENTE el último mensaje del usuario. Responde usando solo los certificados del contexto recuperado para esa consulta. No mezcles documentos de turnos anteriores a menos que el usuario los mencione explícitamente ahora. Usa el mismo idioma que el usuario.";
 
-    return response.output_text?.trim() || null;
+  const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+    { role: "system", content: systemPrompt },
+    ...history,
+    {
+      role: "user",
+      content:
+        intent === "clarification"
+          ? question
+          : `Consulta del usuario:\n${question}\n\nContexto recuperado:\n${context}`,
+    },
+  ];
+
+  try {
+    const response = await openai.chat.completions.create({
+      model,
+      messages,
+      ...(isReasoningModel(model) ? {} : { temperature: 0.2 }),
+    }, { timeout: 30000 });
+
+    return response.choices[0]?.message?.content?.trim() || null;
   } catch (error) {
     handleOpenAIError(error);
     return null;

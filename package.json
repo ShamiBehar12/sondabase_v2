@@ -4,19 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "npm --prefix frontend run dev",
-    "dev:backend": "npm --prefix backend run dev",
-    "dev:racer": "cd racer && ANONYMIZED_TELEMETRY=false venv/bin/uvicorn server:app --port 8000 --reload",
-    "dev:all": "concurrently -k -n FE,BE,RACER -c cyan,yellow,magenta \"npm --prefix frontend run dev\" \"npm --prefix backend run dev\" \"cd racer && venv/bin/uvicorn server:app --port 8000 --reload\"",
-    "docker:mysql": "docker compose up -d mysql",
-    "setup": "npm install && npm --prefix frontend install && npm --prefix backend install && cd racer && python3 -m venv venv && venv/bin/pip install -r requirements.txt",
-    "db:init": "npm --prefix backend run db:init",
-    "db:setup": "npm --prefix backend run db:setup",
-    "build": "npm --prefix frontend run build",
-    "build:backend": "npm --prefix backend run build",
-    "build:dev": "npm --prefix frontend run build:dev",
-    "lint": "npm --prefix frontend run lint",
-    "preview": "npm --prefix frontend run preview"
+    "all": "concurrently -k -n FE,BE,RACER -c cyan,yellow,magenta \"npm --prefix frontend run dev\" \"npm --prefix backend run dev\" \"cd racer && .\\venv\\Scripts\\python.exe -m uvicorn server:app --port 8000 --reload\"",
+    "setup": "npm install && npm --prefix frontend install && npm --prefix backend install && cd racer && python -m venv venv && .\\venv\\Scripts\\python.exe -m pip install -r requirements.txt"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

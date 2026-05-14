@@ -320,7 +320,7 @@ export default function SuccessStoryApproval() {
     <div className="container mx-auto py-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">{t('approval.successStoryApproval')}</h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-white mt-2">
           {t('approval.successStoryApprovalDescription')}
         </p>
       </div>
@@ -328,7 +328,7 @@ export default function SuccessStoryApproval() {
       {unverifiedStories.length === 0 ? (
         <Card>
           <CardContent className="p-6 text-center">
-            <p className="text-muted-foreground">
+            <p className="text-white">
               Ninguna historia de éxito esperando aprobación.
             </p>
           </CardContent>
@@ -355,13 +355,13 @@ export default function SuccessStoryApproval() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-muted-foreground" />
+                      <User className="w-4 h-4 text-white" />
                       <span>{story.full_name || 'Nombre no disponible'}</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Building className="w-4 h-4 text-muted-foreground" />
+                      <Building className="w-4 h-4 text-white" />
                       <span>{story.client_pt || story.client_en || story.client_es || 'No informado'}</span>
                     </div>
                   </TableCell>
@@ -486,3 +486,5 @@ export default function SuccessStoryApproval() {
     </div>
   );
 }
+
+

@@ -193,7 +193,7 @@ export function CertificateDetailDialog({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left Column - Certificate Details */}
             <div className="space-y-4">
-              <div className="bg-muted/20 p-4 rounded-lg">
+              <div className="bg-[rgba(35,44,58,0.2)] p-4 rounded-lg">
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
                   <User className="w-4 h-4" />
                   Informações del Usuario
@@ -203,38 +203,38 @@ export function CertificateDetailDialog({
                 <p><strong>Atualizado em:</strong> {formatDate(certificate.updated_at)}</p>
               </div>
 
-              <div className="bg-muted/20 p-4 rounded-lg">
+              <div className="bg-[rgba(35,44,58,0.2)] p-4 rounded-lg">
                 <h3 className="font-semibold mb-3">Detalhes Básicos</h3>
                 <div className="space-y-2">
                   <p><strong>Título:</strong> {certificate.title}</p>
                   {certificate.description && (
                     <div>
                       <strong>Descrição:</strong>
-                      <p className="text-sm text-muted-foreground mt-1">{certificate.description}</p>
+                      <p className="text-sm text-white mt-1">{certificate.description}</p>
                     </div>
                   )}
                   {certificate.description_pt && (
                     <div>
                       <strong>Descrição (PT):</strong>
-                      <p className="text-sm text-muted-foreground mt-1">{certificate.description_pt}</p>
+                      <p className="text-sm text-white mt-1">{certificate.description_pt}</p>
                     </div>
                   )}
                   {certificate.description_en && (
                     <div>
                       <strong>Descrição (EN):</strong>
-                      <p className="text-sm text-muted-foreground mt-1">{certificate.description_en}</p>
+                      <p className="text-sm text-white mt-1">{certificate.description_en}</p>
                     </div>
                   )}
                   {certificate.description_es && (
                     <div>
                       <strong>Descrição (ES):</strong>
-                      <p className="text-sm text-muted-foreground mt-1">{certificate.description_es}</p>
+                      <p className="text-sm text-white mt-1">{certificate.description_es}</p>
                     </div>
                   )}
                 </div>
               </div>
 
-              <div className="bg-muted/20 p-4 rounded-lg">
+              <div className="bg-[rgba(35,44,58,0.2)] p-4 rounded-lg">
                 <h3 className="font-semibold mb-3">Informações del Arquivo</h3>
                 <div className="space-y-2">
                   <p><strong>Nombre del archivo:</strong> {certificate.file_name}</p>
@@ -244,7 +244,7 @@ export function CertificateDetailDialog({
               </div>
 
               {type === 'certificate' ? (
-                <div className="bg-muted/20 p-4 rounded-lg">
+                <div className="bg-[rgba(35,44,58,0.2)] p-4 rounded-lg">
                   <h3 className="font-semibold mb-3">Informações de Experiência</h3>
                   <div className="space-y-2">
                     {(certificate as Certificate).issuing_organization && (
@@ -268,7 +268,7 @@ export function CertificateDetailDialog({
                   </div>
                 </div>
               ) : (
-                <div className="bg-muted/20 p-4 rounded-lg">
+                <div className="bg-[rgba(35,44,58,0.2)] p-4 rounded-lg">
                   <h3 className="font-semibold mb-3">Informações Profissionais</h3>
                   <div className="space-y-2">
                     {'institution' in certificate && certificate.institution && (
@@ -306,7 +306,7 @@ export function CertificateDetailDialog({
               )}
 
               {certificate.tags && certificate.tags.length > 0 && (
-                <div className="bg-muted/20 p-4 rounded-lg">
+                <div className="bg-[rgba(35,44,58,0.2)] p-4 rounded-lg">
                   <h3 className="font-semibold mb-3">Tags</h3>
                   <div className="flex flex-wrap gap-2">
                     {certificate.tags.map((tag, index) => (
@@ -319,7 +319,7 @@ export function CertificateDetailDialog({
 
             {/* Right Column - PDF Viewer */}
             <div className="space-y-4">
-              <div className="bg-muted/20 p-4 rounded-lg">
+              <div className="bg-[rgba(35,44,58,0.2)] p-4 rounded-lg">
                 <h3 className="font-semibold mb-3">Visualização del Documento</h3>
                 <div className="flex gap-2 mb-4">
                   <Button onClick={handleViewPdf} className="flex-1">
@@ -344,10 +344,10 @@ export function CertificateDetailDialog({
               </div>
 
               {showApprovalActions && (
-                <div className="bg-muted/20 p-4 rounded-lg">
+                <div className="bg-[rgba(35,44,58,0.2)] p-4 rounded-lg">
                   <h3 className="font-semibold mb-3">Ações de Aprobación</h3>
                   {certificate.has_rejection_history ? (
-                    <div className="mb-3 rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-foreground">
+                    <div className="mb-3 rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-[#F3F7FC]">
                       Este certificado já foi rechazado anteriormente y foi reenviado para revisão. Nesta etapa ele pode ser revisado y aprovado, mas no deve ser rechazado novamente.
                     </div>
                   ) : null}
@@ -423,3 +423,5 @@ export function CertificateDetailDialog({
     </>
   );
 }
+
+

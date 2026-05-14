@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 .env
 racer_history.db
+venv

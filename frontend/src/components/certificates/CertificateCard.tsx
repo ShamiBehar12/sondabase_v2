@@ -48,15 +48,15 @@ export function CertificateCard({
   return (
     <div className="premium-card group">
       {/* Header */}
-      <div className="p-6 border-b border-border/50">
+      <div className="p-6 border-b border-[rgba(62,74,95,0.5)]">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-gradient-primary rounded-xl">
+            <div className="p-3 bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white rounded-xl">
               <Award className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-lg text-foreground">{title}</h3>
-              <p className="text-sm text-foreground-secondary">#{certificateNumber}</p>
+              <h3 className="font-semibold text-lg text-[#F3F7FC]">{title}</h3>
+              <p className="text-sm text-white">#{certificateNumber}</p>
             </div>
           </div>
 
@@ -108,25 +108,25 @@ export function CertificateCard({
       <div className="p-6 space-y-4">
         {/* Client & Country */}
         <div>
-          <p className="text-sm font-medium text-foreground-secondary mb-1">Cliente</p>
-          <p className="text-foreground">{client} • {country}</p>
+          <p className="text-sm font-medium text-white mb-1">Cliente</p>
+          <p className="text-[#F3F7FC]">{client} • {country}</p>
         </div>
 
         {/* Certifying Entity */}
         <div>
-          <p className="text-sm font-medium text-foreground-secondary mb-1">Entidade Certificadora</p>
-          <p className="text-foreground">{certifyingEntity}</p>
+          <p className="text-sm font-medium text-white mb-1">Entidade Certificadora</p>
+          <p className="text-[#F3F7FC]">{certifyingEntity}</p>
         </div>
 
         {/* Dates */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-sm font-medium text-foreground-secondary mb-1">Emissão</p>
-            <p className="text-foreground text-sm">{new Date(issueDate).toLocaleDateString('pt-BR')}</p>
+            <p className="text-sm font-medium text-white mb-1">Emissão</p>
+            <p className="text-[#F3F7FC] text-sm">{new Date(issueDate).toLocaleDateString('pt-BR')}</p>
           </div>
           <div>
-            <p className="text-sm font-medium text-foreground-secondary mb-1">Validade</p>
-            <p className={`text-sm ${isExpiringSoon ? 'text-warning' : 'text-foreground'}`}>
+            <p className="text-sm font-medium text-white mb-1">Validade</p>
+            <p className={`text-sm ${isExpiringSoon ? 'text-warning' : 'text-[#F3F7FC]'}`}>
               {new Date(expiryDate).toLocaleDateString('pt-BR')}
             </p>
           </div>
@@ -136,3 +136,4 @@ export function CertificateCard({
     </div>
   );
 }
+

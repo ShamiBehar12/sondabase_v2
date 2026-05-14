@@ -12,6 +12,7 @@ import {
   buildFallbackAnswer,
   buildDocumentHash,
   buildSearchText,
+  classifyQueryIntent,
   defaultAiSettings,
   estimateTokenCount,
   isStrongMatch,
@@ -19,7 +20,7 @@ import {
   type MatchStats,
 } from "./lib/ai.js";
 import { extractPdfTextDirect, extractPdfTextWithOcrFallback } from "./lib/pdf.js";
-import { generateOpenAIAnswer, generateOpenAIEmbedding, testOpenAIConnection } from "./lib/openai.js";
+import { generateOpenAIAnswer, generateOpenAIEmbedding, testOpenAIConnection, type ChatMessage } from "./lib/openai.js";
 import { prisma } from "./lib/prisma.js";
 import {
   hashPassword,
@@ -91,6 +92,40 @@ function requireAdmin(request: typeof app extends any ? any : never) {
     throw app.httpErrors.forbidden("Administrator access required");
   }
   return user;
+}
+
+function normalizeLookupName(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\.[^.]+$/i, "")
+    .replace(/[^\w\s()-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function resolveContentType(absolutePath: string) {
+  const extension = path.extname(absolutePath).toLowerCase();
+  return extension === ".pdf"
+    ? "application/pdf"
+    : extension === ".png"
+      ? "image/png"
+      : extension === ".jpg" || extension === ".jpeg"
+        ? "image/jpeg"
+        : "application/octet-stream";
+}
+
+async function sendStoredFile(reply: any, absolutePath: string, fileName: string, download?: string) {
+  reply.header("Content-Type", resolveContentType(absolutePath));
+  const disposition = download === "1" ? "attachment" : "inline";
+  const encodedFileName = encodeURIComponent(fileName);
+  reply.header("Content-Disposition", `${disposition}; filename="${fileName}"; filename*=UTF-8''${encodedFileName}`);
+  return reply.send(await fs.readFile(absolutePath));
+}
+
+function toJsonSafe<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T;
 }
 
 function pathParam(request: { params: unknown }, key: string) {
@@ -284,6 +319,12 @@ async function ensureAiSettings() {
   });
 
   if (existing) {
+    if (existing.activeChatModel === "gpt-5") {
+      return prisma.aiSettings.update({
+        where: { id: existing.id },
+        data: { activeChatModel: "gpt-4o-mini" },
+      });
+    }
     return existing;
   }
 
@@ -795,26 +836,82 @@ app.post("/api/ai/chat/query", async (request) => {
     throw app.httpErrors.forbidden("Operation not allowed");
   }
 
+  const previousMessages = await prisma.aiChatMessage.findMany({
+    where: { sessionId: session.id },
+    orderBy: { createdAt: "asc" },
+    take: 10,
+  });
+
+  const historyForAI: ChatMessage[] = previousMessages
+    .filter((m) => m.role === "user" || m.role === "assistant")
+    .map((m) => ({
+      role: m.role as "user" | "assistant",
+      content: m.role === "assistant" ? m.content.slice(0, 3000) : m.content,
+    }));
+
+  const intent = classifyQueryIntent(message, historyForAI);
+
   const topK = Math.max(1, Math.min(body.topK ?? settings.topK, 10));
 
-  const indexedDocuments = await prisma.aiDocumentIndex.findMany({
-    where: {
-      status: "indexed",
-      isVerifiedSnapshot: true,
-      recordType: "certificate",
-    },
-    orderBy: { updatedAt: "desc" },
-    include: {
-      chunks: {
-        orderBy: { chunkOrder: "asc" },
-      },
-    },
-  });
+  const [totalIndexed, totalVerified] = await Promise.all([
+    prisma.aiDocumentIndex.count({ where: { status: "indexed", recordType: "certificate" } }),
+    prisma.aiDocumentIndex.count({ where: { status: "indexed", isVerifiedSnapshot: true, recordType: "certificate" } }),
+  ]);
+
+  const indexedDocuments = totalVerified > 0
+    ? await prisma.aiDocumentIndex.findMany({
+        where: { status: "indexed", isVerifiedSnapshot: true, recordType: "certificate" },
+        orderBy: { updatedAt: "desc" },
+        include: { chunks: { orderBy: { chunkOrder: "asc" } } },
+      })
+    : [];
 
   const shouldUseOpenAI = settings.activeProvider === "openai" && Boolean(env.openAiApiKey);
   let queryEmbedding: number[] | null = null;
 
-  if (shouldUseOpenAI) {
+  type MatchEntry = {
+    recordType: string; recordId: string; title: string; fileName: string;
+    filePath: string; score: number; reason: string; matchTerms: string[];
+    referenceLabel?: string; referencePages: number[]; citations: string[];
+  };
+  // Try RACER search when aiDocumentIndex is empty
+  let racerMatches: MatchEntry[] = [];
+  if (totalVerified === 0) {
+    try {
+      const racerResp = await fetch(`${RACER_URL}/search`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: message, n: topK }),
+        signal: AbortSignal.timeout(8000),
+      });
+      if (racerResp.ok) {
+        const racerData = await racerResp.json() as {
+          items: Array<{
+            id: string; text: string; source_file: string; country: string;
+            year: number | null; apostillado: boolean; doc_type: string | null;
+            client: string | null; summary: string | null; distance: number;
+          }>;
+        };
+        racerMatches = racerData.items.map((item) => ({
+          recordType: item.doc_type || "certificate",
+          recordId: item.id,
+          title: item.source_file.replace(/\.pdf$/i, "").replace(/[-_]/g, " "),
+          fileName: item.source_file,
+          filePath: item.relative_path || item.source_file,
+          score: Math.max(0, Number((1 - item.distance).toFixed(3))),
+          reason: item.summary || item.doc_type || "Documento de RACER",
+          matchTerms: [],
+          referenceLabel: item.country || undefined,
+          referencePages: [],
+          citations: [item.text.slice(0, 300)],
+        }));
+      }
+    } catch (err: any) {
+      app.log.warn(`RACER search fallback failed: ${err?.message || err}`);
+    }
+  }
+
+  if (shouldUseOpenAI && totalVerified === 0 && racerMatches.length === 0) {
     try {
       queryEmbedding = await generateOpenAIEmbedding(message, settings.activeEmbeddingModel);
     } catch (error: any) {
@@ -826,7 +923,7 @@ app.post("/api/ai/chat/query", async (request) => {
     .map((document: any) => rankDocumentMatch(message, document, queryEmbedding))
     .filter((item) => isStrongMatch(item.lexicalStats));
 
-  const finalMatches = rankedCandidates
+  const sqlMatches = rankedCandidates
     .sort((left, right) => right.finalScore - left.finalScore)
     .slice(0, topK)
     .map((item) => {
@@ -850,6 +947,30 @@ app.post("/api/ai/chat/query", async (request) => {
       };
     });
 
+  let mergedMatches: MatchEntry[] = sqlMatches.length > 0 ? sqlMatches : racerMatches;
+
+  // Enforce document-level permissions for non-admin users
+  if (user.role !== "admin" && user.role !== "moderator") {
+    const access = await prisma.userDocumentAccess.findUnique({ where: { userId: user.id } });
+    if (access && !access.allowAll && access.filters) {
+      const f = access.filters as {
+        countries?: string[];
+        docTypes?: string[];
+        clients?: string[];
+        apostilledOnly?: boolean;
+      };
+      mergedMatches = mergedMatches.filter((m) => {
+        if (f.countries?.length && !f.countries.includes(m.referenceLabel ?? "")) return false;
+        if (f.docTypes?.length && !f.docTypes.includes(m.recordType)) return false;
+        if (f.apostilledOnly && !(m as any).apostillado) return false;
+        return true;
+      });
+    }
+  }
+
+  const finalMatches: MatchEntry[] = mergedMatches;
+  const serializableMatches = toJsonSafe(finalMatches);
+
   const providerContext = finalMatches
     .map(
       (match, index) =>
@@ -859,9 +980,15 @@ app.post("/api/ai/chat/query", async (request) => {
 
   let answer = buildFallbackAnswer(finalMatches);
 
-  if (shouldUseOpenAI && finalMatches.length > 0) {
+  if (shouldUseOpenAI && (finalMatches.length > 0 || intent === "clarification")) {
     try {
-      const generated = await generateOpenAIAnswer(settings.activeChatModel, message, providerContext);
+      const generated = await generateOpenAIAnswer(
+        settings.activeChatModel,
+        message,
+        providerContext,
+        historyForAI,
+        intent,
+      );
       if (generated) {
         answer = generated;
       }
@@ -870,6 +997,8 @@ app.post("/api/ai/chat/query", async (request) => {
     }
   }
 
+  const userMsgTime = new Date();
+  const assistantMsgTime = new Date(userMsgTime.getTime() + 1);
   await prisma.aiChatMessage.createMany({
     data: [
       {
@@ -877,15 +1006,22 @@ app.post("/api/ai/chat/query", async (request) => {
         userId: user.id,
         role: "user",
         content: message,
+        createdAt: userMsgTime,
       },
       {
         sessionId: session.id,
         userId: user.id,
         role: "assistant",
         content: answer,
-        sourcesJson: finalMatches,
+        sourcesJson: serializableMatches,
+        createdAt: assistantMsgTime,
       },
     ],
+  });
+
+  await prisma.aiChatSession.update({
+    where: { id: session.id },
+    data: { updatedAt: new Date() },
   });
 
   return {
@@ -895,7 +1031,9 @@ app.post("/api/ai/chat/query", async (request) => {
       modelUsed: settings.activeChatModel,
       ragMode: settings.ragMode,
       answer,
-      matches: finalMatches,
+      matches: serializableMatches,
+      intent,
+      _debug: { totalIndexed, totalVerified },
     },
     error: null,
   };
@@ -1014,6 +1152,24 @@ app.post("/auth/reset-password", async (request) => {
   });
 
   return { ok: true };
+});
+
+app.put("/api/users/me/password", async (request) => {
+  const authUser = requireAuth(request);
+  const body = request.body as { currentPassword: string; newPassword: string };
+  if (!body.currentPassword || !body.newPassword)
+    throw app.httpErrors.badRequest("currentPassword y newPassword son requeridos");
+  if (body.newPassword.length < 8)
+    throw app.httpErrors.badRequest("La nueva contraseña debe tener al menos 8 caracteres");
+  const user = await prisma.user.findUnique({ where: { id: authUser.id } });
+  if (!user) throw app.httpErrors.notFound("User not found");
+  if (!(await verifyPassword(body.currentPassword, user.passwordHash)))
+    throw app.httpErrors.badRequest("Contraseña actual incorrecta");
+  await prisma.user.update({
+    where: { id: authUser.id },
+    data: { passwordHash: await hashPassword(body.newPassword) },
+  });
+  return { data: { ok: true }, error: null };
 });
 
 app.post("/api/query/:table", async (request) => {
@@ -1419,23 +1575,35 @@ app.get("/api/storage/:bucket/file", async (request, reply) => {
     throw app.httpErrors.notFound("File not found");
   }
 
-  const extension = path.extname(absolute).toLowerCase();
   const fileName = filename || path.basename(absolute);
-  const contentType =
-    extension === ".pdf"
-      ? "application/pdf"
-      : extension === ".png"
-        ? "image/png"
-        : extension === ".jpg" || extension === ".jpeg"
-          ? "image/jpeg"
-          : "application/octet-stream";
+  return sendStoredFile(reply, absolute, fileName, download);
+});
 
-  reply.header("Content-Type", contentType);
-  const disposition = download === "1" ? "attachment" : "inline";
-  const encodedFileName = encodeURIComponent(fileName);
-  reply.header("Content-Disposition", `${disposition}; filename="${fileName}"; filename*=UTF-8''${encodedFileName}`);
+app.get("/api/storage/certificates/smart-cities-file", async (request, reply) => {
+  const { name, download } = request.query as { name: string; download?: string };
+  if (!name?.trim()) {
+    throw app.httpErrors.badRequest("Name is required");
+  }
 
-  return reply.send(await fs.readFile(absolute));
+  const baseDir = bucketFilePath("certificates", "smart-cities-ingest");
+  if (!(await fileExists(baseDir))) {
+    throw app.httpErrors.notFound("Smart Cities ingest folder not found");
+  }
+
+  const targetName = normalizeLookupName(name);
+  const files = (await fs.readdir(baseDir)).filter((entry) => entry.toLowerCase().endsWith(".pdf"));
+
+  const exact = files.find((entry) => normalizeLookupName(entry) === targetName);
+  const partial = exact
+    ? exact
+    : files.find((entry) => normalizeLookupName(entry).includes(targetName) || targetName.includes(normalizeLookupName(entry)));
+
+  if (!partial) {
+    throw app.httpErrors.notFound(`File not found for citation: ${name}`);
+  }
+
+  const absolute = path.join(baseDir, partial);
+  return sendStoredFile(reply, absolute, partial, download);
 });
 
 app.setErrorHandler((error: any, _request, reply) => {
@@ -1447,7 +1615,8 @@ app.setErrorHandler((error: any, _request, reply) => {
     },
   });
 });
-// ── RACER Smart Cities RAG proxy ──────────────────────────────────────────
+
+// ── RACER Smart Cities RAG proxy ────────────────────────────────────────────
 const RACER_URL = process.env.RACER_URL ?? "http://localhost:8000";
 
 async function sendPdfToRacer(absolutePath: string, fileName: string, documentId?: string) {
@@ -1628,7 +1797,7 @@ app.post("/api/racer/ingest", async (req, reply) => {
   }
 });
 
-// ── RACER document management ─────────────────────────────────────────────
+// ── RACER document management ────────────────────────────────────────────────
 
 app.get("/api/racer/documents", async (req, reply) => {
   requireAuth(req);
@@ -1706,7 +1875,7 @@ app.get("/api/stats/dashboard", async (req, reply) => {
   const activities: ActivityItem[] = [];
 
   for (const cert of recentCerts) {
-    const userName = (cert as any).user?.profile?.fullName || (cert as any).user?.email || "Usuario";
+    const userName = (cert as any).user?.profile?.fullName || (cert as any).user?.email || "Usuário";
     activities.push({
       id: cert.id,
       action: cert.isVerified ? "added_certificate" : "submitted_certificate",
@@ -1717,7 +1886,7 @@ app.get("/api/stats/dashboard", async (req, reply) => {
     });
   }
   for (const story of recentStories) {
-    const userName = (story as any).user?.profile?.fullName || (story as any).user?.email || "Usuario";
+    const userName = (story as any).user?.profile?.fullName || (story as any).user?.email || "Usuário";
     activities.push({
       id: story.id,
       action: story.isVerified ? "published_story" : "submitted_story",
@@ -1745,7 +1914,7 @@ app.get("/api/stats/dashboard", async (req, reply) => {
   });
 });
 
-// ── Seed RACER documents as certificates ──────────────────────────────────
+// ── Seed RACER documents as certificates ──────────────────────────────────────────────────────
 app.post("/api/admin/seed-racer", async (req, reply) => {
   const user = requireAdmin(req);
   const metadataPath = path.join(process.cwd(), "../racer/data/metadata.jsonl");
@@ -1835,7 +2004,6 @@ app.get("/api/usage/summary", async (req) => {
   const profileMap = new Map(profiles.map((p) => [p.userId, p.fullName]));
   const emailMap = new Map(users.map((u) => [u.id, u.email]));
 
-  // per-user aggregation
   const byUser = new Map<string, {
     userId: string; name: string; email: string;
     pageVisits: number; totalTimeSec: number;
@@ -1873,7 +2041,6 @@ app.get("/api/usage/summary", async (req) => {
     if (e.eventType === "tab_click") u.tabClicks++;
   }
 
-  // top pages
   const pageCount = new Map<string, { visits: number; totalMs: number }>();
   for (const e of events) {
     if (e.eventType === "page_visit" && e.page) {
@@ -1892,14 +2059,12 @@ app.get("/api/usage/summary", async (req) => {
     .sort((a, b) => b.visits - a.visits)
     .slice(0, 10);
 
-  // hourly activity (last 7 days)
   const hourly = new Array(24).fill(0);
   const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
   for (const e of events) {
     if (e.createdAt.getTime() > cutoff) hourly[e.createdAt.getHours()]++;
   }
 
-  // tab click breakdown
   const tabCount = new Map<string, number>();
   for (const e of events) {
     if (e.eventType === "tab_click" && e.metadata) {
@@ -1927,6 +2092,56 @@ app.get("/api/usage/summary", async (req) => {
     },
     error: null,
   };
+});
+
+// ── Admin: Chat Audit ──────────────────────────────────────────────────────
+app.get("/api/admin/chat/sessions", async (request) => {
+  requireAdmin(request);
+  const sessions = await prisma.aiChatSession.findMany({
+    orderBy: { updatedAt: "desc" },
+    take: 500,
+    include: {
+      user: { select: { id: true, email: true, profile: { select: { fullName: true } } } },
+      _count: { select: { messages: true } },
+    },
+  });
+  return {
+    data: sessions.map((s) => ({
+      id: s.id,
+      title: s.title,
+      createdAt: s.createdAt,
+      updatedAt: s.updatedAt,
+      userId: s.userId,
+      messageCount: s._count.messages,
+      user: s.user
+        ? { id: s.user.id, email: s.user.email, fullName: s.user.profile?.fullName ?? null }
+        : null,
+    })),
+    error: null,
+  };
+});
+
+// ── Admin: Document Access ──────────────────────────────────────────────────
+app.get("/api/admin/doc-access/:userId", async (request) => {
+  requireAdmin(request);
+  const userId = pathParam(request, "userId");
+  const access = await prisma.userDocumentAccess.findUnique({ where: { userId } });
+  return {
+    data: access ?? { userId, allowAll: true, filters: null },
+    error: null,
+  };
+});
+
+app.put("/api/admin/doc-access/:userId", async (request) => {
+  requireAdmin(request);
+  const userId = pathParam(request, "userId");
+  const body = request.body as { allowAll: boolean; filters?: Record<string, any> | null };
+  const data = await prisma.userDocumentAccess.upsert({
+    where: { userId },
+    create: { userId, allowAll: body.allowAll, filters: body.filters ?? null },
+    update: { allowAll: body.allowAll, filters: body.filters ?? null },
+  });
+  return { data, error: null };
 });
 
 app.listen({ port: env.port, host: env.host });

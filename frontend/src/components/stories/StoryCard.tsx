@@ -39,7 +39,7 @@ export function StoryCard({
   return (
     <div className="premium-card group overflow-hidden">
       {/* Image/Header */}
-      <div className="relative h-48 bg-gradient-secondary overflow-hidden">
+      <div className="relative h-48 bg-[linear-gradient(135deg,#171C25_0%,#1D2430_100%)] overflow-hidden">
         {image ? (
           <img 
             src={image} 
@@ -48,7 +48,7 @@ export function StoryCard({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <FileText className="w-16 h-16 text-foreground-muted" />
+            <FileText className="w-16 h-16 text-white" />
           </div>
         )}
         
@@ -65,7 +65,7 @@ export function StoryCard({
             <Button 
               variant="ghost" 
               size="sm"
-              className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm hover:bg-background/90"
+              className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all bg-[#171C25]/80 backdrop-blur-sm hover:bg-[#171C25]/90"
             >
               <MoreHorizontal className="w-4 h-4" />
             </Button>
@@ -90,10 +90,10 @@ export function StoryCard({
       {/* Content */}
       <div className="p-6 space-y-4">
         <div>
-          <h3 className="font-semibold text-lg text-foreground mb-2 line-clamp-2">
+          <h3 className="font-semibold text-lg text-[#F3F7FC] mb-2 line-clamp-2">
             {title}
           </h3>
-          <div className="flex items-center gap-2 text-sm text-foreground-secondary">
+          <div className="flex items-center gap-2 text-sm text-white">
             <span>{client}</span>
             <span>•</span>
             <span>{country}</span>
@@ -101,7 +101,7 @@ export function StoryCard({
         </div>
 
         {/* Meta Info */}
-        <div className="flex items-center justify-between text-sm text-foreground-muted">
+        <div className="flex items-center justify-between text-sm text-white">
           <span>Por {author}</span>
           <span>{new Date(createdAt).toLocaleDateString('pt-BR')}</span>
         </div>
@@ -112,7 +112,7 @@ export function StoryCard({
             <Eye className="w-4 h-4 mr-2" />
             Ver Detalhes
           </Button>
-          <Button size="sm" className="bg-gradient-primary">
+          <Button size="sm" className="bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white text-white">
             <Download className="w-4 h-4 mr-2" />
             Exportar
           </Button>
@@ -121,3 +121,4 @@ export function StoryCard({
     </div>
   );
 }
+

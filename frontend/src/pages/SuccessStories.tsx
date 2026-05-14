@@ -60,8 +60,8 @@ export default function SuccessStories() {
     <div className="flex-1 space-y-6 p-8 pt-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-gradient">{t('navigation.successStories')}</h2>
-          <p className="text-foreground-muted mt-2">
+          <h2 className="text-3xl font-bold bg-[linear-gradient(135deg,#3B82F6_0%,#6A8DFF_100%)] text-white bg-clip-text text-transparent">{t('navigation.successStories')}</h2>
+          <p className="text-white mt-2">
             {t('successStories.subtitle')}
           </p>
         </div>
@@ -88,7 +88,7 @@ export default function SuccessStories() {
           {/* View Mode Controls */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-foreground-muted">{t('common.view')}:</span>
+              <span className="text-sm font-medium text-white">{t('common.view')}:</span>
               <div className="flex border rounded-lg overflow-hidden">
                 <Button
                   variant={viewMode === 'grid' ? 'default' : 'ghost'}
@@ -116,7 +116,7 @@ export default function SuccessStories() {
           <div className="space-y-4">
             <div className="flex gap-4">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white" />
                 <Input
                   placeholder={t('successStories.searchPlaceholder')}
                   value={searchTerm}
@@ -153,7 +153,7 @@ export default function SuccessStories() {
             {/* Active Filters */}
             {selectedTags.length > 0 && (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">{t('common.tags')}:</span>
+                <span className="text-sm text-white">{t('common.tags')}:</span>
                 {selectedTags.map(tag => (
                   <Badge key={tag} variant="secondary" className="cursor-pointer" onClick={() => toggleTag(tag)}>
                     {tag} ×
@@ -176,3 +176,6 @@ export default function SuccessStories() {
     </div>
   );
 }
+
+
+

@@ -199,10 +199,18 @@ export default function Dashboard() {
   return (
     <div className="p-6 space-y-7">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="relative z-20 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">{t('dashboard.title')}</h1>
-          <p className="text-sm text-foreground-muted mt-0.5">
+          <h1
+            className="text-2xl font-bold tracking-tight"
+            style={{ color: "#FFFFFF", textShadow: "0 1px 10px rgba(0,0,0,0.28)" }}
+          >
+            {t('dashboard.title')}
+          </h1>
+          <p
+            className="text-sm mt-0.5"
+            style={{ color: "rgba(255,255,255,0.82)", textShadow: "0 1px 8px rgba(0,0,0,0.24)" }}
+          >
             {t('dashboard.subtitle')}
           </p>
         </div>
@@ -250,12 +258,12 @@ export default function Dashboard() {
           <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-warning rounded-l-xl" />
           <div className="pl-3">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-semibold text-sm text-foreground">{t('dashboard.alertsExpiring')}</h3>
+              <h3 className="font-semibold text-sm text-[#F3F7FC]">{t('dashboard.alertsExpiring')}</h3>
               <Badge variant="outline" className="text-xs font-semibold border-warning/30 text-warning bg-warning/5">
                 {certificateStats.expiringSoon}
               </Badge>
             </div>
-            <p className="text-xs text-foreground-muted leading-relaxed">{certificateStats.expiringSoon} {t('dashboard.alertsExpiringMessage')}</p>
+            <p className="text-xs text-white leading-relaxed">{certificateStats.expiringSoon} {t('dashboard.alertsExpiringMessage')}</p>
           </div>
         </div>
 
@@ -264,12 +272,12 @@ export default function Dashboard() {
           <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-info rounded-l-xl" />
           <div className="pl-3">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-semibold text-sm text-foreground">{t('dashboard.alertsPending')}</h3>
+              <h3 className="font-semibold text-sm text-[#F3F7FC]">{t('dashboard.alertsPending')}</h3>
               <Badge variant="outline" className="text-xs font-semibold border-info/30 text-info bg-info/5">
                 {dashStats ? dashStats.pendingApprovals : "..."}
               </Badge>
             </div>
-            <p className="text-xs text-foreground-muted leading-relaxed">{dashStats ? dashStats.pendingApprovals : "..."} {t('dashboard.alertsPendingMessage')}</p>
+            <p className="text-xs text-white leading-relaxed">{dashStats ? dashStats.pendingApprovals : "..."} {t('dashboard.alertsPendingMessage')}</p>
           </div>
         </div>
 
@@ -278,14 +286,14 @@ export default function Dashboard() {
           <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-success rounded-l-xl" />
           <div className="pl-3">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-semibold text-sm text-foreground">{t('dashboard.alertsGoal')}</h3>
+              <h3 className="font-semibold text-sm text-[#F3F7FC]">{t('dashboard.alertsGoal')}</h3>
               <Badge variant="outline" className="text-xs font-semibold border-success/30 text-success bg-success/5">
                 {dashStats && dashStats.totalCerts > 0
                   ? Math.round(((dashStats.totalCerts - dashStats.pendingCerts) / dashStats.totalCerts) * 100)
                   : 0}%
               </Badge>
             </div>
-            <p className="text-xs text-foreground-muted leading-relaxed mb-3">
+            <p className="text-xs text-white leading-relaxed mb-3">
               {dashStats && dashStats.totalCerts > 0
                 ? Math.round(((dashStats.totalCerts - dashStats.pendingCerts) / dashStats.totalCerts) * 100)
                 : 0}% {t('dashboard.alertsGoalMessage')}
@@ -304,14 +312,27 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Recent Documents - Takes 2/3 */}
         <div className="xl:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="relative z-20 flex items-center justify-between">
             <div>
-              <h2 className="text-base font-semibold text-foreground">
+              <h2
+                className="text-base font-semibold"
+                style={{ color: "#FFFFFF", textShadow: "0 1px 10px rgba(0,0,0,0.28)" }}
+              >
                 {t('dashboard.recentDocuments')}
               </h2>
-              <p className="text-xs text-foreground-muted mt-0.5">{recentDocuments.length} documentos recientes</p>
+              <p
+                className="text-xs mt-0.5"
+                style={{ color: "rgba(255,255,255,0.82)", textShadow: "0 1px 8px rgba(0,0,0,0.24)" }}
+              >
+                {recentDocuments.length} documentos recientes
+              </p>
             </div>
-            <Button variant="ghost" size="sm" className="text-xs text-foreground-muted hover:text-foreground h-7 px-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs hover:bg-white/[0.12]"
+              style={{ color: "#FFFFFF" }}
+            >
               {t('dashboard.viewAll')}
             </Button>
           </div>
@@ -322,12 +343,12 @@ export default function Dashboard() {
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-muted rounded-lg animate-pulse flex-shrink-0" />
+                      <div className="w-8 h-8 bg-[#232C3A] rounded-lg animate-pulse flex-shrink-0" />
                       <div className="flex-1 space-y-2">
-                        <div className="h-3.5 bg-muted rounded animate-pulse w-3/4" />
-                        <div className="h-3 bg-muted rounded animate-pulse w-1/2" />
+                        <div className="h-3.5 bg-[#232C3A] rounded animate-pulse w-3/4" />
+                        <div className="h-3 bg-[#232C3A] rounded animate-pulse w-1/2" />
                       </div>
-                      <div className="w-14 h-5 bg-muted rounded animate-pulse" />
+                      <div className="w-14 h-5 bg-[#232C3A] rounded animate-pulse" />
                     </div>
                   </div>
                 ))}
@@ -346,14 +367,14 @@ export default function Dashboard() {
                       onClick={() => handleDocumentClick(doc.id, doc.type)}
                     >
                       <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="p-1.5 bg-primary/10 rounded-md flex-shrink-0 group-hover:bg-primary/15 transition-colors">
-                          <Icon className="w-3.5 h-3.5 text-primary" />
+                        <div className="p-1.5 bg-[rgba(59,130,246,0.1)] rounded-md flex-shrink-0 group-hover:bg-[rgba(59,130,246,0.15)] transition-colors">
+                          <Icon className="w-3.5 h-3.5 text-[#3B82F6]" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-sm font-medium text-foreground truncate">
+                          <h3 className="text-sm font-medium text-[#F3F7FC] truncate">
                             {doc.title}
                           </h3>
-                          <p className="text-xs text-foreground-muted mt-0.5 truncate">
+                          <p className="text-xs text-white mt-0.5 truncate">
                             {doc.client || t('dashboard.noOrganization')} · {doc.editedBy}
                           </p>
                         </div>
@@ -371,10 +392,10 @@ export default function Dashboard() {
                           <span className="w-1 h-1 rounded-full bg-border block" />
                         )}
                         <div className="text-right w-[70px]">
-                          <p className="text-xs text-foreground-muted tabular-nums">
+                          <p className="text-xs text-white tabular-nums">
                             {new Date(doc.lastEdited).toLocaleDateString('es-CL')}
                           </p>
-                          <p className="text-[10px] text-foreground-muted/70 tabular-nums">
+                          <p className="text-[10px] text-white tabular-nums">
                             {new Date(doc.lastEdited).toLocaleTimeString('es-CL', {
                               hour: '2-digit',
                               minute: '2-digit'
@@ -388,11 +409,11 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="p-10 text-center">
-                <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center mx-auto mb-3">
-                  <FileText className="w-5 h-5 text-muted-foreground" />
+                <div className="w-10 h-10 rounded-xl bg-[rgba(35,44,58,0.5)] flex items-center justify-center mx-auto mb-3">
+                  <FileText className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-sm font-medium text-foreground mb-1">{t('dashboard.noRecentDocuments')}</h3>
-                <p className="text-xs text-foreground-muted">
+                <h3 className="text-sm font-medium text-[#F3F7FC] mb-1">{t('dashboard.noRecentDocuments')}</h3>
+                <p className="text-xs text-white">
                   {t('dashboard.noRecentDocumentsText')}
                 </p>
               </div>
@@ -402,14 +423,27 @@ export default function Dashboard() {
 
         {/* Activity Timeline - Takes 1/3 */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="relative z-20 flex items-center justify-between">
             <div>
-              <h2 className="text-base font-semibold text-foreground">
+              <h2
+                className="text-base font-semibold"
+                style={{ color: "#FFFFFF", textShadow: "0 1px 10px rgba(0,0,0,0.28)" }}
+              >
                 {t('dashboard.recentActivities')}
               </h2>
-              <p className="text-xs text-foreground-muted mt-0.5">{t('dashboard.recentActivities')}</p>
+              <p
+                className="text-xs mt-0.5"
+                style={{ color: "rgba(255,255,255,0.82)", textShadow: "0 1px 8px rgba(0,0,0,0.24)" }}
+              >
+                {t('dashboard.recentActivities')}
+              </p>
             </div>
-            <Button variant="ghost" size="sm" className="w-7 h-7 p-0 text-foreground-muted hover:text-foreground">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-7 h-7 p-0 hover:bg-white/[0.12]"
+              style={{ color: "#FFFFFF" }}
+            >
               <Clock className="w-3.5 h-3.5" />
             </Button>
           </div>
@@ -419,18 +453,18 @@ export default function Dashboard() {
               <div className="space-y-4">
                 {[1, 2, 3].map(i => (
                   <div key={i} className="flex items-start gap-3">
-                    <div className="w-5 h-5 bg-muted rounded-full animate-pulse flex-shrink-0" />
+                    <div className="w-5 h-5 bg-[#232C3A] rounded-full animate-pulse flex-shrink-0" />
                     <div className="flex-1 space-y-1.5 pt-0.5">
-                      <div className="h-3 bg-muted rounded animate-pulse" />
-                      <div className="h-2.5 bg-muted rounded animate-pulse w-1/3" />
+                      <div className="h-3 bg-[#232C3A] rounded animate-pulse" />
+                      <div className="h-2.5 bg-[#232C3A] rounded animate-pulse w-1/3" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : dashStats.recentActivity.length === 0 ? (
               <div className="text-center py-6">
-                <Clock className="w-7 h-7 text-muted-foreground/40 mx-auto mb-2" />
-                <p className="text-xs text-foreground-muted">{t('dashboard.noRecentDocuments')}</p>
+                <Clock className="w-7 h-7 text-white mx-auto mb-2" />
+                <p className="text-xs text-white">{t('dashboard.noRecentDocuments')}</p>
               </div>
             ) : (
               <div className="relative">
@@ -453,12 +487,12 @@ export default function Dashboard() {
                           }`} />
                         </div>
                         <div className="flex-1 min-w-0 pt-0.5">
-                          <p className="text-xs text-foreground leading-relaxed">
+                          <p className="text-xs text-[#F3F7FC] leading-relaxed">
                             <span className="font-semibold">{activity.user}</span>
                             {' '}{t(`dashboard.activity.${activity.action}`, { defaultValue: activity.action })}{' '}
-                            <span className="font-medium text-foreground-secondary truncate">{activity.document}</span>
+                            <span className="font-medium text-white truncate">{activity.document}</span>
                           </p>
-                          <p className="text-[10px] text-foreground-muted mt-0.5">{timeAgo(activity.time)}</p>
+                          <p className="text-[10px] text-white mt-0.5">{timeAgo(activity.time)}</p>
                         </div>
                       </div>
                     );
@@ -487,7 +521,7 @@ export default function Dashboard() {
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-lg font-semibold">{selectedDocument.title}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-sm text-white mt-1">
                       {selectedDocument.type === 'certificate' ? t('dashboard.certificate') : t('dashboard.successStory')}
                     </p>
                   </div>
@@ -518,7 +552,7 @@ export default function Dashboard() {
               {/* Descrição */}
               {selectedDocument.description && (
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">{t('dashboard.description')}</label>
+                  <label className="text-sm font-medium text-white">{t('dashboard.description')}</label>
                   <p className="mt-1 text-sm leading-relaxed">{selectedDocument.description}</p>
                 </div>
               )}
@@ -526,51 +560,51 @@ export default function Dashboard() {
               {/* Informações del documento */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">{t('dashboard.type')}</label>
+                  <label className="text-sm font-medium text-white">{t('dashboard.type')}</label>
                   <p className="mt-1">{selectedDocument.type === 'certificate' ? t('dashboard.certificate') : t('dashboard.successStory')}</p>
                 </div>
                 {selectedDocument.client && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">{t('dashboard.issuingOrganization')}</label>
+                    <label className="text-sm font-medium text-white">{t('dashboard.issuingOrganization')}</label>
                     <p className="mt-1">{selectedDocument.client}</p>
                   </div>
                 )}
                 {selectedDocument.certificate_number && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">{t('dashboard.certificateNumber')}</label>
+                    <label className="text-sm font-medium text-white">{t('dashboard.certificateNumber')}</label>
                     <p className="mt-1">{selectedDocument.certificate_number}</p>
                   </div>
                 )}
                 {selectedDocument.country && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">{t('dashboard.country')}</label>
+                    <label className="text-sm font-medium text-white">{t('dashboard.country')}</label>
                     <p className="mt-1">{selectedDocument.country}</p>
                   </div>
                 )}
                 {selectedDocument.issued_date && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">{t('dashboard.issueDate')}</label>
+                    <label className="text-sm font-medium text-white">{t('dashboard.issueDate')}</label>
                     <p className="mt-1">{new Date(selectedDocument.issued_date).toLocaleDateString('es-CL')}</p>
                   </div>
                 )}
                 {selectedDocument.contract_start_date && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">{t('dashboard.contractStart')}</label>
+                    <label className="text-sm font-medium text-white">{t('dashboard.contractStart')}</label>
                     <p className="mt-1">{new Date(selectedDocument.contract_start_date).toLocaleDateString('es-CL')}</p>
                   </div>
                 )}
                 {selectedDocument.contract_end_date && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">{t('dashboard.contractEnd')}</label>
+                    <label className="text-sm font-medium text-white">{t('dashboard.contractEnd')}</label>
                     <p className="mt-1">{new Date(selectedDocument.contract_end_date).toLocaleDateString('es-CL')}</p>
                   </div>
                 )}
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">{t('dashboard.createdAt')}</label>
+                  <label className="text-sm font-medium text-white">{t('dashboard.createdAt')}</label>
                   <p className="mt-1">{new Date(selectedDocument.created_at).toLocaleDateString('es-CL')}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">{t('dashboard.lastEdit')}</label>
+                  <label className="text-sm font-medium text-white">{t('dashboard.lastEdit')}</label>
                   <p className="mt-1">{new Date(selectedDocument.lastEdited).toLocaleDateString('es-CL')}</p>
                 </div>
               </div>
@@ -578,7 +612,7 @@ export default function Dashboard() {
               {/* Tags */}
               {selectedDocument.tags && selectedDocument.tags.length > 0 && (
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">{t('dashboard.tags')}</label>
+                  <label className="text-sm font-medium text-white">{t('dashboard.tags')}</label>
                   <div className="flex flex-wrap gap-1 mt-2">
                     {selectedDocument.tags.map((tag, index) => (
                       <Badge key={index} variant="secondary" className="text-xs">
@@ -615,3 +649,5 @@ export default function Dashboard() {
     </div>
   );
 }
+
+

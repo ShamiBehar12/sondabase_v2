@@ -435,7 +435,7 @@ export default function MyCertificates() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold text-white">{t('myCertificates.title')}</h2>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-white mt-2">
             {t('myCertificates.subtitle')}
           </p>
         </div>
@@ -486,7 +486,7 @@ export default function MyCertificates() {
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white" />
         <Input
           placeholder={t('myCertificates.searchPlaceholder')}
           value={searchTerm}
@@ -508,7 +508,7 @@ export default function MyCertificates() {
         <TabsContent value="all">
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="text-muted-foreground">{t('common.loading')}</div>
+              <div className="text-white">{t('common.loading')}</div>
             </div>
           ) : (
             <Table>
@@ -525,7 +525,7 @@ export default function MyCertificates() {
               <TableBody>
                 {filteredCertificates.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={6} className="text-center text-white py-8">
                       {t('myCertificates.noTotal')}
                     </TableCell>
                   </TableRow>
@@ -577,7 +577,7 @@ export default function MyCertificates() {
         <TabsContent value="approved">
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="text-muted-foreground">{t('common.loading')}</div>
+              <div className="text-white">{t('common.loading')}</div>
             </div>
           ) : (
             <Table>
@@ -594,7 +594,7 @@ export default function MyCertificates() {
               <TableBody>
                 {verifiedCertificates.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={6} className="text-center text-white py-8">
                       {t('myCertificates.noApproved')}
                     </TableCell>
                   </TableRow>
@@ -631,7 +631,7 @@ export default function MyCertificates() {
         <TabsContent value="pending">
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="text-muted-foreground">{t('common.loading')}</div>
+              <div className="text-white">{t('common.loading')}</div>
             </div>
           ) : (
             <Table>
@@ -648,7 +648,7 @@ export default function MyCertificates() {
               <TableBody>
                 {pendingCertificates.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={6} className="text-center text-white py-8">
                       {t('myCertificates.noPending')}
                     </TableCell>
                   </TableRow>
@@ -685,7 +685,7 @@ export default function MyCertificates() {
         <TabsContent value="rejected">
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="text-muted-foreground">{t('common.loading')}</div>
+              <div className="text-white">{t('common.loading')}</div>
             </div>
           ) : (
             <Table>
@@ -702,7 +702,7 @@ export default function MyCertificates() {
               <TableBody>
                 {rejectedCertificates.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={6} className="text-center text-white py-8">
                       {t('myCertificates.noRejected')}
                     </TableCell>
                   </TableRow>
@@ -777,3 +777,5 @@ export default function MyCertificates() {
     </div>
   );
 }
+
+

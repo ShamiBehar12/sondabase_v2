@@ -152,8 +152,8 @@ export const SuccessStoryDetailDialog = ({
 
           {/* Language Selection */}
           <div className="flex items-center gap-2 mb-4">
-            <Languages className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium text-foreground-muted">Idioma:</span>
+            <Languages className="h-4 w-4 text-[#3B82F6]" />
+            <span className="text-sm font-medium text-white">Idioma:</span>
             <div className="flex gap-1">
               <Button
                 variant={selectedLanguage === 'pt' ? 'default' : 'outline'}
@@ -188,40 +188,40 @@ export const SuccessStoryDetailDialog = ({
             {/* Basic Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {product && (
-                <div className="flex items-center gap-2 p-3 bg-surface rounded-lg">
-                  <Package className="h-5 w-5 text-primary" />
+                <div className="flex items-center gap-2 p-3 bg-[#202938] rounded-lg">
+                  <Package className="h-5 w-5 text-[#3B82F6]" />
                   <div>
-                    <p className="text-xs text-foreground-muted">Produto</p>
+                    <p className="text-xs text-white">Produto</p>
                     <p className="text-sm font-medium">{product}</p>
                   </div>
                 </div>
               )}
               
               {story.closure_year && (
-                <div className="flex items-center gap-2 p-3 bg-surface rounded-lg">
-                  <Calendar className="h-5 w-5 text-primary" />
+                <div className="flex items-center gap-2 p-3 bg-[#202938] rounded-lg">
+                  <Calendar className="h-5 w-5 text-[#3B82F6]" />
                   <div>
-                    <p className="text-xs text-foreground-muted">Ano</p>
+                    <p className="text-xs text-white">Ano</p>
                     <p className="text-sm font-medium">{story.closure_year}</p>
                   </div>
                 </div>
               )}
               
               {story.contract_value && (
-                <div className="flex items-center gap-2 p-3 bg-surface rounded-lg">
-                  <DollarSign className="h-5 w-5 text-primary" />
+                <div className="flex items-center gap-2 p-3 bg-[#202938] rounded-lg">
+                  <DollarSign className="h-5 w-5 text-[#3B82F6]" />
                   <div>
-                    <p className="text-xs text-foreground-muted">Valor</p>
+                    <p className="text-xs text-white">Valor</p>
                     <p className="text-sm font-medium">{story.contract_value}</p>
                   </div>
                 </div>
               )}
               
               {story.contract_period && (
-                <div className="flex items-center gap-2 p-3 bg-surface rounded-lg">
-                  <Calendar className="h-5 w-5 text-primary" />
+                <div className="flex items-center gap-2 p-3 bg-[#202938] rounded-lg">
+                  <Calendar className="h-5 w-5 text-[#3B82F6]" />
                   <div>
-                    <p className="text-xs text-foreground-muted">Período</p>
+                    <p className="text-xs text-white">Período</p>
                     <p className="text-sm font-medium">{story.contract_period}</p>
                   </div>
                 </div>
@@ -231,16 +231,16 @@ export const SuccessStoryDetailDialog = ({
             <Separator />
 
             {/* Main Content */}
-            <div className="bg-surface rounded-lg p-6 space-y-6">
+            <div className="bg-[#202938] rounded-lg p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Title and Client */}
                 <div className="space-y-4">
                   <div>
-                    <label className="text-xs text-foreground-muted uppercase tracking-wide font-medium">Título</label>
-                    <p className="mt-1 text-lg font-semibold text-primary">{title}</p>
+                    <label className="text-xs text-white uppercase tracking-wide font-medium">Título</label>
+                    <p className="mt-1 text-lg font-semibold text-[#3B82F6]">{title}</p>
                   </div>
                   <div>
-                    <label className="text-xs text-foreground-muted uppercase tracking-wide font-medium">Cliente/Organização</label>
+                    <label className="text-xs text-white uppercase tracking-wide font-medium">Cliente/Organização</label>
                     <p className="mt-1 text-base">{client}</p>
                   </div>
                 </div>
@@ -249,13 +249,13 @@ export const SuccessStoryDetailDialog = ({
                 <div className="space-y-4">
                   {product && (
                     <div>
-                      <label className="text-xs text-foreground-muted uppercase tracking-wide font-medium">Produto/Serviço</label>
+                      <label className="text-xs text-white uppercase tracking-wide font-medium">Produto/Serviço</label>
                       <p className="mt-1 text-base">{product}</p>
                     </div>
                   )}
                   {country && (
                     <div>
-                      <label className="text-xs text-foreground-muted uppercase tracking-wide font-medium">País</label>
+                      <label className="text-xs text-white uppercase tracking-wide font-medium">País</label>
                       <p className="mt-1 text-base">{country}</p>
                     </div>
                   )}
@@ -266,25 +266,25 @@ export const SuccessStoryDetailDialog = ({
               {(story.contract_period || story.contract_value || story.closure_year) && (
                 <div className="pt-4 border-t">
                   <h4 className="font-semibold text-base mb-3 flex items-center gap-2">
-                    <DollarSign className="h-4 w-4 text-primary" />
+                    <DollarSign className="h-4 w-4 text-[#3B82F6]" />
                     Informações del Contrato
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {story.contract_period && (
                       <div>
-                        <label className="text-xs text-foreground-muted uppercase tracking-wide font-medium">Período</label>
+                        <label className="text-xs text-white uppercase tracking-wide font-medium">Período</label>
                         <p className="mt-1 text-sm">{story.contract_period}</p>
                       </div>
                     )}
                     {story.contract_value && (
                       <div>
-                        <label className="text-xs text-foreground-muted uppercase tracking-wide font-medium">Valor</label>
+                        <label className="text-xs text-white uppercase tracking-wide font-medium">Valor</label>
                         <p className="mt-1 text-sm">{story.contract_value}</p>
                       </div>
                     )}
                     {story.closure_year && (
                       <div>
-                        <label className="text-xs text-foreground-muted uppercase tracking-wide font-medium">Ano de Encerramento</label>
+                        <label className="text-xs text-white uppercase tracking-wide font-medium">Ano de Encerramento</label>
                         <p className="mt-1 text-sm">{story.closure_year}</p>
                       </div>
                     )}
@@ -295,39 +295,39 @@ export const SuccessStoryDetailDialog = ({
 
             {/* Challenge Section */}
             {challenge && (
-              <div className="bg-surface rounded-lg p-6">
+              <div className="bg-[#202938] rounded-lg p-6">
                 <h4 className="font-semibold text-base mb-3 flex items-center gap-2">
-                  <Target className="h-4 w-4 text-primary" />
+                  <Target className="h-4 w-4 text-[#3B82F6]" />
                   Desafio
                 </h4>
                 <div className="prose prose-sm max-w-none">
-                  <p className="text-foreground leading-relaxed whitespace-pre-wrap">{challenge}</p>
+                  <p className="text-[#F3F7FC] leading-relaxed whitespace-pre-wrap">{challenge}</p>
                 </div>
               </div>
             )}
 
             {/* Solution Section */}
             {solution && (
-              <div className="bg-surface rounded-lg p-6">
+              <div className="bg-[#202938] rounded-lg p-6">
                 <h4 className="font-semibold text-base mb-3 flex items-center gap-2">
-                  <Lightbulb className="h-4 w-4 text-primary" />
+                  <Lightbulb className="h-4 w-4 text-[#3B82F6]" />
                   Solução
                 </h4>
                 <div className="prose prose-sm max-w-none">
-                  <p className="text-foreground leading-relaxed whitespace-pre-wrap">{solution}</p>
+                  <p className="text-[#F3F7FC] leading-relaxed whitespace-pre-wrap">{solution}</p>
                 </div>
               </div>
             )}
 
             {/* Benefits Section */}
             {benefits && (
-              <div className="bg-surface rounded-lg p-6">
+              <div className="bg-[#202938] rounded-lg p-6">
                 <h4 className="font-semibold text-base mb-3 flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-primary" />
+                  <TrendingUp className="h-4 w-4 text-[#3B82F6]" />
                   Benefícios
                 </h4>
                 <div className="prose prose-sm max-w-none">
-                  <p className="text-foreground leading-relaxed whitespace-pre-wrap">{benefits}</p>
+                  <p className="text-[#F3F7FC] leading-relaxed whitespace-pre-wrap">{benefits}</p>
                 </div>
               </div>
             )}
@@ -344,15 +344,15 @@ export const SuccessStoryDetailDialog = ({
                 {/* Images */}
                 <div className="space-y-4">
                   <h4 className="font-semibold flex items-center gap-2">
-                    <ImageIcon className="h-4 w-4 text-primary" />
+                    <ImageIcon className="h-4 w-4 text-[#3B82F6]" />
                     Imagens
                   </h4>
                   
                   {/* Client Logo */}
                   {imageUrls.client_logo && (
                     <div className="space-y-2">
-                      <label className="text-xs text-foreground-muted uppercase tracking-wide font-medium">Logo del Cliente</label>
-                      <div className="relative w-full h-32 rounded-lg overflow-hidden bg-surface border border-border">
+                      <label className="text-xs text-white uppercase tracking-wide font-medium">Logo del Cliente</label>
+                      <div className="relative w-full h-32 rounded-lg overflow-hidden bg-[#202938] border border-[#3E4A5F]">
                         <img
                           src={imageUrls.client_logo}
                           alt="Logo del cliente"
@@ -365,15 +365,15 @@ export const SuccessStoryDetailDialog = ({
                   {/* Story Images Grid */}
                   {['image_01', 'image_02', 'image_03', 'image_04'].some(key => imageUrls[key]) && (
                     <div className="space-y-2">
-                      <label className="text-xs text-foreground-muted uppercase tracking-wide font-medium">Imagens de la Historia</label>
+                      <label className="text-xs text-white uppercase tracking-wide font-medium">Imagens de la Historia</label>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {['image_01', 'image_02', 'image_03', 'image_04'].map((imageKey, index) => (
                           imageUrls[imageKey] && (
                             <div key={imageKey} className="space-y-2">
-                              <label className="text-xs text-foreground-muted">
+                              <label className="text-xs text-white">
                                 Imagem {index + 1}
                               </label>
-                              <div className="relative w-full h-48 rounded-lg overflow-hidden bg-surface border border-border">
+                              <div className="relative w-full h-48 rounded-lg overflow-hidden bg-[#202938] border border-[#3E4A5F]">
                                 <img
                                   src={imageUrls[imageKey]}
                                   alt={`Imagem de la historia ${index + 1}`}
@@ -390,7 +390,7 @@ export const SuccessStoryDetailDialog = ({
 
                   {/* No images message */}
                   {!imageUrls.client_logo && !['image_01', 'image_02', 'image_03', 'image_04'].some(key => imageUrls[key]) && (
-                    <div className="text-center py-8 text-foreground-muted">
+                    <div className="text-center py-8 text-white">
                       <ImageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
                       <p>Ninguna imagem associada a esta historia</p>
                     </div>
@@ -411,7 +411,7 @@ export const SuccessStoryDetailDialog = ({
                       ))}
                     </div>
                   ) : (
-                    <p className="text-foreground-muted">Ninguna tag associada</p>
+                    <p className="text-white">Ninguna tag associada</p>
                   )}
                 </div>
               </TabsContent>
@@ -422,21 +422,21 @@ export const SuccessStoryDetailDialog = ({
                   <h4 className="font-semibold">Metadados</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs text-foreground-muted uppercase tracking-wide">Status</label>
+                      <label className="text-xs text-white uppercase tracking-wide">Status</label>
                       <div className="mt-1">{getStatusBadge()}</div>
                     </div>
                     <div>
-                      <label className="text-xs text-foreground-muted uppercase tracking-wide">Verificada</label>
+                      <label className="text-xs text-white uppercase tracking-wide">Verificada</label>
                       <p className="mt-1 text-sm">{story.is_verified ? 'Sim' : 'No'}</p>
                     </div>
                     <div>
-                      <label className="text-xs text-foreground-muted uppercase tracking-wide">Data de Criação</label>
+                      <label className="text-xs text-white uppercase tracking-wide">Data de Criação</label>
                       <p className="mt-1 text-sm">
                         {story.created_at ? new Date(story.created_at).toLocaleDateString('pt-BR') : 'N/A'}
                       </p>
                     </div>
                     <div>
-                      <label className="text-xs text-foreground-muted uppercase tracking-wide">Última Atualização</label>
+                      <label className="text-xs text-white uppercase tracking-wide">Última Atualização</label>
                       <p className="mt-1 text-sm">
                         {story.updated_at ? new Date(story.updated_at).toLocaleDateString('pt-BR') : 'N/A'}
                       </p>
@@ -451,3 +451,4 @@ export const SuccessStoryDetailDialog = ({
     </Dialog>
   );
 };
+

@@ -189,13 +189,13 @@ export const CertificateList = ({
         {[...Array(6)].map((_, i) => (
           <Card key={i} className="animate-pulse">
             <CardHeader>
-              <div className="h-4 bg-muted rounded w-3/4"></div>
-              <div className="h-3 bg-muted rounded w-1/2"></div>
+              <div className="h-4 bg-[#232C3A] rounded w-3/4"></div>
+              <div className="h-3 bg-[#232C3A] rounded w-1/2"></div>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="h-3 bg-muted rounded"></div>
-                <div className="h-3 bg-muted rounded w-2/3"></div>
+                <div className="h-3 bg-[#232C3A] rounded"></div>
+                <div className="h-3 bg-[#232C3A] rounded w-2/3"></div>
               </div>
             </CardContent>
           </Card>
@@ -208,9 +208,9 @@ export const CertificateList = ({
     return (
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12">
-          <FileText className="h-12 w-12 text-muted-foreground mb-4" />
+          <FileText className="h-12 w-12 text-white mb-4" />
           <h3 className="text-lg font-semibold mb-2">{t('certificates.noCertificatesFound')}</h3>
-          <p className="text-muted-foreground text-center">
+          <p className="text-white text-center">
             {searchTerm || selectedTags.length > 0
               ? t('certificates.noCertificatesMessage')
               : t('certificates.noCertificatesInitial')}
@@ -300,10 +300,10 @@ export const CertificateList = ({
                         <Trash2 className="h-3 w-3" />
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent className="bg-surface border-border">
+                    <AlertDialogContent className="bg-[#202938] border-[#3E4A5F]">
                       <AlertDialogHeader>
-                        <AlertDialogTitle className="text-foreground">{t('common.delete')} {t('certificates.title')}</AlertDialogTitle>
-                        <AlertDialogDescription className="text-foreground-muted">
+                        <AlertDialogTitle className="text-[#F3F7FC]">{t('common.delete')} {t('certificates.title')}</AlertDialogTitle>
+                        <AlertDialogDescription className="text-white">
                           ¿Estás seguro de que deseas eliminar o certificado "{certificate.title}"? 
                           Esta acción no pode ser deshacerse.
                         </AlertDialogDescription>
@@ -312,7 +312,7 @@ export const CertificateList = ({
                         <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => deleteCertificate(certificate.id)}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          className="bg-[#E5484D] text-[#F3F7FC] hover:bg-[#E5484D]/90"
                         >
                           {t('common.delete')}
                         </AlertDialogAction>
@@ -326,12 +326,12 @@ export const CertificateList = ({
           
           <CardContent className="space-y-4">
             {getLocalizedDescription(certificate) && (
-              <p className="text-sm text-muted-foreground line-clamp-2">
+              <p className="text-sm text-white line-clamp-2">
                 {getLocalizedDescription(certificate)}
               </p>
             )}
 
-            <div className="space-y-2 text-xs text-muted-foreground">
+            <div className="space-y-2 text-xs text-white">
               {certificate.issued_date && (
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
@@ -422,11 +422,11 @@ export const CertificateList = ({
           {filteredCertificates.map((certificate) => (
             <TableRow 
               key={certificate.id}
-              className="hover:bg-muted/50 transition-colors"
+              className="hover:bg-[rgba(35,44,58,0.5)] transition-colors"
             >
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-muted-foreground" />
+                  <FileText className="h-4 w-4 text-white" />
                   {certificate.is_verified && (
                     <CheckCircle className="h-3 w-3 text-green-500" />
                   )}
@@ -439,12 +439,12 @@ export const CertificateList = ({
                     {certificate.title}
                   </div>
                   {getLocalizedDescription(certificate) && (
-                    <div className="text-xs text-muted-foreground line-clamp-1">
+                    <div className="text-xs text-white line-clamp-1">
                       {getLocalizedDescription(certificate)}
                     </div>
                   )}
                   {certificate.certificate_number && (
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-xs text-white">
                       Nº: {certificate.certificate_number}
                     </div>
                   )}
@@ -500,13 +500,13 @@ export const CertificateList = ({
                       )}
                     </>
                   ) : (
-                    <span className="text-xs text-muted-foreground">-</span>
+                    <span className="text-xs text-white">-</span>
                   )}
                 </div>
               </TableCell>
               
               <TableCell>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-xs text-white">
                   {formatFileSize(certificate.file_size)}
                 </div>
               </TableCell>
@@ -564,16 +564,16 @@ export const CertificateList = ({
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-[rgba(229,72,77,0.1)]"
                           title="Excluir"
                         >
                           <Trash2 className="h-3 w-3" />
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-surface border-border" onClick={(y) => y.stopPropagation()}>
+                      <AlertDialogContent className="bg-[#202938] border-[#3E4A5F]" onClick={(y) => y.stopPropagation()}>
                         <AlertDialogHeader>
-                          <AlertDialogTitle className="text-foreground">Confirmar exclusão</AlertDialogTitle>
-                          <AlertDialogDescription className="text-foreground-muted">
+                          <AlertDialogTitle className="text-[#F3F7FC]">Confirmar exclusão</AlertDialogTitle>
+                          <AlertDialogDescription className="text-white">
                             ¿Estás seguro de que deseas eliminar o certificado "{certificate.title}"? 
                             Esta acción no pode ser deshacerse.
                           </AlertDialogDescription>
@@ -582,7 +582,7 @@ export const CertificateList = ({
                           <AlertDialogCancel>Cancelar</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => deleteCertificate(certificate.id)}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            className="bg-[#E5484D] text-[#F3F7FC] hover:bg-[#E5484D]/90"
                           >
                             Excluir
                           </AlertDialogAction>
@@ -599,9 +599,9 @@ export const CertificateList = ({
       
       {filteredCertificates.length === 0 && (
         <div className="text-center py-12">
-          <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <FileText className="h-12 w-12 text-white mx-auto mb-4" />
           <h3 className="text-lg font-semibold mb-2">Ningún certificado encontrado</h3>
-          <p className="text-muted-foreground">
+          <p className="text-white">
             {searchTerm || selectedTags.length > 0
               ? 'Ningún certificado corresponde aos filtros aplicados.'
               : 'Tú aún no possui certificados. Comece fazendo o upload del seu primeiro certificado!'}
@@ -671,3 +671,5 @@ export const CertificateList = ({
     </>
   );
 };
+
+

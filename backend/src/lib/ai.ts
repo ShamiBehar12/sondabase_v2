@@ -5,7 +5,7 @@ export type AiRagMode = "internal" | "provider_managed";
 
 export const AI_PROVIDER_MODELS: Record<AiProviderName, { chat: string[]; embeddings: string[] }> = {
   openai: {
-    chat: ["gpt-5", "gpt-4.1"],
+    chat: ["gpt-4o-mini", "gpt-4o", "gpt-4.1", "gpt-5"],
     embeddings: ["text-embedding-3-large", "text-embedding-3-small"],
   },
   anthropic: {
@@ -21,7 +21,7 @@ export const AI_PROVIDER_MODELS: Record<AiProviderName, { chat: string[]; embedd
 export function defaultAiSettings() {
   return {
     activeProvider: "openai" as AiProviderName,
-    activeChatModel: "gpt-5",
+    activeChatModel: "gpt-4o-mini",
     activeEmbeddingModel: "text-embedding-3-large",
     ragMode: "internal" as AiRagMode,
     topK: 5,
@@ -41,113 +41,21 @@ export function tokenize(input: string) {
 }
 
 const STOPWORDS = new Set([
-  "a",
-  "al",
-  "algo",
-  "algum",
-  "alguna",
-  "alguno",
-  "ante",
-  "ano",
-  "anos",
-  "ao",
-  "aos",
-  "as",
-  "at",
-  "ate",
-  "com",
-  "como",
-  "con",
-  "contra",
-  "certificacion",
-  "certificado",
-  "certificados",
+  "a", "al", "algo", "algum", "alguna", "alguno", "ante", "ano", "anos",
+  "ao", "aos", "as", "at", "ate", "com", "como", "con", "contra",
   "count",
-  "da",
-  "das",
-  "de",
-  "del",
-  "desde",
-  "do",
-  "dos",
-  "e",
-  "el",
-  "ella",
-  "em",
-  "en",
-  "entre",
-  "era",
-  "es",
-  "esa",
-  "ese",
-  "esta",
-  "estado",
-  "este",
-  "esto",
-  "experiencia",
-  "experiencias",
-  "for",
-  "forma",
-  "ha",
-  "hasta",
-  "hay",
-  "individual",
-  "junto",
-  "la",
-  "las",
-  "le",
-  "legalmente",
-  "lo",
-  "los",
-  "mais",
-  "menos",
-  "na",
-  "nas",
-  "no",
-  "nos",
-  "o",
-  "os",
-  "ou",
-  "para",
-  "pela",
-  "pelas",
-  "pelo",
-  "pelos",
-  "per",
-  "por",
-  "porque",
-  "projeto",
-  "projetos",
-  "project",
-  "projects",
-  "proyecto",
-  "proyectos",
-  "publica",
-  "publicas",
-  "publico",
-  "publicos",
-  "que",
-  "relacionadas",
-  "relacionado",
-  "relacionados",
-  "se",
-  "sem",
-  "ser",
-  "si",
-  "sin",
-  "so",
-  "solicitado",
-  "su",
-  "sus",
-  "te",
-  "tem",
-  "to",
-  "um",
-  "uma",
-  "un",
-  "una",
-  "uno",
-  "y",
+  "da", "das", "de", "del", "desde", "do", "dos",
+  "e", "el", "ella", "em", "en", "entre", "era", "es", "esa", "ese",
+  "esta", "estado", "este", "esto", "experiencia", "experiencias",
+  "for", "forma", "ha", "hasta", "hay", "individual", "junto",
+  "la", "las", "le", "legalmente", "lo", "los",
+  "mais", "menos", "na", "nas", "no", "nos",
+  "o", "os", "ou", "para", "pela", "pelas", "pelo", "pelos",
+  "per", "por", "porque", "projeto", "projetos", "project", "projects",
+  "proyecto", "proyectos", "publica", "publicas", "publico", "publicos",
+  "que", "relacionadas", "relacionado", "relacionados",
+  "se", "sem", "ser", "si", "sin", "so", "solicitado", "su", "sus",
+  "te", "tem", "to", "um", "uma", "un", "una", "uno", "y",
 ]);
 
 const TOKEN_SYNONYMS: Record<string, string[]> = {
@@ -162,10 +70,7 @@ const TOKEN_SYNONYMS: Record<string, string[]> = {
 };
 
 function normalizeForSearch(input: string) {
-  return input
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "");
+  return input.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
 }
 
 function isRelevantToken(token: string) {
@@ -433,4 +338,30 @@ export function buildFallbackAnswer(matches: Array<{
   const thirdSentence = matchTerms ? `Principais matches: ${matchTerms}.` : null;
 
   return [firstSentence, secondSentence, thirdSentence].filter(Boolean).join(" ");
+}
+
+export function classifyQueryIntent(
+  message: string,
+  history: Array<{ role: string; content: string }>,
+): "rag" | "clarification" {
+  if (history.length < 2) return "rag";
+  const lower = message.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+  const clarificationPatterns = [
+    /\b(ese|eso|este|esto|esa|esta|aquel|aquello)\b/,
+    /\b(that|this|those|these)\b/,
+    /\b(el|la|los|las) (certificado|documento|resultado|primero|segundo|tercero|ultimo|anterior|mencionado)\b/,
+    /^(y |e |pero |ademas |tambien |and |but |also )/,
+    /\b(explica|explicame|detalla|amplia|elabora|cuentame mas|dime mas)\b/,
+    /\b(explain|elaborate|tell me more|give me more details)\b/,
+    /^(por que|porque|why|how come)\b/,
+    /\b(que significa|que quiere decir|what does|what is|what are)\b/,
+    /\b(mismo|misma|el de|la de)\b/,
+  ];
+  const tokens = meaningfulTokens(message);
+  const matchesClarification = clarificationPatterns.some((p) => p.test(lower));
+  const isShortWithoutSearchTerms =
+    tokens.length <= 3 &&
+    !/\b(busca|buscar|encuentra|muestra|show|find|search|necesito|quiero|dame|lista|listar)\b/.test(lower);
+  if (matchesClarification || isShortWithoutSearchTerms) return "clarification";
+  return "rag";
 }

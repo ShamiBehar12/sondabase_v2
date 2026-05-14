@@ -84,14 +84,14 @@ export default function Analytics() {
   if (!userRole || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#3B82F6] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!summary) {
     return (
-      <div className="p-8 text-foreground-muted text-center">
+      <div className="p-8 text-white text-center">
         No se pudo cargar la analítica.
       </div>
     );
@@ -113,10 +113,10 @@ export default function Analytics() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <BarChart3 className="w-6 h-6 text-primary" />
+          <BarChart3 className="w-6 h-6 text-[#3B82F6]" />
           Analítica de uso
         </h1>
-        <p className="text-foreground-muted text-sm mt-1">
+        <p className="text-white text-sm mt-1">
           {summary.totalEvents.toLocaleString()} eventos registrados
         </p>
       </div>
@@ -134,7 +134,7 @@ export default function Analytics() {
               <Icon className={`w-5 h-5 ${color}`} />
             </div>
             <div>
-              <p className="text-xs text-foreground-muted">{label}</p>
+              <p className="text-xs text-white">{label}</p>
               <p className="text-xl font-bold text-white">{value}</p>
             </div>
           </div>
@@ -143,13 +143,13 @@ export default function Analytics() {
 
       {/* Per-user table */}
       <div className="premium-card p-6">
-        <h2 className="text-sm font-semibold text-foreground-secondary mb-4 uppercase tracking-wider">
+        <h2 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
           Actividad por usuario
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/10 text-foreground-muted text-xs uppercase tracking-wider">
+              <tr className="border-b border-white/10 text-white text-xs uppercase tracking-wider">
                 <th className="text-left pb-3 pr-4">Usuario</th>
                 <th className="text-right pb-3 px-3">Sesiones</th>
                 <th className="text-right pb-3 px-3">Páginas</th>
@@ -164,7 +164,7 @@ export default function Analytics() {
             <tbody className="divide-y divide-white/5">
               {summary.users.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="py-8 text-center text-foreground-muted">
+                  <td colSpan={9} className="py-8 text-center text-white">
                     Sin datos aún. Los eventos se registran al navegar por la app.
                   </td>
                 </tr>
@@ -175,20 +175,20 @@ export default function Analytics() {
                   <tr key={u.userId} className="hover:bg-white/5 transition-colors">
                     <td className="py-3 pr-4">
                       <p className="font-medium text-white">{u.name}</p>
-                      <p className="text-xs text-foreground-muted">{u.email}</p>
+                      <p className="text-xs text-white">{u.email}</p>
                     </td>
-                    <td className="text-right px-3 text-foreground-secondary">{u.sessions}</td>
-                    <td className="text-right px-3 text-foreground-secondary">{u.pageVisits}</td>
-                    <td className="text-right px-3 text-foreground-secondary">{fmtSec(u.avgTimeSec)}</td>
-                    <td className="text-right px-3 text-foreground-secondary">{fmtSec(u.totalTimeSec)}</td>
-                    <td className="text-right px-3 text-foreground-secondary">{u.aiQueries}</td>
+                    <td className="text-right px-3 text-white">{u.sessions}</td>
+                    <td className="text-right px-3 text-white">{u.pageVisits}</td>
+                    <td className="text-right px-3 text-white">{fmtSec(u.avgTimeSec)}</td>
+                    <td className="text-right px-3 text-white">{fmtSec(u.totalTimeSec)}</td>
+                    <td className="text-right px-3 text-white">{u.aiQueries}</td>
                     <td className="text-right px-3">
                       <span className={u.avgAiMs > 10000 ? 'text-yellow-400' : 'text-green-400'}>
                         {u.aiQueries > 0 ? fmt(u.avgAiMs) : '—'}
                       </span>
                     </td>
-                    <td className="text-right px-3 text-foreground-secondary">{u.uploads}</td>
-                    <td className="text-right pl-3 text-foreground-secondary">{u.tabClicks}</td>
+                    <td className="text-right px-3 text-white">{u.uploads}</td>
+                    <td className="text-right pl-3 text-white">{u.tabClicks}</td>
                   </tr>
                 ))}
             </tbody>
@@ -199,22 +199,22 @@ export default function Analytics() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Top pages */}
         <div className="premium-card p-6">
-          <h2 className="text-sm font-semibold text-foreground-secondary mb-4 uppercase tracking-wider">
+          <h2 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
             Páginas más visitadas
           </h2>
           <div className="space-y-3">
             {summary.topPages.length === 0 && (
-              <p className="text-foreground-muted text-sm">Sin datos aún.</p>
+              <p className="text-white text-sm">Sin datos aún.</p>
             )}
             {summary.topPages.map((p) => (
               <div key={p.page} className="flex items-center justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-white truncate">{pageName(p.page)}</p>
-                  <p className="text-xs text-foreground-muted">{p.page}</p>
+                  <p className="text-xs text-white">{p.page}</p>
                 </div>
                 <div className="text-right flex-shrink-0">
-                  <p className="text-sm font-medium text-foreground-secondary">{p.visits} visitas</p>
-                  <p className="text-xs text-foreground-muted">{fmtSec(p.avgTimeSec)} prom.</p>
+                  <p className="text-sm font-medium text-white">{p.visits} visitas</p>
+                  <p className="text-xs text-white">{fmtSec(p.avgTimeSec)} prom.</p>
                 </div>
               </div>
             ))}
@@ -223,18 +223,18 @@ export default function Analytics() {
 
         {/* Top tabs */}
         <div className="premium-card p-6">
-          <h2 className="text-sm font-semibold text-foreground-secondary mb-4 uppercase tracking-wider flex items-center gap-2">
+          <h2 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider flex items-center gap-2">
             <MousePointerClick className="w-4 h-4" />
             Tabs más clickeadas
           </h2>
           <div className="space-y-3">
             {summary.topTabs.length === 0 && (
-              <p className="text-foreground-muted text-sm">Sin datos aún.</p>
+              <p className="text-white text-sm">Sin datos aún.</p>
             )}
             {summary.topTabs.map((t) => (
               <div key={t.tab} className="flex items-center justify-between">
                 <p className="text-sm text-white capitalize">{t.tab}</p>
-                <span className="text-sm font-medium text-foreground-secondary">{t.count}</span>
+                <span className="text-sm font-medium text-white">{t.count}</span>
               </div>
             ))}
           </div>
@@ -242,21 +242,21 @@ export default function Analytics() {
 
         {/* Hourly heatmap */}
         <div className="premium-card p-6">
-          <h2 className="text-sm font-semibold text-foreground-secondary mb-4 uppercase tracking-wider">
+          <h2 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
             Actividad por hora (últimos 7 días)
           </h2>
           <div className="flex items-end gap-1 h-24">
             {summary.hourlyActivity.map((count, hour) => (
               <div key={hour} className="flex-1 flex flex-col items-center gap-1">
                 <div
-                  className="w-full rounded-sm bg-primary/80 transition-all"
+                  className="w-full rounded-sm bg-[#3B82F6]/80 transition-all"
                   style={{ height: `${Math.round((count / maxHourly) * 80)}px`, minHeight: count > 0 ? 2 : 0 }}
                   title={`${hour}:00 — ${count} eventos`}
                 />
               </div>
             ))}
           </div>
-          <div className="flex justify-between text-xs text-foreground-muted mt-1">
+          <div className="flex justify-between text-xs text-white mt-1">
             <span>0h</span>
             <span>6h</span>
             <span>12h</span>
@@ -269,21 +269,21 @@ export default function Analytics() {
       {/* AI timing detail */}
       {totalAiQueries > 0 && (
         <div className="premium-card p-6">
-          <h2 className="text-sm font-semibold text-foreground-secondary mb-4 uppercase tracking-wider flex items-center gap-2">
+          <h2 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider flex items-center gap-2">
             <Brain className="w-4 h-4" />
             Detalle de tiempos — Asistente IA
           </h2>
           <div className="flex gap-8">
             <div>
-              <p className="text-xs text-foreground-muted">Total consultas</p>
+              <p className="text-xs text-white">Total consultas</p>
               <p className="text-2xl font-bold text-white">{totalAiQueries}</p>
             </div>
             <div>
-              <p className="text-xs text-foreground-muted">Tiempo promedio</p>
+              <p className="text-xs text-white">Tiempo promedio</p>
               <p className="text-2xl font-bold text-white">{fmt(avgAiMs)}</p>
             </div>
             <div>
-              <p className="text-xs text-foreground-muted">Tiempo total acumulado</p>
+              <p className="text-xs text-white">Tiempo total acumulado</p>
               <p className="text-2xl font-bold text-white">{fmt(totalAiMsAll)}</p>
             </div>
           </div>
@@ -292,3 +292,5 @@ export default function Analytics() {
     </div>
   );
 }
+
+

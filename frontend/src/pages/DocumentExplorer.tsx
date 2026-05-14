@@ -100,11 +100,11 @@ export default function DocumentExplorer() {
     <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-6 flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <FolderSearch className="w-6 h-6 text-primary" />
+          <h1 className="text-2xl font-bold text-[#F3F7FC] flex items-center gap-2">
+            <FolderSearch className="w-6 h-6 text-[#3B82F6]" />
             {t("navigation.documentExplorer")}
           </h1>
-          <p className="text-foreground-muted text-sm mt-1">
+          <p className="text-white text-sm mt-1">
             {loading ? t("common.loading") : `${documents.length} documents found`}
           </p>
         </div>
@@ -117,7 +117,7 @@ export default function DocumentExplorer() {
           <Filter className="w-3.5 h-3.5" />
           {t("common.filter")}
           {hasActiveFilters && (
-            <Badge className="ml-1 h-4 px-1.5 text-[10px] bg-primary text-white">
+            <Badge className="ml-1 h-4 px-1.5 text-[10px] bg-[#3B82F6] text-white">
               {[
                 filters.type !== "all",
                 !!filters.country,
@@ -135,13 +135,13 @@ export default function DocumentExplorer() {
         {showFilters && (
           <div className="premium-card p-4 w-64 flex-shrink-0 space-y-5 h-fit sticky top-4">
             <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold text-foreground uppercase tracking-wide">
+              <p className="text-xs font-semibold text-[#F3F7FC] uppercase tracking-wide">
                 {t("common.filter")}
               </p>
               {hasActiveFilters && (
                 <button
                   onClick={clearFilters}
-                  className="text-xs text-foreground-muted hover:text-error flex items-center gap-1"
+                  className="text-xs text-white hover:text-error flex items-center gap-1"
                 >
                   <X className="w-3 h-3" />
                   {t("common.clear")}
@@ -151,25 +151,25 @@ export default function DocumentExplorer() {
 
             {/* Search */}
             <div>
-              <Label className="text-xs text-foreground-muted mb-1.5 block">{t("common.search")}</Label>
+              <Label className="text-xs text-white mb-1.5 block">{t("common.search")}</Label>
               <Input
                 placeholder="Title, organization..."
                 value={filters.search}
                 onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
-                className="h-8 text-sm bg-background/50"
+                className="h-8 text-sm bg-[rgba(23,28,37,0.5)]"
               />
             </div>
 
             {/* Type */}
             <div>
-              <Label className="text-xs text-foreground-muted mb-1.5 flex items-center gap-1">
+              <Label className="text-xs text-white mb-1.5 flex items-center gap-1">
                 <FileText className="w-3 h-3" /> Type
               </Label>
               <Select
                 value={filters.type}
                 onValueChange={(v) => setFilters((f) => ({ ...f, type: v }))}
               >
-                <SelectTrigger className="h-8 text-sm bg-background/50">
+                <SelectTrigger className="h-8 text-sm bg-[rgba(23,28,37,0.5)]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -183,14 +183,14 @@ export default function DocumentExplorer() {
             {/* Country */}
             {filterOptions.countries.length > 0 && (
               <div>
-                <Label className="text-xs text-foreground-muted mb-1.5 flex items-center gap-1">
+                <Label className="text-xs text-white mb-1.5 flex items-center gap-1">
                   <MapPin className="w-3 h-3" /> {t("common.country")}
                 </Label>
                 <Select
                   value={filters.country || "__all__"}
                   onValueChange={(v) => setFilters((f) => ({ ...f, country: v === "__all__" ? "" : v }))}
                 >
-                  <SelectTrigger className="h-8 text-sm bg-background/50">
+                  <SelectTrigger className="h-8 text-sm bg-[rgba(23,28,37,0.5)]">
                     <SelectValue placeholder="All countries" />
                   </SelectTrigger>
                   <SelectContent>
@@ -206,14 +206,14 @@ export default function DocumentExplorer() {
             {/* Organization */}
             {filterOptions.organizations.length > 0 && (
               <div>
-                <Label className="text-xs text-foreground-muted mb-1.5 flex items-center gap-1">
+                <Label className="text-xs text-white mb-1.5 flex items-center gap-1">
                   <Building2 className="w-3 h-3" /> {t("common.organization")}
                 </Label>
                 <Select
                   value={filters.organization || "__all__"}
                   onValueChange={(v) => setFilters((f) => ({ ...f, organization: v === "__all__" ? "" : v }))}
                 >
-                  <SelectTrigger className="h-8 text-sm bg-background/50">
+                  <SelectTrigger className="h-8 text-sm bg-[rgba(23,28,37,0.5)]">
                     <SelectValue placeholder="All organizations" />
                   </SelectTrigger>
                   <SelectContent>
@@ -229,14 +229,14 @@ export default function DocumentExplorer() {
             {/* Year */}
             {filterOptions.years.length > 0 && (
               <div>
-                <Label className="text-xs text-foreground-muted mb-1.5 flex items-center gap-1">
+                <Label className="text-xs text-white mb-1.5 flex items-center gap-1">
                   <Calendar className="w-3 h-3" /> Year
                 </Label>
                 <Select
                   value={filters.year || "__all__"}
                   onValueChange={(v) => setFilters((f) => ({ ...f, year: v === "__all__" ? "" : v }))}
                 >
-                  <SelectTrigger className="h-8 text-sm bg-background/50">
+                  <SelectTrigger className="h-8 text-sm bg-[rgba(23,28,37,0.5)]">
                     <SelectValue placeholder="All years" />
                   </SelectTrigger>
                   <SelectContent>
@@ -252,7 +252,7 @@ export default function DocumentExplorer() {
             {/* Tags */}
             {filterOptions.tags.length > 0 && (
               <div>
-                <Label className="text-xs text-foreground-muted mb-1.5 flex items-center gap-1">
+                <Label className="text-xs text-white mb-1.5 flex items-center gap-1">
                   <Tag className="w-3 h-3" /> {t("common.tags")}
                 </Label>
                 <div className="space-y-1.5 max-h-40 overflow-y-auto">
@@ -264,7 +264,7 @@ export default function DocumentExplorer() {
                         onCheckedChange={() => toggleTag(tag)}
                         className="h-3.5 w-3.5"
                       />
-                      <Label htmlFor={`tag-${tag}`} className="text-xs text-foreground-secondary cursor-pointer">
+                      <Label htmlFor={`tag-${tag}`} className="text-xs text-white cursor-pointer">
                         {tag}
                       </Label>
                     </div>
@@ -278,15 +278,15 @@ export default function DocumentExplorer() {
         {/* Results */}
         <div className="flex-1 min-w-0">
           {loading ? (
-            <div className="premium-card flex items-center justify-center h-48 text-foreground-muted">
+            <div className="premium-card flex items-center justify-center h-48 text-white">
               {t("common.loading")}
             </div>
           ) : documents.length === 0 ? (
-            <div className="premium-card flex flex-col items-center justify-center h-48 text-foreground-muted gap-2">
+            <div className="premium-card flex flex-col items-center justify-center h-48 text-white gap-2">
               <FolderSearch className="w-10 h-10 opacity-30" />
               <p className="text-sm">No documents found</p>
               {hasActiveFilters && (
-                <button onClick={clearFilters} className="text-xs text-primary hover:underline">
+                <button onClick={clearFilters} className="text-xs text-[#3B82F6] hover:underline">
                   Clear filters
                 </button>
               )}
@@ -299,42 +299,42 @@ export default function DocumentExplorer() {
                   className="premium-card p-4 flex flex-col gap-2 hover:border-white/[0.13] transition-colors cursor-default"
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <div className="w-7 h-7 rounded-lg bg-[rgba(59,130,246,0.1)] flex items-center justify-center flex-shrink-0">
                       {doc.type === "story" ? (
-                        <FileText className="w-3.5 h-3.5 text-primary" />
+                        <FileText className="w-3.5 h-3.5 text-[#3B82F6]" />
                       ) : (
-                        <Award className="w-3.5 h-3.5 text-primary" />
+                        <Award className="w-3.5 h-3.5 text-[#3B82F6]" />
                       )}
                     </div>
                     <Badge
                       variant="outline"
-                      className="text-[10px] h-4 px-1.5 capitalize border-border/60 text-foreground-muted"
+                      className="text-[10px] h-4 px-1.5 capitalize border-[rgba(62,74,95,0.6)] text-white"
                     >
                       {doc.type === "story" ? "Story" : "Certificate"}
                     </Badge>
                   </div>
 
                   <div>
-                    <p className="text-sm font-semibold text-foreground leading-tight line-clamp-2">
+                    <p className="text-sm font-semibold text-[#F3F7FC] leading-tight line-clamp-2">
                       {doc.title}
                     </p>
                   </div>
 
                   <div className="space-y-1 mt-auto">
                     {doc.organization && (
-                      <div className="flex items-center gap-1.5 text-xs text-foreground-muted">
+                      <div className="flex items-center gap-1.5 text-xs text-white">
                         <Building2 className="w-3 h-3 flex-shrink-0" />
                         <span className="truncate">{doc.organization}</span>
                       </div>
                     )}
                     {doc.country && (
-                      <div className="flex items-center gap-1.5 text-xs text-foreground-muted">
+                      <div className="flex items-center gap-1.5 text-xs text-white">
                         <MapPin className="w-3 h-3 flex-shrink-0" />
                         <span>{doc.country}</span>
                       </div>
                     )}
                     {doc.year && (
-                      <div className="flex items-center gap-1.5 text-xs text-foreground-muted">
+                      <div className="flex items-center gap-1.5 text-xs text-white">
                         <Calendar className="w-3 h-3 flex-shrink-0" />
                         <span>{doc.year}</span>
                       </div>
@@ -342,17 +342,17 @@ export default function DocumentExplorer() {
                   </div>
 
                   {doc.tags && doc.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 pt-1 border-t border-border/30">
+                    <div className="flex flex-wrap gap-1 pt-1 border-t border-[rgba(62,74,95,0.3)]">
                       {doc.tags.slice(0, 4).map((tag) => (
                         <span
                           key={tag}
-                          className="text-[10px] px-1.5 py-0.5 rounded bg-white/[0.04] text-foreground-muted border border-border/30"
+                          className="text-[10px] px-1.5 py-0.5 rounded bg-white/[0.04] text-white border border-[rgba(62,74,95,0.3)]"
                         >
                           {tag}
                         </span>
                       ))}
                       {doc.tags.length > 4 && (
-                        <span className="text-[10px] text-foreground-muted">+{doc.tags.length - 4}</span>
+                        <span className="text-[10px] text-white">+{doc.tags.length - 4}</span>
                       )}
                     </div>
                   )}
@@ -365,3 +365,5 @@ export default function DocumentExplorer() {
     </div>
   );
 }
+
+

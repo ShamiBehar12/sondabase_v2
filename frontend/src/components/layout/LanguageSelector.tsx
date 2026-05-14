@@ -67,7 +67,7 @@ export function LanguageSelector() {
             key={language.code}
             onClick={() => changeLanguage(language.code)}
             className={`cursor-pointer ${
-              i18n.language === language.code ? 'bg-accent' : ''
+              i18n.language === language.code ? 'bg-[#3B82F6]' : ''
             }`}
           >
             <span className="mr-2">{language.flag}</span>
@@ -78,3 +78,4 @@ export function LanguageSelector() {
     </DropdownMenu>
   );
 }
+

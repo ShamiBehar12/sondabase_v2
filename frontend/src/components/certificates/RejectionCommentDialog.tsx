@@ -126,7 +126,7 @@ export function RejectionCommentDialog({
               <Skeleton className="h-4 w-32" />
             </div>
           ) : rejectionComments.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-8 text-white">
               {t('myCertificates.noRejected')}
             </div>
           ) : (
@@ -138,18 +138,18 @@ export function RejectionCommentDialog({
                       <Badge variant="destructive">
                         {t('myCertificates.statusRejected')}
                       </Badge>
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-sm text-white">
                         {comment.admin_name}
                       </span>
                     </div>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs text-white">
                       {format(new Date(comment.created_at), 'dd/MM/yyyy HH:mm', {
                         locale: getDateLocale()
                       })}
                     </span>
                   </div>
                   
-                  <div className="bg-muted/50 rounded-lg p-4">
+                  <div className="bg-[rgba(35,44,58,0.5)] rounded-lg p-4">
                     <p className="text-sm whitespace-pre-wrap">
                       {comment.rejection_reason}
                     </p>
@@ -165,3 +165,5 @@ export function RejectionCommentDialog({
     </Dialog>
   );
 }
+
+

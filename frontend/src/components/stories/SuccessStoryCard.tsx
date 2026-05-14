@@ -67,12 +67,12 @@ export const SuccessStoryCard = ({
           <div className="flex items-center justify-between gap-4">
             <div className="flex-1 min-w-0">
               {/* Título */}
-              <h3 className="text-lg font-semibold text-foreground line-clamp-1 mb-2">
+              <h3 className="text-lg font-semibold text-[#F3F7FC] line-clamp-1 mb-2">
                 {title}
               </h3>
               
               {/* Informações em linha horizontal SEM quebra */}
-              <div className="flex items-center gap-4 text-sm text-foreground-muted overflow-x-auto scrollbar-hide">
+              <div className="flex items-center gap-4 text-sm text-white overflow-x-auto scrollbar-hide">
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <Building2 className="h-4 w-4" />
                   <span className="whitespace-nowrap">{client}</span>
@@ -212,7 +212,7 @@ export const SuccessStoryCard = ({
 
       <CardContent className="pt-0 space-y-3">
         {/* Informações organizadas horizontalmente */}
-        <div className="flex items-center gap-3 text-sm text-foreground-muted flex-wrap">
+        <div className="flex items-center gap-3 text-sm text-white flex-wrap">
           {country && (
             <div className="flex items-center gap-1">
               <MapPin className="h-4 w-4 flex-shrink-0" />
@@ -258,3 +258,4 @@ export const SuccessStoryCard = ({
     </Card>
   );
 };
+

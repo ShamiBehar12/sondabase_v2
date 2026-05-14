@@ -102,8 +102,8 @@ export function ProfessionalCertificateCard({
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
-              <GraduationCap className="h-5 w-5 text-primary flex-shrink-0" />
-              <h3 className="font-semibold text-foreground line-clamp-2 leading-tight">
+              <GraduationCap className="h-5 w-5 text-[#3B82F6] flex-shrink-0" />
+              <h3 className="font-semibold text-[#F3F7FC] line-clamp-2 leading-tight">
                 {certificate.title}
               </h3>
             </div>
@@ -150,7 +150,7 @@ export function ProfessionalCertificateCard({
               variant="ghost"
               size="sm"
               onClick={() => onDownload(certificate)}
-              className="opacity-0 group-hover:opacity-100 transition-opacity"
+              className="opacity-0 group-hover:opacity-100 transition-all"
             >
               <Download className="h-4 w-4" />
             </Button>
@@ -158,7 +158,7 @@ export function ProfessionalCertificateCard({
               variant="ghost"
               size="sm"
               onClick={() => onEdit(certificate)}
-              className="opacity-0 group-hover:opacity-100 transition-opacity"
+              className="opacity-0 group-hover:opacity-100 transition-all"
             >
               <Edit className="h-4 w-4" />
             </Button>
@@ -166,7 +166,7 @@ export function ProfessionalCertificateCard({
               variant="ghost"
               size="sm"
               onClick={() => onDelete(certificate.id)}
-              className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
+              className="opacity-0 group-hover:opacity-100 transition-all text-destructive hover:text-destructive"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -176,21 +176,21 @@ export function ProfessionalCertificateCard({
 
       <CardContent className="pt-0 space-y-3">
         {certificate.description && (
-          <p className="text-sm text-foreground-muted line-clamp-2">
+          <p className="text-sm text-white line-clamp-2">
             {certificate.description}
           </p>
         )}
 
         <div className="space-y-2 text-sm">
           {certificate.institution && (
-            <div className="flex items-center gap-2 text-foreground-muted">
+            <div className="flex items-center gap-2 text-white">
               <Building2 className="h-4 w-4 flex-shrink-0" />
               <span className="truncate">{certificate.institution}</span>
             </div>
           )}
 
           {certificate.professional_council && (
-            <div className="flex items-center gap-2 text-foreground-muted">
+            <div className="flex items-center gap-2 text-white">
               <FileText className="h-4 w-4 flex-shrink-0" />
               <span className="truncate">
                 {certificate.professional_council}
@@ -202,7 +202,7 @@ export function ProfessionalCertificateCard({
           )}
 
           {(certificate.country || certificate.state_province || certificate.city) && (
-            <div className="flex items-center gap-2 text-foreground-muted">
+            <div className="flex items-center gap-2 text-white">
               <MapPin className="h-4 w-4 flex-shrink-0" />
               <span className="truncate">
                 {[certificate.city, certificate.state_province, certificate.country]
@@ -214,7 +214,7 @@ export function ProfessionalCertificateCard({
           )}
 
           {(certificate.issued_date || certificate.valid_until) && (
-            <div className="flex items-center gap-2 text-foreground-muted">
+            <div className="flex items-center gap-2 text-white">
               <Calendar className="h-4 w-4 flex-shrink-0" />
               <span className="truncate">
                 {certificate.issued_date && `Emitido: ${formatDate(certificate.issued_date)}`}
@@ -225,7 +225,7 @@ export function ProfessionalCertificateCard({
           )}
 
           {certificate.course_hours && (
-            <div className="flex items-center gap-2 text-foreground-muted">
+            <div className="flex items-center gap-2 text-white">
               <Clock className="h-4 w-4 flex-shrink-0" />
               <span>{certificate.course_hours}h de carga horária</span>
             </div>
@@ -258,3 +258,4 @@ export function ProfessionalCertificateCard({
     </Card>
   );
 }
+

@@ -27,6 +27,7 @@ model User {
   aiSettingsUpdates   AiSettings[]   @relation("AiSettingsUpdatedBy")
   aiMessages          AiChatMessage[]
   aiDocumentIndexes   AiDocumentIndex[]
+  documentAccess      UserDocumentAccess?
 
   @@map("users")
 }
@@ -417,6 +418,18 @@ model AiChatMessage {
 
   @@index([sessionId, createdAt])
   @@map("ai_chat_messages")
+}
+
+model UserDocumentAccess {
+  id        String   @id @default(uuid()) @db.Char(36)
+  userId    String   @unique @map("user_id") @db.Char(36)
+  allowAll  Boolean  @default(true) @map("allow_all")
+  filters   Json?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_document_access")
 }
 
 model AnalyticsEvent {
